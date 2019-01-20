@@ -1,0 +1,31 @@
+{
+  "name": "kata-checkout-order-total",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "tsc --outDir dist test/test.spec.ts && jasmine dist/test/test.spec.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/calledtoconstruct/kata-checkout-order-total.git"
+  },
+  "author": "Joseph Woolley",
+  "license": "",
+  "bugs": {
+    "url": "https://github.com/calledtoconstruct/kata-checkout-order-total/issues"
+  },
+  "homepage": "https://github.com/calledtoconstruct/kata-checkout-order-total#readme",
+  "dependencies": {
+    "@types/jasmine": "^3.3.7",
+    "jasmine": "^3.3.1",
+    "karma": "^3.1.4"
+  },
+  "devDependencies": {
+    "tslint": "^5.12.1",
+    "typescript": "^3.2.4"
+  }
+}
