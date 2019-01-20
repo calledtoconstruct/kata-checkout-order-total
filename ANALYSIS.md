@@ -375,13 +375,13 @@ $92.00
 **When** calculating the item total
 **Then** the item total is calculated using the algorithm provided below.
 
-
 ```
 collect all items matching item code
 and sort items from highest cost (item_weight * item_price) to lowest cost
 
 for each item:
-    if item number modula (bulk_quantity + sale_quantity) does not equal zero, add (item_weight * item_price) to item_total
+    let index = item number (one based) modula (bulk_quantity + sale_quantity)
+    if index is between 1 and bulk_quantity inclusive then add (item_weight * item_price) to item_total
     otherwise add (item_weight * item_price * discount_percentage) to item_total
 
 bulk_quantity = 2
@@ -402,18 +402,22 @@ sorted items:
 
 item_total = $0.00
 -> 10 ounces at $0.25 per ounce ($2.50)
+index = 1
 item_total = item_total + $2.50
 item_total = $0.00 + $2.50
 item_total = $2.50
 -> 12 ounces at $0.20 per ounce ($2.40)
+index = 2
 item_total = item_total + $2.40
 item_total = $2.50 + $2.40
 item_total = $4.90
 -> 5 ounces at $0.30 per ounce ($1.50)
+index = 0
 item_total = item_total + ($1.50 * 50%)
 item_total = $4.90 + $0.75
 item_total = $5.65
 -> 10 ounces at $0.10 per ounce ($1.00)
+index = 1
 item_total = item_total + $1.00
 item_total = $5.65 + $1.00
 item_total = $6.65
@@ -442,33 +446,40 @@ sorted items:
 
 item_total = $0.00
 -> 12 ounces at $0.30 per ounce ($3.60)
+index = 1
 item_total = item_total + $3.60
 item_total = $0.00 + $3.60
 item_total = $3.60
 -> 10 ounces at $0.25 per ounce ($2.50)
-item_total = item_total + $2.50
-item_total = $3.60 + $2.50
-item_total = $6.10
--> 10 ounces at $0.25 per ounce ($2.50)
+index = 2 (greater than bulk_quantity, discount applies)
 item_total = item_total + ($2.50 * 50%)
-item_total = $6.10 + $1.25
-item_total = $7.35
+item_total = $3.60 + $1.25
+item_total = $4.85
+-> 10 ounces at $0.25 per ounce ($2.50)
+index = 0 (discount applies)
+item_total = item_total + ($2.50 * 50%)
+item_total = $4.85 + $1.25
+item_total = $6.10
 -> 12 ounces at $0.20 per ounce ($2.40)
+index = 1
 item_total = item_total + $2.40
-item_total = $7.35 + $2.40
-item_total = $9.75
+item_total = $6.10 + $2.40
+item_total = $8.50
 -> 5 ounces at $0.30 per ounce ($1.50)
-item_total = item_total + $1.50
-item_total = $9.75 + $1.50
-item_total = $11.25
+index = 2 (greater than bulk_quantity, discount applies)
+item_total = item_total + ($1.50 * 50%)
+item_total = $8.50 + $0.75
+item_total = $9.25
 -> 10 ounces at $0.10 per ounce ($1.00)
+index = 0 (discount applies)
 item_total = item_total + ($1.00 * 50%)
-item_total = $11.25 + $0.50
-item_total = $11.75
+item_total = $9.25 + $0.50
+item_total = $9.75
 -> 10 ounces at $0.10 per ounce ($1.00)
+index = 1
 item_total = item_total + $1.00
-item_total = $11.75 + $1.00
-item_total = $12.75
+item_total = $9.75 + $1.00
+item_total = $10.75
 ```
 
 ## *As a customer, I want the ability to see the transaction total, so that I can be sure I am not overspending my budget.*
