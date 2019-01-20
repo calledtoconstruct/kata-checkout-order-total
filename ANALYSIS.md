@@ -65,6 +65,13 @@
 **When** adding the rule
 **Then** the collection contains the rule.
 
+> buy 2 packages of (by weight item) get 1 package of equal or lesser value for 50% off
+
+**Given** a collection of pricing rules
+**And** a new rule containing a start date, end date, item code, bulk quantity, sale quantity, and discount percentage
+**When** adding the rule
+**Then** the collection contains the rule.
+
 > multiple discounts for an item
 
 **Given** a collection of pricing rules
@@ -249,15 +256,220 @@ $60.00
 
 > buy 3 get 1 for 100% off limit 8
 
+**Given** a transaction
+**And** an item with the item type `by quantity`
+**And** a discount rule for the same item code
+**And** the discount rule contains a start date, end date, item code, bulk quantity, sale quantity, discount percentage, and maximum discount quantity
+**And** the item quantity equals or exceeds the discount quantity
+**And** today's date is between the start date and end date inclusive
+**When** calculating the item total
+**Then** the item total is calculated using the algorithm provided below.
+
+```
+item_quantity = 11
+item_price = $10.00
+bulk_quantity = 3
+sale_quantity = 1
+discount_percentage = 100%
+max_discount_quantity = 8
+
+over_quantity = (item_quantity % max_discount_quantity)
+under_quantity = (item_quantity - over_quantity)
+discount_quantity = (bulk_quantity + sale_quantity)
+
+over_quantity = 11 % 8
+over_quantity = 3
+
+under_quantity = 11 - 3
+under_quantity = 8
+
+discount_quantity = 3 + 1
+discount_quantity = 4
+
+(floor(under_quantity / discount_quantity) * ((bulk_quantity * item_price) + (sale_quantity * item_price * (100 - discount_percentage)))) + (((under_quantity % discount_quantity) + over_quantity) * item_price)
+
+(floor(8 / 4) * ((3 * $10.00) + (1 * $10.00 * (100 - 100%)))) + (((8 % 4) + 3) * $10.00)
+(2 * ($30.00 + (1 * $10.00 * 0.0))) + ((0 + 3) * $10.00)
+(2 * ($30.00 + $0.00)) + (3 * $10.00)
+(2 * $30.00) + $30.00
+$60.00 + $30.00
+$90.00
+```
 
 > buy 2 get 1 for $1.00
 
+**Given** a transaction
+**And** an item with the item type `by quantity`
+**And** a discount rule for the same item code
+**And** the discount rule contains a start date, end date, item code, bulk quantity, sale quantity, and discount price
+**And** the item quantity equals or exceeds the discount quantity
+**And** today's date is between the start date and end date inclusive
+**When** calculating the item total
+**Then** the item total is the sum of the floor of the item quantity divided by the sum of the bulk quantity and the sale quantity times the sum of the bulk quantity times the item price and the sale quantity times the discount price and the item quantity modula the sum of the discount quantity and the sale quantity times the item price.
 
-> buy 2 get 1 for $1.00 limit 6
+```
+(floor(item_quantity / (bulk_quantity + sale_quantity)) * ((bulk_quantity * item_price) + (sale_quantity * discount_price))) + ((item_quantity % (bulk_quantity + sale_quantity)) * item_price)
+
+item_quantity = 7
+item_price = $10.00
+bulk_quantity = 2
+sale_quantity = 1
+discount_price = $1.00
+
+(floor(7 / (2 + 1)) * ((2 * $10.00) + (1 * $1.00))) + ((7 % (2 + 1)) * $10.00)
+(floor(7 / 3) * ($20.00 + $1.00)) + ((7 % 3) * $10.00)
+(2 * $21.00) + (1 * $10.00)
+$42.00 + $10.00
+$52.00
+```
+
+> buy 3 get 1 for $1.00 limit 8
+
+**Given** a transaction
+**And** an item with the item type `by quantity`
+**And** a discount rule for the same item code
+**And** the discount rule contains a start date, end date, item code, bulk quantity, sale quantity, discount price, and maximum discount quantity
+**And** the item quantity equals or exceeds the discount quantity
+**And** today's date is between the start date and end date inclusive
+**When** calculating the item total
+**Then** the item total is calculated using the algorithm provided below.
+
+```
+item_quantity = 11
+item_price = $10.00
+bulk_quantity = 3
+sale_quantity = 1
+discount_price = $1.00
+max_discount_quantity = 8
+
+over_quantity = (item_quantity % max_discount_quantity)
+under_quantity = (item_quantity - over_quantity)
+discount_quantity = (bulk_quantity + sale_quantity)
+
+over_quantity = 11 % 8
+over_quantity = 3
+
+under_quantity = 11 - 3
+under_quantity = 8
+
+discount_quantity = 3 + 1
+discount_quantity = 4
+
+(floor(under_quantity / discount_quantity) * ((bulk_quantity * item_price) + (sale_quantity * item_price * discount_price))) + (((under_quantity % discount_quantity) + over_quantity) * item_price)
+
+(floor(8 / 4) * ((3 * $10.00) + (1 * $1.00))) + (((8 % 4) + 3) * $10.00)
+(2 * ($30.00 + $1.00)) + ((0 + 3) * $10.00)
+(2 * $31.00) + (3 * $10.00)
+$62.00 + $30.00
+$92.00
+```
+
+> buy 2 packages of (by weight item) get 1 package of equal or lesser value for 50% off
+
+**Given** a transaction
+**And** an item with the item type `by weight`
+**And** a discount rule for the same item code
+**And** the discount rule contains a start date, end date, item code, bulk quantity, sale quantity, and a discount percentage
+**And** the item quantity equals or exceeds the discount quantity
+**And** today's date is between the start date and end date inclusive
+**When** calculating the item total
+**Then** the item total is calculated using the algorithm provided below.
 
 
+```
+collect all items matching item code
+and sort items from highest cost (item_weight * item_price) to lowest cost
 
+for each item:
+    if item number modula (bulk_quantity + sale_quantity) does not equal zero, add (item_weight * item_price) to item_total
+    otherwise add (item_weight * item_price * discount_percentage) to item_total
 
+bulk_quantity = 2
+sale_quantity = 1
+discount_percentage = 50%
+
+collected items:
+5 ounces at $0.30 per ounce ($1.50)
+10 ounces at $0.25 per ounce ($2.50)
+10 ounces at $0.10 per ounce ($1.00)
+12 ounces at $0.20 per ounce ($2.40)
+
+sorted items:
+10 ounces at $0.25 per ounce ($2.50)
+12 ounces at $0.20 per ounce ($2.40)
+5 ounces at $0.30 per ounce ($1.50)
+10 ounces at $0.10 per ounce ($1.00)
+
+item_total = $0.00
+-> 10 ounces at $0.25 per ounce ($2.50)
+item_total = item_total + $2.50
+item_total = $0.00 + $2.50
+item_total = $2.50
+-> 12 ounces at $0.20 per ounce ($2.40)
+item_total = item_total + $2.40
+item_total = $2.50 + $2.40
+item_total = $4.90
+-> 5 ounces at $0.30 per ounce ($1.50)
+item_total = item_total + ($1.50 * 50%)
+item_total = $4.90 + $0.75
+item_total = $5.65
+-> 10 ounces at $0.10 per ounce ($1.00)
+item_total = item_total + $1.00
+item_total = $5.65 + $1.00
+item_total = $6.65
+
+bulk_quantity = 1
+sale_quantity = 2
+discount_percentage = 50%
+
+collected items:
+5 ounces at $0.30 per ounce ($1.50)
+10 ounces at $0.25 per ounce ($2.50)
+10 ounces at $0.10 per ounce ($1.00)
+12 ounces at $0.20 per ounce ($2.40)
+12 ounces at $0.30 per ounce ($3.60)
+10 ounces at $0.25 per ounce ($2.50)
+10 ounces at $0.10 per ounce ($1.00)
+
+sorted items:
+12 ounces at $0.30 per ounce ($3.60)
+10 ounces at $0.25 per ounce ($2.50)
+10 ounces at $0.25 per ounce ($2.50)
+12 ounces at $0.20 per ounce ($2.40)
+5 ounces at $0.30 per ounce ($1.50)
+10 ounces at $0.10 per ounce ($1.00)
+10 ounces at $0.10 per ounce ($1.00)
+
+item_total = $0.00
+-> 12 ounces at $0.30 per ounce ($3.60)
+item_total = item_total + $3.60
+item_total = $0.00 + $3.60
+item_total = $3.60
+-> 10 ounces at $0.25 per ounce ($2.50)
+item_total = item_total + $2.50
+item_total = $3.60 + $2.50
+item_total = $6.10
+-> 10 ounces at $0.25 per ounce ($2.50)
+item_total = item_total + ($2.50 * 50%)
+item_total = $6.10 + $1.25
+item_total = $7.35
+-> 12 ounces at $0.20 per ounce ($2.40)
+item_total = item_total + $2.40
+item_total = $7.35 + $2.40
+item_total = $9.75
+-> 5 ounces at $0.30 per ounce ($1.50)
+item_total = item_total + $1.50
+item_total = $9.75 + $1.50
+item_total = $11.25
+-> 10 ounces at $0.10 per ounce ($1.00)
+item_total = item_total + ($1.00 * 50%)
+item_total = $11.25 + $0.50
+item_total = $11.75
+-> 10 ounces at $0.10 per ounce ($1.00)
+item_total = item_total + $1.00
+item_total = $11.75 + $1.00
+item_total = $12.75
+```
 
 ## *As a customer, I want the ability to see the transaction total, so that I can be sure I am not overspending my budget.*
 
