@@ -1,7 +1,8 @@
 
 export class Item {
     constructor(
-        public readonly code: string | null
+        public readonly code: string | null,
+        public readonly description: string | null
     ) {
     }
 }
