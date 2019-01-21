@@ -1,6 +1,6 @@
 /* global describe, it, expect, beforeEach */
 
-import { ItemList, Item, ItemListImplementation, StandardItem } from '../src/item';
+import { ItemList, Item, ItemListImplementation, StandardItem, ItemType } from '../src/item';
 
 import {
     Discount,
@@ -127,25 +127,25 @@ describe('Given a collection of Items', () => {
 
 describe('Given a collection of Pricing Rules', () => {
     class FakeByQuantityItem implements Item {
-        public readonly code: 'by quantity item';
-        public readonly type: "by quantity";
+        public readonly code: string = 'by quantity item';
+        public readonly type: ItemType = 'by quantity';
         public validate(): void {}
     }
 
     class FakeByWeightItem implements Item {
-        public readonly code: 'by weight item';
-        public readonly type: 'by weight';
+        public readonly code: string = 'by weight item';
+        public readonly type: ItemType = 'by weight';
         public validate(): void {}
     }
 
     class FakeItemList implements ItemList {
-        add(item: Item): void {
+        public add(item: Item): void {
             throw new Error("Method not implemented.");
         }
-        includes(item: Item): boolean {
+        public includes(item: Item): boolean {
             throw new Error("Method not implemented.");
         }
-        get(code: string) {
+        public get(code: string): Item {
             if (code === 'by quantity item') {
                 return new FakeByQuantityItem();
             } else if (code === 'by weight item') {
@@ -176,6 +176,38 @@ describe('Given a collection of Pricing Rules', () => {
         it('Should be added to the list', () => {
             const result = discountList.includes(item[1]);
             expect(result).toBe(true);
+        });
+
+    });
+
+    const invalidDiscountsWithItemTypeMismatch: Parameters<[string, Discount]> = new Parameters<[string, Discount]>([
+        ['standard discount item type mismatch', new StandardDiscount(new Date(), new Date(), 'by weight item', 1.0)],
+        ['bulk flat price item type mismatch', new BulkFlatPriceDiscount(new Date(), new Date(), 'by weight item', 3, 5.0)],
+        ['up sale percent discount item type mismatch', new UpSalePercentDiscount(new Date(), new Date(), 'by weight item', 2, 1, 0.5)],
+        ['limited up sale percent discount item type mismatch', new LimitedUpSalePercentDiscount(new Date(), new Date(), 'by weight item', 3, 1, 1, 8)],
+        ['up sale flat price discount item type mismatch', new UpSaleFlatPriceDiscount(new Date(), new Date(), 'by weight item', 2, 1, 1.25)],
+        ['limited up sale flat price discount item type mismatch', new LimitedUpSaleFlatPriceDiscount(new Date(), new Date(), 'by weight item', 3, 2, 1, 10)],
+        ['up sale percent discount by weight item type mismatch', new UpSalePercentDiscountByWeight(new Date(), new Date(), 'by quantity item', 2, 1, .5)]
+    ]);
+
+    invalidDiscountsWithItemTypeMismatch.forEach().describe('And an invalid discount When adding it', (item: [string, Discount]) => {
+        let error: Error | null = null;
+
+        beforeEach(() => {
+            try {
+                discountList.add(item[1]);
+            } catch (exception) {
+                error = exception;
+            }
+        });
+
+        it(item[0] + ' Should raise an error', () => {
+            expect(error).not.toBeNull();
+        });
+
+        it(item[0] + ' Should not be added to the list', () => {
+            const result = discountList.includes(item[1]);
+            expect(result).toBe(false);
         });
 
     });

@@ -1,4 +1,4 @@
-import { ItemList } from "./item";
+import { ItemList, ItemType } from "./item";
 
 export interface DiscountList {
     add(discount: Discount): void;
@@ -6,9 +6,17 @@ export interface DiscountList {
 }
 
 export interface Discount {
-    readonly startDate: Date,
-    readonly endDate: Date,
-    readonly code: string,
+    readonly startDate: Date;
+    readonly endDate: Date;
+    readonly code: string;
+    validate(itemList: ItemList): void;
+}
+
+const validateItemType: (itemList: ItemList, code: string, type: ItemType) => void = (itemList: ItemList, code: string, type: ItemType): void => {
+    const item = itemList.get(code);
+    if (item.type !== type) {
+        throw new Error('Item Type Mismatch');
+    }
 }
 
 export class StandardDiscount implements Discount {
@@ -18,6 +26,10 @@ export class StandardDiscount implements Discount {
         public readonly code: string,
         public readonly price: number
     ) {}
+
+    public validate(itemList: ItemList): void {
+        validateItemType(itemList, this.code, 'by quantity');
+    }
 }
 
 export class BulkFlatPriceDiscount implements Discount {
@@ -28,9 +40,12 @@ export class BulkFlatPriceDiscount implements Discount {
         public readonly quantity: number,
         public readonly price: number
     ) {}
+    public validate(itemList: ItemList): void {
+        validateItemType(itemList, this.code, 'by quantity');
+    }
 }
 
-class UpSaleDiscount implements Discount {
+abstract class UpSaleDiscount implements Discount {
     constructor(
         public readonly startDate: Date,
         public readonly endDate: Date,
@@ -38,6 +53,11 @@ class UpSaleDiscount implements Discount {
         public readonly bulk: number,
         public readonly sale: number
     ) {}
+    public abstract validate(itemList: ItemList): void;
+
+    protected validateItemType(itemList: ItemList, type: ItemType): void {
+        validateItemType(itemList, this.code, type);
+    }
 }
 
 export class UpSalePercentDiscount extends UpSaleDiscount {
@@ -50,6 +70,9 @@ export class UpSalePercentDiscount extends UpSaleDiscount {
         public readonly percent: number
     ) {
         super(startDate, endDate, code, bulk, sale);
+    }
+    public validate(itemList: ItemList): void {
+        super.validateItemType(itemList, 'by quantity');
     }
 }
 
@@ -65,6 +88,9 @@ export class LimitedUpSalePercentDiscount extends UpSaleDiscount {
     ) {
         super(startDate, endDate, code, bulk, sale);
     }
+    public validate(itemList: ItemList): void {
+        super.validateItemType(itemList, 'by quantity');
+    }
 }
 
 export class UpSaleFlatPriceDiscount extends UpSaleDiscount {
@@ -77,6 +103,9 @@ export class UpSaleFlatPriceDiscount extends UpSaleDiscount {
         public readonly price: number
     ) {
         super(startDate, endDate, code, bulk, sale);
+    }
+    public validate(itemList: ItemList): void {
+        super.validateItemType(itemList, 'by quantity');
     }
 }
 
@@ -92,6 +121,9 @@ export class LimitedUpSaleFlatPriceDiscount extends UpSaleDiscount {
     ) {
         super(startDate, endDate, code, bulk, sale);
     }
+    public validate(itemList: ItemList): void {
+        super.validateItemType(itemList, 'by quantity');
+    }
 }
 
 export class UpSalePercentDiscountByWeight extends UpSaleDiscount {
@@ -105,17 +137,22 @@ export class UpSalePercentDiscountByWeight extends UpSaleDiscount {
     ) {
         super(startDate, endDate, code, bulk, sale);
     }
+    public validate(itemList: ItemList): void {
+        super.validateItemType(itemList, 'by weight');
+    }
 }
 
 export class DiscountListImplementation implements DiscountList {
+    private readonly list: Array<Discount> = new Array<Discount>();
 
     constructor(private readonly itemList: ItemList) {}
     
     public add(discount: Discount): void {
-
+        discount.validate(this.itemList);
+        this.list.push(discount);
     }
 
     public includes(discount: Discount): boolean {
-        return true;
+        return this.list.indexOf(discount) !== -1;
     }
 }

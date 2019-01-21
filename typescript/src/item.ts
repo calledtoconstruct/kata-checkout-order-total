@@ -1,12 +1,15 @@
 
 export interface ItemList {
+    get(code: string): Item;
     add(item: Item): void;
     includes(item: Item): boolean;
 }
 
+export type ItemType = 'by quantity' | 'by weight' | null;
+
 export interface Item {
     readonly code: string | null;
-    readonly type: 'by quantity' | 'by weight' | null;
+    readonly type: ItemType;
     validate(): void;
 }
 
@@ -14,7 +17,7 @@ export class StandardItem implements Item {
     constructor(
         public readonly code: string | null,
         public readonly description: string | null,
-        public readonly type: 'by quantity' | 'by weight' | null,
+        public readonly type: ItemType,
         public readonly price: number | null
     ) {
     }
@@ -51,5 +54,13 @@ export class ItemListImplementation implements ItemList {
 
     public includes(item: Item): boolean {
         return this.list.indexOf(item) !== -1;
+    }
+
+    public get(code: string): Item {
+        const items = this.list.filter((value: Item): boolean => value.code === code);
+        if (items.length === 0) {
+            throw new Error('Requested Item Does Not Exist');
+        }
+        return items[0];
     }
 }
