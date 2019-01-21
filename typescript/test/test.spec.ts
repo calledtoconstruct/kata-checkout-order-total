@@ -1,7 +1,7 @@
 /* global describe, it, expect, beforeEach */
 
 import { ItemList, Item } from '../src/item';
-import { Discount, StandardDiscount, DiscountList } from '../src/discount';
+import { Discount, StandardDiscount, DiscountList, BulkFlatPriceDiscount } from '../src/discount';
 
 interface Parameterized<T> {
     it(description: string, func: (value: T) => void): void;
@@ -118,6 +118,7 @@ describe('Given a collection of Pricing Rules', () => {
 
     const validDiscounts: Parameters<[string, Discount]> = new Parameters<[string, Discount]>([
         ['standard discount', new StandardDiscount(new Date(), new Date(), 'random item code', 1.0)],
+        ['bulk flat price', new BulkFlatPriceDiscount(new Date(), new Date(), 'random item code', 3, 5.0)],
     ]);
 
     validDiscounts.forEach().describe('And a valid discount When adding it', (item: [string, Discount]) => {
