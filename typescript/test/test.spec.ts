@@ -1,6 +1,7 @@
 /* global describe, it, expect, beforeEach */
 
 import { ItemList, Item } from '../src/item';
+import { Discount, StandardDiscount, DiscountList } from '../src/discount';
 
 interface Parameterized<T> {
     it(description: string, func: (value: T) => void): void;
@@ -110,4 +111,26 @@ describe('Given a collection of Items', () => {
 
     });
     
+});
+
+describe('Given a collection of Pricing Rules', () => {
+    const discountList = new DiscountList();
+
+    const validDiscounts: Parameters<[string, Discount]> = new Parameters<[string, Discount]>([
+        ['standard discount', new StandardDiscount(new Date(), new Date(), 'random item code', 1.0)],
+    ]);
+
+    validDiscounts.forEach().describe('And a valid discount When adding it', (item: [string, Discount]) => {
+
+        beforeEach(() => {
+            discountList.add(item[1]);
+        });
+
+        it('Should be added to the list', () => {
+            const result = discountList.includes(item[1]);
+            expect(result).toBe(true);
+        });
+
+    });
+
 });
