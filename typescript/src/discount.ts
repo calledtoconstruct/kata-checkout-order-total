@@ -24,6 +24,17 @@ export class BulkFlatPriceDiscount implements Discount {
     ) {}
 }
 
+export class UpSaleDiscount implements Discount {
+    constructor(
+        public readonly startDate: Date,
+        public readonly endDate: Date,
+        public readonly code: string,
+        public readonly bulk: number,
+        public readonly sale: number,
+        public readonly percent: number
+    ) {}
+}
+
 export class DiscountList {
     
     public add(discount: Discount): void {
