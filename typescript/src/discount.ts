@@ -1,4 +1,9 @@
 
+export interface DiscountList {
+    add(discount: Discount): void;
+    includes(discount: Discount): boolean;
+}
+
 export interface Discount {
     readonly startDate: Date,
     readonly endDate: Date,
@@ -101,7 +106,7 @@ export class UpSalePercentDiscountByWeight extends UpSaleDiscount {
     }
 }
 
-export class DiscountList {
+export class DiscountListImplementation implements DiscountList {
     
     public add(discount: Discount): void {
 

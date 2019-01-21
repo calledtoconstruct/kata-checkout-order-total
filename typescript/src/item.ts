@@ -1,4 +1,9 @@
 
+export interface ItemList {
+    add(item: Item): void;
+    includes(item: Item): boolean;
+}
+
 export class Item {
     constructor(
         public readonly code: string | null,
@@ -9,7 +14,7 @@ export class Item {
     }
 }
 
-export class ItemList {
+export class ItemListImplementation implements ItemList {
     private readonly list: Array<Item> = new Array<Item>();
 
     public add(item: Item): void {

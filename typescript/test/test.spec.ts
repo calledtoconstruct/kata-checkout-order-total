@@ -1,7 +1,7 @@
 /* global describe, it, expect, beforeEach */
 
-import { ItemList, Item } from '../src/item';
-import { Discount, StandardDiscount, DiscountList, BulkFlatPriceDiscount, UpSalePercentDiscount, LimitedUpSalePercentDiscount, UpSaleFlatPriceDiscount, LimitedUpSaleFlatPriceDiscount, UpSalePercentDiscountByWeight } from '../src/discount';
+import { ItemList, Item, ItemListImplementation } from '../src/item';
+import { Discount, StandardDiscount, DiscountList, BulkFlatPriceDiscount, UpSalePercentDiscount, LimitedUpSalePercentDiscount, UpSaleFlatPriceDiscount, LimitedUpSaleFlatPriceDiscount, UpSalePercentDiscountByWeight, DiscountListImplementation } from '../src/discount';
 
 interface Parameterized<T> {
     it(description: string, func: (value: T) => void): void;
@@ -31,7 +31,7 @@ class Parameters<T> {
 }
 
 describe('Given a collection of Items', () => {
-    const itemList = new ItemList();
+    const itemList: ItemList = new ItemListImplementation();
 
     describe('And a new item containing an Item Code, Description, Type, and Price', () => {
         const item = new Item(
@@ -114,7 +114,7 @@ describe('Given a collection of Items', () => {
 });
 
 describe('Given a collection of Pricing Rules', () => {
-    const discountList = new DiscountList();
+    const discountList: DiscountList = new DiscountListImplementation();
 
     const validDiscounts: Parameters<[string, Discount]> = new Parameters<[string, Discount]>([
         ['standard discount', new StandardDiscount(new Date(), new Date(), 'random item code', 1.0)],
