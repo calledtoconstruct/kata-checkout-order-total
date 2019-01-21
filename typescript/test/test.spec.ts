@@ -154,8 +154,12 @@ describe('Given a collection of Pricing Rules', () => {
         }
     }
 
-    const itemList: ItemList = new FakeItemList()
-    const discountList: DiscountList = new DiscountListImplementation(itemList);
+    let discountList: DiscountList;
+
+    beforeEach(() => {
+        const itemList: ItemList = new FakeItemList()
+        discountList = new DiscountListImplementation(itemList);
+    });
 
     const validDiscounts: Parameters<[string, Discount]> = new Parameters<[string, Discount]>([
         ['standard discount', new StandardDiscount(new Date(), new Date(), 'by quantity item', 1.0)],
