@@ -24,28 +24,53 @@ export class BulkFlatPriceDiscount implements Discount {
     ) {}
 }
 
-export class UpSaleDiscount implements Discount {
+class UpSaleDiscount implements Discount {
     constructor(
         public readonly startDate: Date,
         public readonly endDate: Date,
         public readonly code: string,
         public readonly bulk: number,
-        public readonly sale: number,
-        public readonly percent: number
+        public readonly sale: number
     ) {}
 }
 
-export class LimitedUpSaleDiscount extends UpSaleDiscount {
+export class UpSalePercentDiscount extends UpSaleDiscount {
     constructor(
         readonly startDate: Date,
         readonly endDate: Date,
         readonly code: string,
         readonly bulk: number,
         readonly sale: number,
-        readonly percent: number,
+        public readonly percent: number
+    ) {
+        super(startDate, endDate, code, bulk, sale);
+    }
+}
+
+export class LimitedUpSalePercentDiscount extends UpSaleDiscount {
+    constructor(
+        readonly startDate: Date,
+        readonly endDate: Date,
+        readonly code: string,
+        readonly bulk: number,
+        readonly sale: number,
+        public readonly percent: number,
         public readonly limit: number
     ) {
-        super(startDate, endDate, code, bulk, sale, percent);
+        super(startDate, endDate, code, bulk, sale);
+    }
+}
+
+export class UpSaleFlatPriceDiscount extends UpSaleDiscount {
+    constructor(
+        readonly startDate: Date,
+        readonly endDate: Date,
+        readonly code: string,
+        readonly bulk: number,
+        readonly sale: number,
+        public readonly price: number
+    ) {
+        super(startDate, endDate, code, bulk, sale);
     }
 }
 
