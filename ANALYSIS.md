@@ -72,18 +72,40 @@
 **When** adding the rule
 **Then** the collection contains the rule.
 
+> rule validation
+
+**Given** a collection of pricing rules
+**And** a rule that applies to `by quantity` items
+**And** a matching item by item code with the item type `by weight`
+**When** validating the rule
+**Then** an error is raised.
+
+**Given** a collection of pricing rules
+**And** a rule that applies to `by weight` items
+**And** a matching item by item code with the item type `by quantity`
+**When** validating the rule
+**Then** and error is raised.
+
+**Given** a collection of pricing rules
+**And** a rule with an item code
+**And** no matching item by item code
+**When** validating the rule
+**Then** an error is raised.
+
 > multiple discounts for an item
 
 **Given** a collection of pricing rules
 **And** a rule containing AT LEAST a start date, end date, and item code
 **And** a rule exists with the same item code and an overlapping date range
 **When** adding the rule
-**Then** an error is raised.
+**Then** an error is raised
+**And** the new rule is not included in the collection.
 
 **Given** a collection of pricing rules
 **And** an invalid rule (not matching the above rule types)
 **When** adding the rule
-**Then** and error is raised.
+**Then** and error is raised
+**And** the rule is not included in the collection.
 
 # Epic - Scanning
 
