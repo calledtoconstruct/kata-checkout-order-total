@@ -2,20 +2,25 @@
 
 import { ItemList, Item } from '../src/item';
 
+interface Parameterized<T> {
+    it(description: string, func: (value: T) => void): void;
+    describe(description: string, func: (value: T) => void): void;
+}
+
 class Parameters<T> {
     constructor(public readonly cases: Array<T>) {}
-    public forEach(): any { 
+    public forEach(): Parameterized<T> { 
         return {
             it: (description: string, func: (value: T) => void): void => {
                 this.cases.forEach((cs: T): void => {
-                    it(description + ' ' + JSON.stringify(cs), (): void => {
+                    it(description, (): void => {
                         func(cs);
                     });     
                 });
             },
             describe: (description: string, func: (value: T) => void): void => {
                 this.cases.forEach((cs: T): void => {
-                    describe(description + ' ' + JSON.stringify(cs), (): void => {
+                    describe(description, (): void => {
                         func(cs);
                     });     
                 });
@@ -30,7 +35,9 @@ describe('Given a collection of Items', () => {
     describe('And a new item containing an Item Code, Description, Type, and Price', () => {
         const item = new Item(
             'random item code',
-            'random description'
+            'random description',
+            'by quantity',
+            3.0
         );
 
         describe('When adding the item', () => {
@@ -48,41 +55,33 @@ describe('Given a collection of Items', () => {
 
     });
 
-    describe('And an invalid item missing an Item Code, Description, Type, or Price', () => {
+    const invalidItems: Parameters<[string, Item]> = new Parameters<[string, Item]>([
+        ['item code', new Item(null, 'random description', 'by weight', 3.0)],
+        ['description', new Item('random item code', null, 'by quantity', 3.0)],
+        ['type', new Item('random item code', 'random description', null, 3.0)],
+        ['price', new Item('random item code', 'random description', 'by weight', null)]
+    ]);
 
-        describe('When adding an item', () => {
-            let error: Error | null = null;
+    invalidItems.forEach().describe('And an invalid item When adding it, it', (item: [string, Item]) => {
+        let error: Error | null = null;
 
-            const parameters: Parameters<[string, Item]> = new Parameters<[string, Item]>([
-                ['item code', new Item(null, 'random description')],
-                ['description', new Item('random item code', null)]
-            ]);
-
-            const add = (item: Item) => {
-                try {
-                    itemList.add(item);
-                    fail();
-                } catch (caught) {
-                    error = caught;
-                }
-            };
-
-            parameters.forEach().describe('missing', (item: Item) => {
-
-                beforeEach(() => {
-                    add(item);
-                });
-    
-                it('Should reject the item because it is missing', () => {
-                    expect(error).not.toBeNull()
-                });
-
-                it('Should not be added to list', () => {
-                    const result = itemList.includes(item);
-                    expect(result).toBe(false);
-                });
-
-            });
+        beforeEach(() => {
+            try {
+                itemList.add(item[1]);
+                fail();
+            } catch (caught) {
+                error = caught;
+            }
         });
+
+        it('Should reject the item because it is missing ' + item[0], () => {
+            expect(error).not.toBeNull()
+        });
+
+        it('Should not be added to the list', () => {
+            const result = itemList.includes(item[1]);
+            expect(result).toBe(false);
+        });
+
     });
 });
