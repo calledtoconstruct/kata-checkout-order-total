@@ -187,7 +187,14 @@ describe('Given a collection of Pricing Rules', () => {
         ['limited up sale percent discount item type mismatch', new LimitedUpSalePercentDiscount(new Date(), new Date(), 'by weight item', 3, 1, 1, 8)],
         ['up sale flat price discount item type mismatch', new UpSaleFlatPriceDiscount(new Date(), new Date(), 'by weight item', 2, 1, 1.25)],
         ['limited up sale flat price discount item type mismatch', new LimitedUpSaleFlatPriceDiscount(new Date(), new Date(), 'by weight item', 3, 2, 1, 10)],
-        ['up sale percent discount by weight item type mismatch', new UpSalePercentDiscountByWeight(new Date(), new Date(), 'by quantity item', 2, 1, .5)]
+        ['up sale percent discount by weight item type mismatch', new UpSalePercentDiscountByWeight(new Date(), new Date(), 'by quantity item', 2, 1, .5)],
+        ['standard discount no matching item', new StandardDiscount(new Date(), new Date(), 'no matching item', 1.0)],
+        ['bulk flat price no matching item', new BulkFlatPriceDiscount(new Date(), new Date(), 'no matching item', 3, 5.0)],
+        ['up sale percent discount no matching item', new UpSalePercentDiscount(new Date(), new Date(), 'no matching item', 2, 1, 0.5)],
+        ['limited up sale percent discount no matching item', new LimitedUpSalePercentDiscount(new Date(), new Date(), 'no matching item', 3, 1, 1, 8)],
+        ['up sale flat price discount no matching item', new UpSaleFlatPriceDiscount(new Date(), new Date(), 'no matching item', 2, 1, 1.25)],
+        ['limited up sale flat price discount no matching item', new LimitedUpSaleFlatPriceDiscount(new Date(), new Date(), 'no matching item', 3, 2, 1, 10)],
+        ['up sale percent discount by weight no matching item', new UpSalePercentDiscountByWeight(new Date(), new Date(), 'no matching item', 2, 1, .5)]
     ]);
 
     invalidDiscountsWithItemTypeMismatch.forEach().describe('And an invalid discount When adding it', (item: [string, Discount]) => {
