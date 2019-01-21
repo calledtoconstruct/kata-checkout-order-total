@@ -17,7 +17,7 @@ describe('Given a collection of Items', () => {
             });
 
             it('Should exist in the list', () => {
-                const result = itemList.contains(item);
+                const result = itemList.includes(item);
                 expect(result).toBe(true);
             });
 
@@ -26,21 +26,34 @@ describe('Given a collection of Items', () => {
     });
 
     describe('And an invalid item missing an Item Code, Description, Type, or Price', () => {
-        const item = new Item(null
-        );
 
-        describe('When adding the item', () => {
+        describe('When adding an item', () => {
+            let error: Error | null = null;
 
-            beforeEach(() => {
-            });
-
-            it('Should reject the item because it is missing the Item Code', () => {
+            const add = (item: Item) => {
                 try {
                     itemList.add(item);
                     fail();
-                } catch (error) {
-                    
+                } catch (caught) {
+                    error = caught;
                 }
+            };
+
+            describe('missing Item Code', () => {
+                const item = new Item(null);
+
+                beforeEach(() => {
+                    add(item);
+                });
+    
+                it('Should reject the item because it is missing the Item Code', () => {
+                    expect(error).not.toBeNull()
+                });
+
+                it('Should not be added to list', () => {
+                    const result = itemList.includes(item);
+                    expect(result).toBe(false);
+                });
             });
         });
     });
