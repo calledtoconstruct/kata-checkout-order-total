@@ -1,7 +1,19 @@
 /* global describe, it, expect, beforeEach */
 
-import { ItemList, Item, ItemListImplementation } from '../src/item';
-import { Discount, StandardDiscount, DiscountList, BulkFlatPriceDiscount, UpSalePercentDiscount, LimitedUpSalePercentDiscount, UpSaleFlatPriceDiscount, LimitedUpSaleFlatPriceDiscount, UpSalePercentDiscountByWeight, DiscountListImplementation } from '../src/discount';
+import { ItemList, Item, ItemListImplementation, StandardItem } from '../src/item';
+
+import {
+    Discount,
+    StandardDiscount,
+    DiscountList,
+    BulkFlatPriceDiscount,
+    UpSalePercentDiscount,
+    LimitedUpSalePercentDiscount,
+    UpSaleFlatPriceDiscount,
+    LimitedUpSaleFlatPriceDiscount,
+    UpSalePercentDiscountByWeight,
+    DiscountListImplementation
+} from '../src/discount';
 
 interface Parameterized<T> {
     it(description: string, func: (value: T) => void): void;
@@ -34,7 +46,7 @@ describe('Given a collection of Items', () => {
     const itemList: ItemList = new ItemListImplementation();
 
     describe('And a new item containing an Item Code, Description, Type, and Price', () => {
-        const item = new Item(
+        const item = new StandardItem(
             'random item code',
             'random description',
             'by quantity',
@@ -55,7 +67,7 @@ describe('Given a collection of Items', () => {
         });
 
         describe('When adding the item again', () => {
-            const otherItem = new Item(
+            const otherItem = new StandardItem(
                 'random item code',
                 'random description',
                 'by quantity',
@@ -82,10 +94,10 @@ describe('Given a collection of Items', () => {
     });
 
     const invalidItems: Parameters<[string, Item]> = new Parameters<[string, Item]>([
-        ['item code', new Item(null, 'random description', 'by weight', 3.0)],
-        ['description', new Item('random item code', null, 'by quantity', 3.0)],
-        ['type', new Item('random item code', 'random description', null, 3.0)],
-        ['price', new Item('random item code', 'random description', 'by weight', null)]
+        ['item code', new StandardItem(null, 'random description', 'by weight', 3.0)],
+        ['description', new StandardItem('random item code', null, 'by quantity', 3.0)],
+        ['type', new StandardItem('random item code', 'random description', null, 3.0)],
+        ['price', new StandardItem('random item code', 'random description', 'by weight', null)]
     ]);
 
     invalidItems.forEach().describe('And an invalid item When adding it, it', (item: [string, Item]) => {
@@ -114,16 +126,45 @@ describe('Given a collection of Items', () => {
 });
 
 describe('Given a collection of Pricing Rules', () => {
-    const discountList: DiscountList = new DiscountListImplementation();
+    class FakeByQuantityItem implements Item {
+        public readonly code: 'by quantity item';
+        public readonly type: "by quantity";
+        public validate(): void {}
+    }
+
+    class FakeByWeightItem implements Item {
+        public readonly code: 'by weight item';
+        public readonly type: 'by weight';
+        public validate(): void {}
+    }
+
+    class FakeItemList implements ItemList {
+        add(item: Item): void {
+            throw new Error("Method not implemented.");
+        }
+        includes(item: Item): boolean {
+            throw new Error("Method not implemented.");
+        }
+        get(code: string) {
+            if (code === 'by quantity item') {
+                return new FakeByQuantityItem();
+            } else if (code === 'by weight item') {
+                return new FakeByWeightItem();
+            } else throw new Error('invalid test');
+        }
+    }
+
+    const itemList: ItemList = new FakeItemList()
+    const discountList: DiscountList = new DiscountListImplementation(itemList);
 
     const validDiscounts: Parameters<[string, Discount]> = new Parameters<[string, Discount]>([
-        ['standard discount', new StandardDiscount(new Date(), new Date(), 'random item code', 1.0)],
-        ['bulk flat price', new BulkFlatPriceDiscount(new Date(), new Date(), 'random item code', 3, 5.0)],
-        ['up sale percent discount', new UpSalePercentDiscount(new Date(), new Date(), 'random item code', 2, 1, 0.5)],
-        ['limited up sale percent discount', new LimitedUpSalePercentDiscount(new Date(), new Date(), 'random item code', 3, 1, 1, 8)],
-        ['up sale flat price discount', new UpSaleFlatPriceDiscount(new Date(), new Date(), 'random item code', 2, 1, 1.25)],
-        ['limited up sale flat price discount', new LimitedUpSaleFlatPriceDiscount(new Date(), new Date(), 'random item code', 3, 2, 1, 10)],
-        ['up sale percent discount by weight', new UpSalePercentDiscountByWeight(new Date(), new Date(), 'random item code', 2, 1, .5)]
+        ['standard discount', new StandardDiscount(new Date(), new Date(), 'by quantity item', 1.0)],
+        ['bulk flat price', new BulkFlatPriceDiscount(new Date(), new Date(), 'by quantity item', 3, 5.0)],
+        ['up sale percent discount', new UpSalePercentDiscount(new Date(), new Date(), 'by quantity item', 2, 1, 0.5)],
+        ['limited up sale percent discount', new LimitedUpSalePercentDiscount(new Date(), new Date(), 'by quantity item', 3, 1, 1, 8)],
+        ['up sale flat price discount', new UpSaleFlatPriceDiscount(new Date(), new Date(), 'by quantity item', 2, 1, 1.25)],
+        ['limited up sale flat price discount', new LimitedUpSaleFlatPriceDiscount(new Date(), new Date(), 'by quantity item', 3, 2, 1, 10)],
+        ['up sale percent discount by weight', new UpSalePercentDiscountByWeight(new Date(), new Date(), 'by weight item', 2, 1, .5)]
     ]);
 
     validDiscounts.forEach().describe('And a valid discount When adding it', (item: [string, Discount]) => {

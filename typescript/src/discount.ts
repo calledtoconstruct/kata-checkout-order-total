@@ -1,3 +1,4 @@
+import { ItemList } from "./item";
 
 export interface DiscountList {
     add(discount: Discount): void;
@@ -107,6 +108,8 @@ export class UpSalePercentDiscountByWeight extends UpSaleDiscount {
 }
 
 export class DiscountListImplementation implements DiscountList {
+
+    constructor(private readonly itemList: ItemList) {}
     
     public add(discount: Discount): void {
 

@@ -4,7 +4,13 @@ export interface ItemList {
     includes(item: Item): boolean;
 }
 
-export class Item {
+export interface Item {
+    readonly code: string | null;
+    readonly type: 'by quantity' | 'by weight' | null;
+    validate(): void;
+}
+
+export class StandardItem implements Item {
     constructor(
         public readonly code: string | null,
         public readonly description: string | null,
@@ -12,24 +18,28 @@ export class Item {
         public readonly price: number | null
     ) {
     }
+
+    public validate(): void {
+        if ((this.code || null) === null) {
+            throw new Error('Missing required Item Code.');
+        }
+        if ((this.description || null) === null) {
+            throw new Error('Missing required Description.');
+        }
+        if ((this.type || null) === null) {
+            throw new Error('Missing required Type.');
+        }
+        if ((this.price || null) === null) {
+            throw new Error('Missing required Price.');
+        }
+    }
 }
 
 export class ItemListImplementation implements ItemList {
     private readonly list: Array<Item> = new Array<Item>();
 
     public add(item: Item): void {
-        if ((item.code || null) === null) {
-            throw new Error('Missing required Item Code.');
-        }
-        if ((item.description || null) === null) {
-            throw new Error('Missing required Description.');
-        }
-        if ((item.type || null) === null) {
-            throw new Error('Missing required Type.');
-        }
-        if ((item.price || null) === null) {
-            throw new Error('Missing required Price.');
-        }
+        item.validate();
         const copy = this.list.splice(0);
         copy.filter((value: Item): boolean => {
             return value.code !== item.code;
