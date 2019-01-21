@@ -25,6 +25,12 @@ export class ItemList {
         if ((item.price || null) === null) {
             throw new Error('Missing required Price.');
         }
+        const copy = this.list.splice(0);
+        copy.filter((value: Item): boolean => {
+            return value.code !== item.code;
+        }).forEach((value: Item): void => {
+            this.list.push(value);
+        });
         this.list.push(item);
     }
 

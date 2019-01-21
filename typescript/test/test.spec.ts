@@ -53,6 +53,31 @@ describe('Given a collection of Items', () => {
 
         });
 
+        describe('When adding the item again', () => {
+            const otherItem = new Item(
+                'random item code',
+                'random description',
+                'by quantity',
+                5.0
+            );
+
+            beforeEach(() => {
+                itemList.add(item);
+                itemList.add(otherItem);
+            });
+
+            it('the first item should not exist in the list', () => {
+                const result = itemList.includes(item);
+                expect(result).toBe(false);
+            });
+
+            it('the other item should exist in the list', () => {
+                const result = itemList.includes(otherItem);
+                expect(result).toBe(true);
+            });
+
+        });
+
     });
 
     const invalidItems: Parameters<[string, Item]> = new Parameters<[string, Item]>([
@@ -82,6 +107,10 @@ describe('Given a collection of Items', () => {
             const result = itemList.includes(item[1]);
             expect(result).toBe(false);
         });
+
+    });
+
+    describe('And a duplicate item with an Item Code, Description, Type, and Price', () => {
 
     });
 });
