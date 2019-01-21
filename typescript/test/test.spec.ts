@@ -43,7 +43,11 @@ class Parameters<T> {
 }
 
 describe('Given a collection of Items', () => {
-    const itemList: ItemList = new ItemListImplementation();
+    let itemList: ItemList;
+
+    beforeEach(() => {
+        itemList = new ItemListImplementation();
+    });
 
     describe('And a new item containing an Item Code, Description, Type, and Price', () => {
         const item = new StandardItem(
