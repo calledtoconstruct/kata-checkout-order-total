@@ -88,6 +88,19 @@ export class LimitedUpSaleFlatPriceDiscount extends UpSaleDiscount {
     }
 }
 
+export class UpSalePercentDiscountByWeight extends UpSaleDiscount {
+    constructor(
+        readonly startDate: Date,
+        readonly endDate: Date,
+        readonly code: string,
+        readonly bulk: number,
+        readonly sale: number,
+        public readonly percent: number
+    ) {
+        super(startDate, endDate, code, bulk, sale);
+    }
+}
+
 export class DiscountList {
     
     public add(discount: Discount): void {

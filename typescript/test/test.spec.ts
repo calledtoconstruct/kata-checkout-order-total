@@ -1,7 +1,7 @@
 /* global describe, it, expect, beforeEach */
 
 import { ItemList, Item } from '../src/item';
-import { Discount, StandardDiscount, DiscountList, BulkFlatPriceDiscount, UpSalePercentDiscount, LimitedUpSalePercentDiscount, UpSaleFlatPriceDiscount, LimitedUpSaleFlatPriceDiscount } from '../src/discount';
+import { Discount, StandardDiscount, DiscountList, BulkFlatPriceDiscount, UpSalePercentDiscount, LimitedUpSalePercentDiscount, UpSaleFlatPriceDiscount, LimitedUpSaleFlatPriceDiscount, UpSalePercentDiscountByWeight } from '../src/discount';
 
 interface Parameterized<T> {
     it(description: string, func: (value: T) => void): void;
@@ -123,6 +123,7 @@ describe('Given a collection of Pricing Rules', () => {
         ['limited up sale percent discount', new LimitedUpSalePercentDiscount(new Date(), new Date(), 'random item code', 3, 1, 1, 8)],
         ['up sale flat price discount', new UpSaleFlatPriceDiscount(new Date(), new Date(), 'random item code', 2, 1, 1.25)],
         ['limited up sale flat price discount', new LimitedUpSaleFlatPriceDiscount(new Date(), new Date(), 'random item code', 3, 2, 1, 10)],
+        ['up sale percent discount by weight', new UpSalePercentDiscountByWeight(new Date(), new Date(), 'random item code', 2, 1, .5)]
     ]);
 
     validDiscounts.forEach().describe('And a valid discount When adding it', (item: [string, Discount]) => {
