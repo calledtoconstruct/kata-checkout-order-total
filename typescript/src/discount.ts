@@ -74,6 +74,20 @@ export class UpSaleFlatPriceDiscount extends UpSaleDiscount {
     }
 }
 
+export class LimitedUpSaleFlatPriceDiscount extends UpSaleDiscount {
+    constructor(
+        readonly startDate: Date,
+        readonly endDate: Date,
+        readonly code: string,
+        readonly bulk: number,
+        readonly sale: number,
+        public readonly price: number,
+        public readonly limit: number        
+    ) {
+        super(startDate, endDate, code, bulk, sale);
+    }
+}
+
 export class DiscountList {
     
     public add(discount: Discount): void {

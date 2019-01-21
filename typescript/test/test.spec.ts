@@ -1,7 +1,7 @@
 /* global describe, it, expect, beforeEach */
 
 import { ItemList, Item } from '../src/item';
-import { Discount, StandardDiscount, DiscountList, BulkFlatPriceDiscount, UpSalePercentDiscount, LimitedUpSalePercentDiscount, UpSaleFlatPriceDiscount } from '../src/discount';
+import { Discount, StandardDiscount, DiscountList, BulkFlatPriceDiscount, UpSalePercentDiscount, LimitedUpSalePercentDiscount, UpSaleFlatPriceDiscount, LimitedUpSaleFlatPriceDiscount } from '../src/discount';
 
 interface Parameterized<T> {
     it(description: string, func: (value: T) => void): void;
@@ -119,9 +119,10 @@ describe('Given a collection of Pricing Rules', () => {
     const validDiscounts: Parameters<[string, Discount]> = new Parameters<[string, Discount]>([
         ['standard discount', new StandardDiscount(new Date(), new Date(), 'random item code', 1.0)],
         ['bulk flat price', new BulkFlatPriceDiscount(new Date(), new Date(), 'random item code', 3, 5.0)],
-        ['up sale discount', new UpSalePercentDiscount(new Date(), new Date(), 'random item code', 2, 1, 0.5)],
-        ['limited up sale discount', new LimitedUpSalePercentDiscount(new Date(), new Date(), 'random item code', 3, 1, 1, 8)],
+        ['up sale percent discount', new UpSalePercentDiscount(new Date(), new Date(), 'random item code', 2, 1, 0.5)],
+        ['limited up sale percent discount', new LimitedUpSalePercentDiscount(new Date(), new Date(), 'random item code', 3, 1, 1, 8)],
         ['up sale flat price discount', new UpSaleFlatPriceDiscount(new Date(), new Date(), 'random item code', 2, 1, 1.25)],
+        ['limited up sale flat price discount', new LimitedUpSaleFlatPriceDiscount(new Date(), new Date(), 'random item code', 3, 2, 1, 10)],
     ]);
 
     validDiscounts.forEach().describe('And a valid discount When adding it', (item: [string, Discount]) => {
