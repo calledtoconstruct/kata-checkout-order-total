@@ -1,6 +1,16 @@
 
 export class Item {
-    public test() {
-        return false;
+    constructor() {
+
+    }
+}
+
+export class ItemList {
+    public add(item: Item): void {
+        // 
+    }
+
+    public contains(item: Item): boolean {
+        return true;
     }
 }

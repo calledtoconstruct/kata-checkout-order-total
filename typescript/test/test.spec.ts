@@ -1,32 +1,24 @@
 /* global describe, it, expect, beforeEach */
 
-import { Discount } from '../src/discount';
-import { Item } from '../src/item';
-import { Transaction } from '../src/transaction';
+import { ItemList, Item } from '../src/item';
 
-describe('...', () => {
-    describe('...', () => {
-        const discount = new Discount();
+describe('Given a collection of Items', () => {
+    const itemList = new ItemList();
+
+    describe('And a new item containing an Item Code, Description, Type, and Price', () => {
         const item = new Item();
-        const transaction = new Transaction();
 
-        beforeEach(() => {
+        describe('When adding the item', () => {
 
-        });
+            beforeEach(() => {
+                itemList.add(item);
+            });
 
-        it('...', () => {
-            const result = discount.test();
-            expect(result).toBe(false);
-        });
+            it('Should exist in the list', () => {
+                const result = itemList.contains(item);
+                expect(result).toBe(true);
+            });
 
-        it('...', () => {
-            const result = item.test();
-            expect(result).toBe(false);
-        });
-
-        it('...', () => {
-            const result = transaction.test();
-            expect(result).toBe(false);
         });
     });
 });
