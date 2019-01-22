@@ -108,34 +108,35 @@ describe('Given a collection of Items', () => {
 
 });
 
+class FakeByQuantityItem implements Item {
+    public readonly code: string = 'by quantity item';
+    public readonly type: ItemType = 'by quantity';
+    public validate(): void { }
+}
+
+class FakeByWeightItem implements Item {
+    public readonly code: string = 'by weight item';
+    public readonly type: ItemType = 'by weight';
+    public validate(): void { }
+}
+
+class FakeItemList implements ItemList {
+    public add(_: Item): void {
+        throw new Error("Method not implemented.");
+    }
+    public includes(_: Item): boolean {
+        throw new Error("Method not implemented.");
+    }
+    public get(code: string): Item {
+        if (code === 'by quantity item') {
+            return new FakeByQuantityItem();
+        } else if (code === 'by weight item') {
+            return new FakeByWeightItem();
+        } else throw new Error('invalid test');
+    }
+}
+
 describe('Given a collection of Pricing Rules', () => {
-    class FakeByQuantityItem implements Item {
-        public readonly code: string = 'by quantity item';
-        public readonly type: ItemType = 'by quantity';
-        public validate(): void { }
-    }
-
-    class FakeByWeightItem implements Item {
-        public readonly code: string = 'by weight item';
-        public readonly type: ItemType = 'by weight';
-        public validate(): void { }
-    }
-
-    class FakeItemList implements ItemList {
-        public add(_: Item): void {
-            throw new Error("Method not implemented.");
-        }
-        public includes(_: Item): boolean {
-            throw new Error("Method not implemented.");
-        }
-        public get(code: string): Item {
-            if (code === 'by quantity item') {
-                return new FakeByQuantityItem();
-            } else if (code === 'by weight item') {
-                return new FakeByWeightItem();
-            } else throw new Error('invalid test');
-        }
-    }
 
     let discountList: DiscountList;
 
@@ -306,6 +307,50 @@ describe('Given a collection of Pricing Rules', () => {
 
                 });
 
+            });
+
+        });
+
+    });
+
+});
+
+const invertedDateRange: DateRange = {
+    startDate: new Date(2010, 3, 31, 0, 0, 0, 0),
+    endDate: new Date(2010, 3, 1, 11, 59, 59, 999)
+};
+
+const invertedDateRangeDiscountScenarios: Parameterized<Discount, TestScenario<Discount>> = new Parameterized<Discount, TestScenario<Discount>>([
+    { description: 'standard discount', target: new StandardDiscount(invertedDateRange.startDate, invertedDateRange.endDate, 'by quantity item', 1.0) },
+    { description: 'bulk flat price', target: new BulkFlatPriceDiscount(invertedDateRange.startDate, invertedDateRange.endDate, 'by quantity item', 3, 5.0) },
+    { description: 'up sale percent discount', target: new UpSalePercentDiscount(invertedDateRange.startDate, invertedDateRange.endDate, 'by quantity item', 2, 1, 0.5) },
+    { description: 'limited up sale percent discount', target: new LimitedUpSalePercentDiscount(invertedDateRange.startDate, invertedDateRange.endDate, 'by quantity item', 3, 1, 1, 8) },
+    { description: 'up sale flat price discount', target: new UpSaleFlatPriceDiscount(invertedDateRange.startDate, invertedDateRange.endDate, 'by quantity item', 2, 1, 1.25) },
+    { description: 'limited up sale flat price discount', target: new LimitedUpSaleFlatPriceDiscount(invertedDateRange.startDate, invertedDateRange.endDate, 'by quantity item', 3, 2, 1, 10) },
+    { description: 'up sale percent discount by weight', target: new UpSalePercentDiscountByWeight(invertedDateRange.startDate, invertedDateRange.endDate, 'by weight item', 2, 1, .5) }
+]);
+
+invertedDateRangeDiscountScenarios.forEach().describe('Given a pricing rule with an inverted date range', (invertedDateRangeDiscountScenario: TestScenario<Discount>) => {
+
+    const scenarioDescription: string = invertedDateRangeDiscountScenario.description;
+    const discount: Discount = invertedDateRangeDiscountScenario.target;
+    const itemList: ItemList = new FakeItemList()
+
+    describe(scenarioDescription, () => {
+
+        describe('When validating', () => {
+            let error: Error | null = null;
+
+            beforeEach(() => {
+                try {
+                    discount.validate(itemList);
+                } catch (exception) {
+                    error = exception;
+                }
+            });
+
+            it('Should raise an error.', () => {
+                expect(error).not.toBeNull();
             });
 
         });

@@ -1,4 +1,5 @@
-import { ItemList, ItemType } from "./item";
+import { ItemList, ItemType } from './item';
+import { DateRange } from './date';
 
 export interface DiscountList {
     add(discount: Discount): void;
@@ -17,7 +18,17 @@ const validateItemType: (itemList: ItemList, code: string, type: ItemType) => vo
     if (item.type !== type) {
         throw new Error('Item Type Mismatch');
     }
-}
+};
+const fallbackDateRange: DateRange = {
+    startDate: new Date(2001, 1, 1, 8, 0, 0, 0),
+    endDate: new Date(2001, 1, 31, 17, 0, 0, 0)
+};
+
+const validateItemDateRange: (discount: Discount) => void = (discount: Discount): void => {
+    if ((discount.startDate || fallbackDateRange.startDate).valueOf() >= (discount.endDate || fallbackDateRange.endDate).valueOf()) {
+        throw new Error('The end date must be after the start date.');
+    }
+};
 
 export class StandardDiscount implements Discount {
     constructor(
@@ -29,6 +40,7 @@ export class StandardDiscount implements Discount {
 
     public validate(itemList: ItemList): void {
         validateItemType(itemList, this.code, 'by quantity');
+        validateItemDateRange(this);
     }
 }
 
@@ -42,6 +54,7 @@ export class BulkFlatPriceDiscount implements Discount {
     ) { }
     public validate(itemList: ItemList): void {
         validateItemType(itemList, this.code, 'by quantity');
+        validateItemDateRange(this);
     }
 }
 
@@ -57,6 +70,7 @@ abstract class UpSaleDiscount implements Discount {
 
     protected validateItemType(itemList: ItemList, type: ItemType): void {
         validateItemType(itemList, this.code, type);
+        validateItemDateRange(this);
     }
 }
 
