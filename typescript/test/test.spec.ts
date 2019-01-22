@@ -22,25 +22,31 @@ interface Parameterized<T> {
 
 class Parameters<T> {
     constructor(public readonly cases: Array<T>) {}
-    public forEach(): Parameterized<T> { 
+    public forEach(predicate?: (cs: T) => boolean): Parameterized<T> { 
         return {
             it: (description: string, func: (value: T) => void): void => {
                 this.cases.forEach((cs: T): void => {
-                    it(description, (): void => {
-                        func(cs);
-                    });     
+                    if (predicate === undefined || predicate(cs)) {
+                        it(description, (): void => {
+                            func(cs);
+                        });     
+                    }
                 });
             },
             describe: (description: string, func: (value: T) => void): void => {
                 this.cases.forEach((cs: T): void => {
-                    describe(description, (): void => {
-                        func(cs);
-                    });     
+                    if (predicate === undefined || predicate(cs)) {
+                        describe(description, (): void => {
+                            func(cs);
+                        });     
+                    }
                 });
             }
         };
     }
 }
+
+type DateRange = { startDate: Date, endDate: Date };
 
 describe('Given a collection of Items', () => {
     let itemList: ItemList;
@@ -165,17 +171,22 @@ describe('Given a collection of Pricing Rules', () => {
         discountList = new DiscountListImplementation(itemList);
     });
 
-    const validDiscounts: Parameters<[string, Discount]> = new Parameters<[string, Discount]>([
-        ['standard discount', new StandardDiscount(new Date(), new Date(), 'by quantity item', 1.0)],
-        ['bulk flat price', new BulkFlatPriceDiscount(new Date(), new Date(), 'by quantity item', 3, 5.0)],
-        ['up sale percent discount', new UpSalePercentDiscount(new Date(), new Date(), 'by quantity item', 2, 1, 0.5)],
-        ['limited up sale percent discount', new LimitedUpSalePercentDiscount(new Date(), new Date(), 'by quantity item', 3, 1, 1, 8)],
-        ['up sale flat price discount', new UpSaleFlatPriceDiscount(new Date(), new Date(), 'by quantity item', 2, 1, 1.25)],
-        ['limited up sale flat price discount', new LimitedUpSaleFlatPriceDiscount(new Date(), new Date(), 'by quantity item', 3, 2, 1, 10)],
-        ['up sale percent discount by weight', new UpSalePercentDiscountByWeight(new Date(), new Date(), 'by weight item', 2, 1, .5)]
+    const discountMonth: DateRange = {
+        startDate: new Date(2010, 3, 1, 0, 0, 0, 0),
+        endDate: new Date(2010, 3, 31, 11, 59, 59, 999)
+    };
+
+    const validDiscountScenarios: Parameters<[string, Discount]> = new Parameters<[string, Discount]>([
+        ['standard discount', new StandardDiscount(discountMonth.startDate, discountMonth.endDate, 'by quantity item', 1.0)],
+        ['bulk flat price', new BulkFlatPriceDiscount(discountMonth.startDate, discountMonth.endDate, 'by quantity item', 3, 5.0)],
+        ['up sale percent discount', new UpSalePercentDiscount(discountMonth.startDate, discountMonth.endDate, 'by quantity item', 2, 1, 0.5)],
+        ['limited up sale percent discount', new LimitedUpSalePercentDiscount(discountMonth.startDate, discountMonth.endDate, 'by quantity item', 3, 1, 1, 8)],
+        ['up sale flat price discount', new UpSaleFlatPriceDiscount(discountMonth.startDate, discountMonth.endDate, 'by quantity item', 2, 1, 1.25)],
+        ['limited up sale flat price discount', new LimitedUpSaleFlatPriceDiscount(discountMonth.startDate, discountMonth.endDate, 'by quantity item', 3, 2, 1, 10)],
+        ['up sale percent discount by weight', new UpSalePercentDiscountByWeight(discountMonth.startDate, discountMonth.endDate, 'by weight item', 2, 1, .5)]
     ]);
 
-    validDiscounts.forEach().describe('And a valid discount When adding it', (item: [string, Discount]) => {
+    validDiscountScenarios.forEach().describe('And a valid discount When adding it', (item: [string, Discount]) => {
 
         beforeEach(() => {
             discountList.add(item[1]);
@@ -223,6 +234,90 @@ describe('Given a collection of Pricing Rules', () => {
         it(item[0] + ' Should not be added to the list', () => {
             const result = discountList.includes(item[1]);
             expect(result).toBe(false);
+        });
+
+    });
+
+    const weekInsideMonth: DateRange = {
+        startDate: new Date(2010, 3, 5, 0, 0, 0, 0),
+        endDate: new Date(2010, 3, 11, 11, 59, 59, 999)
+    };
+
+    const weekOverlappingBeginningOfMonth: DateRange = {
+        startDate: new Date(2010, 2, 27, 0, 0, 0, 0),
+        endDate: new Date(2010, 3, 5, 11, 59, 59, 999)
+    };
+
+    const weekOverlappingEndOfMonth: DateRange = {
+        startDate: new Date(2010, 3, 28, 0, 0, 0, 0),
+        endDate: new Date(2010, 4, 7, 11, 59, 59, 999)
+    };
+
+    const quarterOverlappingEntireMonth: DateRange = {
+        startDate: new Date(2010, 1, 3, 0, 0, 0, 0),
+        endDate: new Date(2010, 4, 3, 11, 59, 59, 999)
+    };
+
+    const overlappingDateScenarios: Parameters<[string, DateRange]> = new Parameters<[string, DateRange]>([
+        ['week inside of month', weekInsideMonth],
+        ['week overlapping beginning of month', weekOverlappingBeginningOfMonth],
+        ['week overlapping end of month', weekOverlappingEndOfMonth],
+        ['quarter overlapping entire month', quarterOverlappingEntireMonth]
+    ]);
+
+    overlappingDateScenarios.forEach().describe('When adding a duplicate', (overlappingDateScenario: [string, DateRange]) => {  
+        
+        const overlappingDateRange: DateRange = overlappingDateScenario[1];
+
+        const overlappingDiscountScenarios: Parameters<[string, Discount]> = new Parameters<[string, Discount]>([
+            ['standard discount', new StandardDiscount(overlappingDateRange.startDate, overlappingDateRange.endDate, 'by quantity item', 1.0)],
+            ['bulk flat price', new BulkFlatPriceDiscount(overlappingDateRange.startDate, overlappingDateRange.endDate, 'by quantity item', 3, 5.0)],
+            ['up sale percent discount', new UpSalePercentDiscount(overlappingDateRange.startDate, overlappingDateRange.endDate, 'by quantity item', 2, 1, 0.5)],
+            ['limited up sale percent discount', new LimitedUpSalePercentDiscount(overlappingDateRange.startDate, overlappingDateRange.endDate, 'by quantity item', 3, 1, 1, 8)],
+            ['up sale flat price discount', new UpSaleFlatPriceDiscount(overlappingDateRange.startDate, overlappingDateRange.endDate, 'by quantity item', 2, 1, 1.25)],
+            ['limited up sale flat price discount', new LimitedUpSaleFlatPriceDiscount(overlappingDateRange.startDate, overlappingDateRange.endDate, 'by quantity item', 3, 2, 1, 10)],
+            ['up sale percent discount by weight', new UpSalePercentDiscountByWeight(overlappingDateRange.startDate, overlappingDateRange.endDate, 'by weight item', 2, 1, .5)]
+        ]);
+
+        overlappingDiscountScenarios.forEach().describe(overlappingDateScenario[0], (overlappingDiscountScenario: [string, Discount]) => {
+
+            const overlappingDiscount: Discount = overlappingDiscountScenario[1];
+            const whenSameCode = (validDiscount: [string, Discount]): boolean => validDiscount[1].code === overlappingDiscount.code;
+
+            validDiscountScenarios.forEach(whenSameCode).describe(overlappingDiscountScenario[0], (discountScenario: [string, Discount]) => {
+
+                const discount: Discount = discountScenario[1];
+                let error: Error | null = null;
+
+                beforeEach(() => {
+                    discountList.add(discount);
+                    try {
+                        discountList.add(overlappingDiscount);
+                    } catch (exception) {
+                        error = exception;
+                    }
+                });
+
+                describe(discountScenario[0], () => {
+
+                    it('Should raise an error.', () => {
+                        expect(error).not.toBeNull();
+                    });
+    
+                    it('Should not be included.', () => {
+                        const result = discountList.includes(overlappingDiscount);
+                        expect(result).not.toBe(true)
+                    });
+
+                    it('Should not replace existing.', () => {
+                        const result = discountList.includes(discount);
+                        expect(result).toBe(true);
+                    });
+
+                });
+
+            });
+
         });
 
     });

@@ -149,10 +149,28 @@ export class DiscountListImplementation implements DiscountList {
     
     public add(discount: Discount): void {
         discount.validate(this.itemList);
+
+        const duplicates = this.list.filter((existing: Discount) => {
+            return (existing.code === discount.code) && (DiscountListImplementation.overlap(existing.startDate, existing.endDate, discount.startDate, discount.endDate));
+        });
+
+        if (duplicates.length > 0) {
+            throw new Error('Duplicate or overlapping discount for ' + discount.code);
+        }
+
         this.list.push(discount);
     }
 
     public includes(discount: Discount): boolean {
         return this.list.indexOf(discount) !== -1;
+    }
+
+    private static overlap(firstStart: Date, firstEnd: Date, secondStart: Date, secondEnd: Date): boolean {
+        if (firstStart < secondStart && firstEnd < secondStart) {
+            return false;
+        } else if (secondEnd < firstStart && secondEnd < firstEnd) {
+            return false;
+        }
+        return true;
     }
 }
