@@ -74,48 +74,51 @@ describe('Given a collection of Items', () => {
     });
 
     const invalidItems: Parameterized<Item, TestScenario<Item>> = new Parameterized<Item, TestScenario<Item>>([
-        ['item code', new StandardItem(null, 'random description', 'by weight', 3.0)],
-        ['description', new StandardItem('random item code', null, 'by quantity', 3.0)],
-        ['type', new StandardItem('random item code', 'random description', null, 3.0)],
-        ['price', new StandardItem('random item code', 'random description', 'by weight', null)]
+        { description: 'item code', target: new StandardItem(null, 'random description', 'by weight', 3.0) },
+        { description: 'description', target: new StandardItem('random item code', null, 'by quantity', 3.0) },
+        { description: 'type', target: new StandardItem('random item code', 'random description', null, 3.0) },
+        { description: 'price', target: new StandardItem('random item code', 'random description', 'by weight', null) }
     ]);
 
-    invalidItems.forEach().describe('And an invalid item When adding it, it', (item: TestScenario<Item>) => {
+    invalidItems.forEach().describe('And an invalid item When adding it, it', (invalidItemScenario: TestScenario<Item>) => {
+
+        const scenarioDescription: string = invalidItemScenario.description;
+        const invalidItem: Item = invalidItemScenario.target;
         let error: Error | null = null;
 
         beforeEach(() => {
             try {
-                itemList.add(item[1]);
+                itemList.add(invalidItem);
                 fail();
             } catch (caught) {
                 error = caught;
             }
         });
 
-        it('Should reject the item because it is missing ' + item[0], () => {
+        it('Should reject the item because it is missing ' + scenarioDescription, () => {
             expect(error).not.toBeNull()
         });
 
-        it('Should not be added to the list', () => {
-            const result = itemList.includes(item[1]);
+        it('Should not be added to the list because it is missing ' + scenarioDescription, () => {
+            const result = itemList.includes(invalidItem);
             expect(result).toBe(false);
         });
 
     });
-    
+
 });
 
 describe('Given a collection of Pricing Rules', () => {
     class FakeByQuantityItem implements Item {
         public readonly code: string = 'by quantity item';
         public readonly type: ItemType = 'by quantity';
-        public validate(): void {}
+        public validate(): void { }
     }
 
     class FakeByWeightItem implements Item {
         public readonly code: string = 'by weight item';
         public readonly type: ItemType = 'by weight';
-        public validate(): void {}
+        public validate(): void { }
     }
 
     class FakeItemList implements ItemList {
@@ -147,63 +150,77 @@ describe('Given a collection of Pricing Rules', () => {
     };
 
     const validDiscountScenarios: Parameterized<Discount, TestScenario<Discount>> = new Parameterized<Discount, TestScenario<Discount>>([
-        ['standard discount', new StandardDiscount(discountMonth.startDate, discountMonth.endDate, 'by quantity item', 1.0)],
-        ['bulk flat price', new BulkFlatPriceDiscount(discountMonth.startDate, discountMonth.endDate, 'by quantity item', 3, 5.0)],
-        ['up sale percent discount', new UpSalePercentDiscount(discountMonth.startDate, discountMonth.endDate, 'by quantity item', 2, 1, 0.5)],
-        ['limited up sale percent discount', new LimitedUpSalePercentDiscount(discountMonth.startDate, discountMonth.endDate, 'by quantity item', 3, 1, 1, 8)],
-        ['up sale flat price discount', new UpSaleFlatPriceDiscount(discountMonth.startDate, discountMonth.endDate, 'by quantity item', 2, 1, 1.25)],
-        ['limited up sale flat price discount', new LimitedUpSaleFlatPriceDiscount(discountMonth.startDate, discountMonth.endDate, 'by quantity item', 3, 2, 1, 10)],
-        ['up sale percent discount by weight', new UpSalePercentDiscountByWeight(discountMonth.startDate, discountMonth.endDate, 'by weight item', 2, 1, .5)]
+        { description: 'standard discount', target: new StandardDiscount(discountMonth.startDate, discountMonth.endDate, 'by quantity item', 1.0) },
+        { description: 'bulk flat price', target: new BulkFlatPriceDiscount(discountMonth.startDate, discountMonth.endDate, 'by quantity item', 3, 5.0) },
+        { description: 'up sale percent discount', target: new UpSalePercentDiscount(discountMonth.startDate, discountMonth.endDate, 'by quantity item', 2, 1, 0.5) },
+        { description: 'limited up sale percent discount', target: new LimitedUpSalePercentDiscount(discountMonth.startDate, discountMonth.endDate, 'by quantity item', 3, 1, 1, 8) },
+        { description: 'up sale flat price discount', target: new UpSaleFlatPriceDiscount(discountMonth.startDate, discountMonth.endDate, 'by quantity item', 2, 1, 1.25) },
+        { description: 'limited up sale flat price discount', target: new LimitedUpSaleFlatPriceDiscount(discountMonth.startDate, discountMonth.endDate, 'by quantity item', 3, 2, 1, 10) },
+        { description: 'up sale percent discount by weight', target: new UpSalePercentDiscountByWeight(discountMonth.startDate, discountMonth.endDate, 'by weight item', 2, 1, .5) }
     ]);
 
     validDiscountScenarios.forEach().describe('And a valid discount When adding it', (discountScenario: TestScenario<Discount>) => {
 
+        const scenarioDescription: string = discountScenario.description;
+        const discount: Discount = discountScenario.target;
+
         beforeEach(() => {
-            discountList.add(discountScenario[1]);
+            discountList.add(discount);
         });
 
-        it('Should be added to the list', () => {
-            const result = discountList.includes(discountScenario[1]);
-            expect(result).toBe(true);
+        describe(scenarioDescription, () => {
+
+            it('Should be added to the list', () => {
+                const result = discountList.includes(discount);
+                expect(result).toBe(true);
+            });
+
         });
 
     });
 
     const invalidDiscountsWithItemTypeMismatch: Parameterized<Discount, TestScenario<Discount>> = new Parameterized<Discount, TestScenario<Discount>>([
-        ['standard discount item type mismatch', new StandardDiscount(new Date(), new Date(), 'by weight item', 1.0)],
-        ['bulk flat price item type mismatch', new BulkFlatPriceDiscount(new Date(), new Date(), 'by weight item', 3, 5.0)],
-        ['up sale percent discount item type mismatch', new UpSalePercentDiscount(new Date(), new Date(), 'by weight item', 2, 1, 0.5)],
-        ['limited up sale percent discount item type mismatch', new LimitedUpSalePercentDiscount(new Date(), new Date(), 'by weight item', 3, 1, 1, 8)],
-        ['up sale flat price discount item type mismatch', new UpSaleFlatPriceDiscount(new Date(), new Date(), 'by weight item', 2, 1, 1.25)],
-        ['limited up sale flat price discount item type mismatch', new LimitedUpSaleFlatPriceDiscount(new Date(), new Date(), 'by weight item', 3, 2, 1, 10)],
-        ['up sale percent discount by weight item type mismatch', new UpSalePercentDiscountByWeight(new Date(), new Date(), 'by quantity item', 2, 1, .5)],
-        ['standard discount no matching item', new StandardDiscount(new Date(), new Date(), 'no matching item', 1.0)],
-        ['bulk flat price no matching item', new BulkFlatPriceDiscount(new Date(), new Date(), 'no matching item', 3, 5.0)],
-        ['up sale percent discount no matching item', new UpSalePercentDiscount(new Date(), new Date(), 'no matching item', 2, 1, 0.5)],
-        ['limited up sale percent discount no matching item', new LimitedUpSalePercentDiscount(new Date(), new Date(), 'no matching item', 3, 1, 1, 8)],
-        ['up sale flat price discount no matching item', new UpSaleFlatPriceDiscount(new Date(), new Date(), 'no matching item', 2, 1, 1.25)],
-        ['limited up sale flat price discount no matching item', new LimitedUpSaleFlatPriceDiscount(new Date(), new Date(), 'no matching item', 3, 2, 1, 10)],
-        ['up sale percent discount by weight no matching item', new UpSalePercentDiscountByWeight(new Date(), new Date(), 'no matching item', 2, 1, .5)]
+        { description: 'standard discount item type mismatch', target: new StandardDiscount(new Date(), new Date(), 'by weight item', 1.0) },
+        { description: 'bulk flat price item type mismatch', target: new BulkFlatPriceDiscount(new Date(), new Date(), 'by weight item', 3, 5.0) },
+        { description: 'up sale percent discount item type mismatch', target: new UpSalePercentDiscount(new Date(), new Date(), 'by weight item', 2, 1, 0.5) },
+        { description: 'limited up sale percent discount item type mismatch', target: new LimitedUpSalePercentDiscount(new Date(), new Date(), 'by weight item', 3, 1, 1, 8) },
+        { description: 'up sale flat price discount item type mismatch', target: new UpSaleFlatPriceDiscount(new Date(), new Date(), 'by weight item', 2, 1, 1.25) },
+        { description: 'limited up sale flat price discount item type mismatch', target: new LimitedUpSaleFlatPriceDiscount(new Date(), new Date(), 'by weight item', 3, 2, 1, 10) },
+        { description: 'up sale percent discount by weight item type mismatch', target: new UpSalePercentDiscountByWeight(new Date(), new Date(), 'by quantity item', 2, 1, .5) },
+        { description: 'standard discount no matching item', target: new StandardDiscount(new Date(), new Date(), 'no matching item', 1.0) },
+        { description: 'bulk flat price no matching item', target: new BulkFlatPriceDiscount(new Date(), new Date(), 'no matching item', 3, 5.0) },
+        { description: 'up sale percent discount no matching item', target: new UpSalePercentDiscount(new Date(), new Date(), 'no matching item', 2, 1, 0.5) },
+        { description: 'limited up sale percent discount no matching item', target: new LimitedUpSalePercentDiscount(new Date(), new Date(), 'no matching item', 3, 1, 1, 8) },
+        { description: 'up sale flat price discount no matching item', target: new UpSaleFlatPriceDiscount(new Date(), new Date(), 'no matching item', 2, 1, 1.25) },
+        { description: 'limited up sale flat price discount no matching item', target: new LimitedUpSaleFlatPriceDiscount(new Date(), new Date(), 'no matching item', 3, 2, 1, 10) },
+        { description: 'up sale percent discount by weight no matching item', target: new UpSalePercentDiscountByWeight(new Date(), new Date(), 'no matching item', 2, 1, .5) }
     ]);
 
     invalidDiscountsWithItemTypeMismatch.forEach().describe('And an invalid discount When adding it', (typeMismatchScenario: TestScenario<Discount>) => {
+
+        const scenarioDescription: string = typeMismatchScenario.description;
+        const discount: Discount = typeMismatchScenario.target;
         let error: Error | null = null;
 
         beforeEach(() => {
             try {
-                discountList.add(typeMismatchScenario[1]);
+                discountList.add(discount);
             } catch (exception) {
                 error = exception;
             }
         });
 
-        it(typeMismatchScenario[0] + ' Should raise an error', () => {
-            expect(error).not.toBeNull();
-        });
+        describe(scenarioDescription, () => {
 
-        it(typeMismatchScenario[0] + ' Should not be added to the list', () => {
-            const result = discountList.includes(typeMismatchScenario[1]);
-            expect(result).toBe(false);
+            it('Should raise an error', () => {
+                expect(error).not.toBeNull();
+            });
+    
+            it('Should not be added to the list', () => {
+                const result = discountList.includes(discount);
+                expect(result).toBe(false);
+            });
+
         });
 
     });
@@ -229,34 +246,37 @@ describe('Given a collection of Pricing Rules', () => {
     };
 
     const overlappingDateScenarios: Parameterized<DateRange, TestScenario<DateRange>> = new Parameterized<DateRange, TestScenario<DateRange>>([
-        ['week inside of month', weekInsideMonth],
-        ['week overlapping beginning of month', weekOverlappingBeginningOfMonth],
-        ['week overlapping end of month', weekOverlappingEndOfMonth],
-        ['quarter overlapping entire month', quarterOverlappingEntireMonth]
+        { description: 'week inside of month', target: weekInsideMonth },
+        { description: 'week overlapping beginning of month', target: weekOverlappingBeginningOfMonth },
+        { description: 'week overlapping end of month', target: weekOverlappingEndOfMonth },
+        { description: 'quarter overlapping entire month', target: quarterOverlappingEntireMonth }
     ]);
 
-    overlappingDateScenarios.forEach().describe('When adding a duplicate', (overlappingDateScenario: TestScenario<DateRange>) => {  
-        
-        const overlappingDateRange: DateRange = overlappingDateScenario[1];
+    overlappingDateScenarios.forEach().describe('When adding a duplicate', (overlappingDateScenario: TestScenario<DateRange>) => {
+
+        const scenarioDescription: string = overlappingDateScenario.description;
+        const overlappingDateRange: DateRange = overlappingDateScenario.target;
 
         const overlappingDiscountScenarios: Parameterized<Discount, TestScenario<Discount>> = new Parameterized<Discount, TestScenario<Discount>>([
-            ['standard discount', new StandardDiscount(overlappingDateRange.startDate, overlappingDateRange.endDate, 'by quantity item', 1.0)],
-            ['bulk flat price', new BulkFlatPriceDiscount(overlappingDateRange.startDate, overlappingDateRange.endDate, 'by quantity item', 3, 5.0)],
-            ['up sale percent discount', new UpSalePercentDiscount(overlappingDateRange.startDate, overlappingDateRange.endDate, 'by quantity item', 2, 1, 0.5)],
-            ['limited up sale percent discount', new LimitedUpSalePercentDiscount(overlappingDateRange.startDate, overlappingDateRange.endDate, 'by quantity item', 3, 1, 1, 8)],
-            ['up sale flat price discount', new UpSaleFlatPriceDiscount(overlappingDateRange.startDate, overlappingDateRange.endDate, 'by quantity item', 2, 1, 1.25)],
-            ['limited up sale flat price discount', new LimitedUpSaleFlatPriceDiscount(overlappingDateRange.startDate, overlappingDateRange.endDate, 'by quantity item', 3, 2, 1, 10)],
-            ['up sale percent discount by weight', new UpSalePercentDiscountByWeight(overlappingDateRange.startDate, overlappingDateRange.endDate, 'by weight item', 2, 1, .5)]
+            { description: 'standard discount', target: new StandardDiscount(overlappingDateRange.startDate, overlappingDateRange.endDate, 'by quantity item', 1.0) },
+            { description: 'bulk flat price', target: new BulkFlatPriceDiscount(overlappingDateRange.startDate, overlappingDateRange.endDate, 'by quantity item', 3, 5.0) },
+            { description: 'up sale percent discount', target: new UpSalePercentDiscount(overlappingDateRange.startDate, overlappingDateRange.endDate, 'by quantity item', 2, 1, 0.5) },
+            { description: 'limited up sale percent discount', target: new LimitedUpSalePercentDiscount(overlappingDateRange.startDate, overlappingDateRange.endDate, 'by quantity item', 3, 1, 1, 8) },
+            { description: 'up sale flat price discount', target: new UpSaleFlatPriceDiscount(overlappingDateRange.startDate, overlappingDateRange.endDate, 'by quantity item', 2, 1, 1.25) },
+            { description: 'limited up sale flat price discount', target: new LimitedUpSaleFlatPriceDiscount(overlappingDateRange.startDate, overlappingDateRange.endDate, 'by quantity item', 3, 2, 1, 10) },
+            { description: 'up sale percent discount by weight', target: new UpSalePercentDiscountByWeight(overlappingDateRange.startDate, overlappingDateRange.endDate, 'by weight item', 2, 1, .5) }
         ]);
 
-        overlappingDiscountScenarios.forEach().describe(overlappingDateScenario[0], (overlappingDiscountScenario: TestScenario<Discount>) => {
+        overlappingDiscountScenarios.forEach().describe(scenarioDescription, (overlappingDiscountScenario: TestScenario<Discount>) => {
 
-            const overlappingDiscount: Discount = overlappingDiscountScenario[1];
-            const whenSameCode = (validDiscount: TestScenario<Discount>): boolean => validDiscount[1].code === overlappingDiscount.code;
+            const scenarioDescription: string = overlappingDiscountScenario.description;
+            const overlappingDiscount: Discount = overlappingDiscountScenario.target;
+            const whenSameCode = (validDiscountScenario: TestScenario<Discount>): boolean => validDiscountScenario.target.code === overlappingDiscount.code;
 
-            validDiscountScenarios.forEach(whenSameCode).describe(overlappingDiscountScenario[0], (discountScenario: TestScenario<Discount>) => {
+            validDiscountScenarios.forEach(whenSameCode).describe(scenarioDescription, (discountScenario: TestScenario<Discount>) => {
 
-                const discount: Discount = discountScenario[1];
+                const scenarioDescription: string = discountScenario.description;
+                const discount: Discount = discountScenario.target;
                 let error: Error | null = null;
 
                 beforeEach(() => {
@@ -268,12 +288,12 @@ describe('Given a collection of Pricing Rules', () => {
                     }
                 });
 
-                describe(discountScenario[0], () => {
+                describe(scenarioDescription, () => {
 
                     it('Should raise an error.', () => {
                         expect(error).not.toBeNull();
                     });
-    
+
                     it('Should not be included.', () => {
                         const result = discountList.includes(overlappingDiscount);
                         expect(result).not.toBe(true)

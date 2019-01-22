@@ -1,5 +1,8 @@
 
-export type TestScenario<Target> = [ string, Target ];
+export interface TestScenario<Target> {
+    description: string;
+    target: Target;
+}
 
 export interface ParameterizedToken<Target, Scenario extends TestScenario<Target>> {
     it(description: string, func: (value: Scenario) => void): void;
@@ -7,15 +10,15 @@ export interface ParameterizedToken<Target, Scenario extends TestScenario<Target
 }
 
 export class Parameterized<Target, Scenario extends TestScenario<Target>> {
-    constructor(private readonly scenarios: Array<Scenario>) {}
-    public forEach(predicate?: (scenario: Scenario) => boolean): ParameterizedToken<Target, Scenario> { 
+    constructor(private readonly scenarios: Array<Scenario>) { }
+    public forEach(predicate?: (scenario: Scenario) => boolean): ParameterizedToken<Target, Scenario> {
         return {
             it: (description: string, func: (value: Scenario) => void): void => {
                 this.scenarios.forEach((scenario: Scenario): void => {
                     if (predicate === undefined || predicate(scenario)) {
                         it(description, (): void => {
                             func(scenario);
-                        });     
+                        });
                     }
                 });
             },
@@ -24,7 +27,7 @@ export class Parameterized<Target, Scenario extends TestScenario<Target>> {
                     if (predicate === undefined || predicate(scenario)) {
                         describe(description, (): void => {
                             func(scenario);
-                        });     
+                        });
                     }
                 });
             }
