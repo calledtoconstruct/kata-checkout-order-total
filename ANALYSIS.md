@@ -104,8 +104,21 @@
 **Given** a collection of pricing rules
 **And** an invalid rule (not matching the above rule types)
 **When** adding the rule
-**Then** and error is raised
+**Then** an error is raised
 **And** the rule is not included in the collection.
+
+> Validation common to all pricing rules
+
+**Given** a pricing rule
+**And** a start date
+**And** an end date that is less than or equal to the start date
+**When** validating the pricing rule
+**Then** an error is raised.
+
+**Given** a pricing rule
+**And** a start date, end date, or item code that is undefined or null
+**When** validating the pricing rule
+**Then** an error is raised.
 
 # Epic - Scanning
 
