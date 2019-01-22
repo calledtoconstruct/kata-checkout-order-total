@@ -1,4 +1,5 @@
-/* global describe, it, expect, beforeEach */
+
+import { Parameterized, TestScenario } from './parameterized';
 
 import { ItemList, Item, ItemListImplementation, StandardItem, ItemType } from '../src/item';
 
@@ -14,37 +15,6 @@ import {
     UpSalePercentDiscountByWeight,
     DiscountListImplementation
 } from '../src/discount';
-
-interface Parameterized<T> {
-    it(description: string, func: (value: T) => void): void;
-    describe(description: string, func: (value: T) => void): void;
-}
-
-class Parameters<T> {
-    constructor(public readonly cases: Array<T>) {}
-    public forEach(predicate?: (cs: T) => boolean): Parameterized<T> { 
-        return {
-            it: (description: string, func: (value: T) => void): void => {
-                this.cases.forEach((cs: T): void => {
-                    if (predicate === undefined || predicate(cs)) {
-                        it(description, (): void => {
-                            func(cs);
-                        });     
-                    }
-                });
-            },
-            describe: (description: string, func: (value: T) => void): void => {
-                this.cases.forEach((cs: T): void => {
-                    if (predicate === undefined || predicate(cs)) {
-                        describe(description, (): void => {
-                            func(cs);
-                        });     
-                    }
-                });
-            }
-        };
-    }
-}
 
 type DateRange = { startDate: Date, endDate: Date };
 
@@ -103,14 +73,14 @@ describe('Given a collection of Items', () => {
 
     });
 
-    const invalidItems: Parameters<[string, Item]> = new Parameters<[string, Item]>([
+    const invalidItems: Parameterized<Item, TestScenario<Item>> = new Parameterized<Item, TestScenario<Item>>([
         ['item code', new StandardItem(null, 'random description', 'by weight', 3.0)],
         ['description', new StandardItem('random item code', null, 'by quantity', 3.0)],
         ['type', new StandardItem('random item code', 'random description', null, 3.0)],
         ['price', new StandardItem('random item code', 'random description', 'by weight', null)]
     ]);
 
-    invalidItems.forEach().describe('And an invalid item When adding it, it', (item: [string, Item]) => {
+    invalidItems.forEach().describe('And an invalid item When adding it, it', (item: TestScenario<Item>) => {
         let error: Error | null = null;
 
         beforeEach(() => {
@@ -176,7 +146,7 @@ describe('Given a collection of Pricing Rules', () => {
         endDate: new Date(2010, 3, 31, 11, 59, 59, 999)
     };
 
-    const validDiscountScenarios: Parameters<[string, Discount]> = new Parameters<[string, Discount]>([
+    const validDiscountScenarios: Parameterized<Discount, TestScenario<Discount>> = new Parameterized<Discount, TestScenario<Discount>>([
         ['standard discount', new StandardDiscount(discountMonth.startDate, discountMonth.endDate, 'by quantity item', 1.0)],
         ['bulk flat price', new BulkFlatPriceDiscount(discountMonth.startDate, discountMonth.endDate, 'by quantity item', 3, 5.0)],
         ['up sale percent discount', new UpSalePercentDiscount(discountMonth.startDate, discountMonth.endDate, 'by quantity item', 2, 1, 0.5)],
@@ -186,20 +156,20 @@ describe('Given a collection of Pricing Rules', () => {
         ['up sale percent discount by weight', new UpSalePercentDiscountByWeight(discountMonth.startDate, discountMonth.endDate, 'by weight item', 2, 1, .5)]
     ]);
 
-    validDiscountScenarios.forEach().describe('And a valid discount When adding it', (item: [string, Discount]) => {
+    validDiscountScenarios.forEach().describe('And a valid discount When adding it', (discountScenario: TestScenario<Discount>) => {
 
         beforeEach(() => {
-            discountList.add(item[1]);
+            discountList.add(discountScenario[1]);
         });
 
         it('Should be added to the list', () => {
-            const result = discountList.includes(item[1]);
+            const result = discountList.includes(discountScenario[1]);
             expect(result).toBe(true);
         });
 
     });
 
-    const invalidDiscountsWithItemTypeMismatch: Parameters<[string, Discount]> = new Parameters<[string, Discount]>([
+    const invalidDiscountsWithItemTypeMismatch: Parameterized<Discount, TestScenario<Discount>> = new Parameterized<Discount, TestScenario<Discount>>([
         ['standard discount item type mismatch', new StandardDiscount(new Date(), new Date(), 'by weight item', 1.0)],
         ['bulk flat price item type mismatch', new BulkFlatPriceDiscount(new Date(), new Date(), 'by weight item', 3, 5.0)],
         ['up sale percent discount item type mismatch', new UpSalePercentDiscount(new Date(), new Date(), 'by weight item', 2, 1, 0.5)],
@@ -216,23 +186,23 @@ describe('Given a collection of Pricing Rules', () => {
         ['up sale percent discount by weight no matching item', new UpSalePercentDiscountByWeight(new Date(), new Date(), 'no matching item', 2, 1, .5)]
     ]);
 
-    invalidDiscountsWithItemTypeMismatch.forEach().describe('And an invalid discount When adding it', (item: [string, Discount]) => {
+    invalidDiscountsWithItemTypeMismatch.forEach().describe('And an invalid discount When adding it', (typeMismatchScenario: TestScenario<Discount>) => {
         let error: Error | null = null;
 
         beforeEach(() => {
             try {
-                discountList.add(item[1]);
+                discountList.add(typeMismatchScenario[1]);
             } catch (exception) {
                 error = exception;
             }
         });
 
-        it(item[0] + ' Should raise an error', () => {
+        it(typeMismatchScenario[0] + ' Should raise an error', () => {
             expect(error).not.toBeNull();
         });
 
-        it(item[0] + ' Should not be added to the list', () => {
-            const result = discountList.includes(item[1]);
+        it(typeMismatchScenario[0] + ' Should not be added to the list', () => {
+            const result = discountList.includes(typeMismatchScenario[1]);
             expect(result).toBe(false);
         });
 
@@ -258,18 +228,18 @@ describe('Given a collection of Pricing Rules', () => {
         endDate: new Date(2010, 4, 3, 11, 59, 59, 999)
     };
 
-    const overlappingDateScenarios: Parameters<[string, DateRange]> = new Parameters<[string, DateRange]>([
+    const overlappingDateScenarios: Parameterized<DateRange, TestScenario<DateRange>> = new Parameterized<DateRange, TestScenario<DateRange>>([
         ['week inside of month', weekInsideMonth],
         ['week overlapping beginning of month', weekOverlappingBeginningOfMonth],
         ['week overlapping end of month', weekOverlappingEndOfMonth],
         ['quarter overlapping entire month', quarterOverlappingEntireMonth]
     ]);
 
-    overlappingDateScenarios.forEach().describe('When adding a duplicate', (overlappingDateScenario: [string, DateRange]) => {  
+    overlappingDateScenarios.forEach().describe('When adding a duplicate', (overlappingDateScenario: TestScenario<DateRange>) => {  
         
         const overlappingDateRange: DateRange = overlappingDateScenario[1];
 
-        const overlappingDiscountScenarios: Parameters<[string, Discount]> = new Parameters<[string, Discount]>([
+        const overlappingDiscountScenarios: Parameterized<Discount, TestScenario<Discount>> = new Parameterized<Discount, TestScenario<Discount>>([
             ['standard discount', new StandardDiscount(overlappingDateRange.startDate, overlappingDateRange.endDate, 'by quantity item', 1.0)],
             ['bulk flat price', new BulkFlatPriceDiscount(overlappingDateRange.startDate, overlappingDateRange.endDate, 'by quantity item', 3, 5.0)],
             ['up sale percent discount', new UpSalePercentDiscount(overlappingDateRange.startDate, overlappingDateRange.endDate, 'by quantity item', 2, 1, 0.5)],
@@ -279,12 +249,12 @@ describe('Given a collection of Pricing Rules', () => {
             ['up sale percent discount by weight', new UpSalePercentDiscountByWeight(overlappingDateRange.startDate, overlappingDateRange.endDate, 'by weight item', 2, 1, .5)]
         ]);
 
-        overlappingDiscountScenarios.forEach().describe(overlappingDateScenario[0], (overlappingDiscountScenario: [string, Discount]) => {
+        overlappingDiscountScenarios.forEach().describe(overlappingDateScenario[0], (overlappingDiscountScenario: TestScenario<Discount>) => {
 
             const overlappingDiscount: Discount = overlappingDiscountScenario[1];
-            const whenSameCode = (validDiscount: [string, Discount]): boolean => validDiscount[1].code === overlappingDiscount.code;
+            const whenSameCode = (validDiscount: TestScenario<Discount>): boolean => validDiscount[1].code === overlappingDiscount.code;
 
-            validDiscountScenarios.forEach(whenSameCode).describe(overlappingDiscountScenario[0], (discountScenario: [string, Discount]) => {
+            validDiscountScenarios.forEach(whenSameCode).describe(overlappingDiscountScenario[0], (discountScenario: TestScenario<Discount>) => {
 
                 const discount: Discount = discountScenario[1];
                 let error: Error | null = null;
