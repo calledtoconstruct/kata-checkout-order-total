@@ -16,7 +16,7 @@ import {
     DiscountListImplementation
 } from '../src/discount';
 
-type DateRange = { startDate: Date, endDate: Date };
+import { DateRange } from '../src/date';
 
 describe('Given a collection of Items', () => {
     let itemList: ItemList;
