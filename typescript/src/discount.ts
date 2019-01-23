@@ -77,6 +77,12 @@ const validateBulkQuantity: (upSale: UpSale) => void = (upSale: UpSale): void =>
     }
 };
 
+const validateSaleQuantity: (upSale: UpSale) => void = (upSale: UpSale): void => {
+    if (upSale.sale < 1) {
+        throw new Error('Sale Quantity must be Greater Than Zero');
+    }
+};
+
 abstract class UpSaleDiscount implements Discount, UpSale {
     constructor(
         public readonly startDate: Date,
@@ -90,6 +96,7 @@ abstract class UpSaleDiscount implements Discount, UpSale {
     protected validateItemType(itemList: ItemList, type: ItemType): void {
         validateItemCode(this);
         validateBulkQuantity(this);
+        validateSaleQuantity(this);
         validateItemType(itemList, this.code, type);
         validateItemDateRange(this);
     }
