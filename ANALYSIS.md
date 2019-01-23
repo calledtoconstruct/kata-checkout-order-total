@@ -107,6 +107,28 @@
 **Then** an error is raised
 **And** the rule is not included in the collection.
 
+> Validation of up sale rules
+
+**Given** an up sale pricing rule
+**And** a bulk quantity less than one
+**When** validating the rule
+**Then** an error is raised.
+
+**Given** an up sale pricing rule
+**And** a sale quantity less than one
+**When** validating the rule
+**Then** an error is raised.
+
+**Given** an up sale pricing rule
+**And** a fractional bulk quantity
+**When** validating the rule
+**Then** an error is raised.
+
+**Given** an up sale pricing rule
+**And** a fractional sale quantity
+**When** validating the rule
+**Then** an error is raised.
+
 > Validation common to all pricing rules
 
 **Given** a pricing rule
