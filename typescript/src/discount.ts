@@ -83,6 +83,12 @@ const validateSaleQuantity: (upSale: UpSale) => void = (upSale: UpSale): void =>
     }
 };
 
+const validateWholeNumberBulkQuantity: (upSale: UpSale) => void = (upSale: UpSale): void => {
+    if (Math.floor(upSale.bulk) !== upSale.bulk) {
+        throw new Error('Bulk Quantity must be a Whole Number');
+    }
+};
+
 abstract class UpSaleDiscount implements Discount, UpSale {
     constructor(
         public readonly startDate: Date,
@@ -95,6 +101,7 @@ abstract class UpSaleDiscount implements Discount, UpSale {
 
     protected validateItemType(itemList: ItemList, type: ItemType): void {
         validateItemCode(this);
+        validateWholeNumberBulkQuantity(this);
         validateBulkQuantity(this);
         validateSaleQuantity(this);
         validateItemType(itemList, this.code, type);
