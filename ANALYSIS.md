@@ -144,6 +144,18 @@
 
 # Epic - Scanning
 
+## *As a cashier, I want the ability to open a new transaction, so that I can serve customers.*
+
+### Acceptance Criteria
+
+**Given** a transaction processor
+**When** starting a new transaction
+**Then** a unique transaction number is returned.
+
+**Given** a new transaction
+**When** requesting the total
+**Then** zero is returned.
+
 ## *As a cashier, I want the ability to scan an item, so that items can be easily added to the transaction.*
 
 ### Acceptance Criteria
@@ -544,6 +556,12 @@ item_total = $10.75
 ### Acceptance Criteria
 
 **Given** a transaction
-**And** all item totals have been calculated
+**And** one item that costs $5.00
 **When** calculating the sale total
-**Then** the sale total is the sum of all item totals.
+**Then** the sale total is $5.00.
+
+**Given** a transaction
+**And** one item that costs $5.00
+**And** another item that costs $3.00
+**When** calculating the sale total
+**Then** the sale total is $8.00.
