@@ -1,6 +1,11 @@
 
+import * as uuid from 'uuid';
+
 export class Transaction {
-    public test() {
-        return false;
+
+    public start(): string {
+        const uniqueId: string = uuid();
+        return 'transaction ' + uniqueId;
     }
+
 }

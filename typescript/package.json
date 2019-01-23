@@ -21,8 +21,10 @@
   "homepage": "https://github.com/calledtoconstruct/kata-checkout-order-total#readme",
   "dependencies": {
     "@types/jasmine": "^3.3.7",
+    "@types/uuid": "^3.4.4",
     "jasmine": "^3.3.1",
-    "karma": "^3.1.4"
+    "karma": "^3.1.4",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "tslint": "^5.12.1",
