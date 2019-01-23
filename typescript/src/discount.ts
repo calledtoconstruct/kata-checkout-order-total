@@ -13,6 +13,12 @@ export interface Discount {
     validate(itemList: ItemList): void;
 }
 
+const validateItemCode: (discount: Discount) => void = (discount: Discount): void => {
+    if (discount.code.length === 0) {
+        throw new Error('Invalid Item Code');
+    }
+};
+
 const validateItemType: (itemList: ItemList, code: string, type: ItemType) => void = (itemList: ItemList, code: string, type: ItemType): void => {
     const item = itemList.get(code);
     if (item.type !== type) {
@@ -39,6 +45,7 @@ export class StandardDiscount implements Discount {
     ) { }
 
     public validate(itemList: ItemList): void {
+        validateItemCode(this);
         validateItemType(itemList, this.code, 'by quantity');
         validateItemDateRange(this);
     }
@@ -53,6 +60,7 @@ export class BulkFlatPriceDiscount implements Discount {
         public readonly price: number
     ) { }
     public validate(itemList: ItemList): void {
+        validateItemCode(this);
         validateItemType(itemList, this.code, 'by quantity');
         validateItemDateRange(this);
     }
@@ -69,6 +77,7 @@ abstract class UpSaleDiscount implements Discount {
     public abstract validate(itemList: ItemList): void;
 
     protected validateItemType(itemList: ItemList, type: ItemType): void {
+        validateItemCode(this);
         validateItemType(itemList, this.code, type);
         validateItemDateRange(this);
     }

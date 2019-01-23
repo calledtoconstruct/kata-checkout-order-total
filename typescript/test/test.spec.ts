@@ -376,3 +376,47 @@ invertedDateRangeDiscountScenarios.forEach().describe('Given a pricing rule with
     });
 
 });
+
+const invalidDiscountScenarios: Parameterized<Discount, TestScenario<Discount>> = new Parameterized<Discount, TestScenario<Discount>>([
+    { description: 'standard discount with empty item code', target: new StandardDiscount(new Date(), new Date(), '', 1.0) },
+    { description: 'bulk flat price with empty item code', target: new BulkFlatPriceDiscount(new Date(), new Date(), '', 3, 5.0) },
+    { description: 'up sale percent discount with empty item code', target: new UpSalePercentDiscount(new Date(), new Date(), '', 2, 1, 0.5) },
+    { description: 'limited up sale percent discount with empty item code', target: new LimitedUpSalePercentDiscount(new Date(), new Date(), '', 3, 1, 1, 8) },
+    { description: 'up sale flat price discount with empty item code', target: new UpSaleFlatPriceDiscount(new Date(), new Date(), '', 2, 1, 1.25) },
+    { description: 'limited up sale flat price discount with empty item code', target: new LimitedUpSaleFlatPriceDiscount(new Date(), new Date(), '', 3, 2, 1, 10) },
+    { description: 'up sale percent discount by weight with empty item code', target: new UpSalePercentDiscountByWeight(new Date(), new Date(), '', 2, 1, .5) }
+]);
+
+invalidDiscountScenarios.forEach().describe('Given a', (invalidDiscountScenario: TestScenario<Discount>) => {
+
+    const scenarioDescription: string = invalidDiscountScenario.description;
+    const invalidDiscount: Discount = invalidDiscountScenario.target;
+    const fakeItemList: FakeItemList = new FakeItemList();
+    const itemList: ItemList = fakeItemList;
+    const expectedError: Error = new Error('Invalid Item Code');
+
+    describe(scenarioDescription, () => {
+
+        fakeItemList.addFakeItem('', new FakeItem());
+
+        describe('When validating', () => {
+            let error: Error | null = null;
+
+            beforeEach(() => {
+                try {
+                    invalidDiscount.validate(itemList);
+                } catch (exception) {
+                    error = exception;
+                }
+            });
+
+            it('Should raise an error.', () => {
+                expect(error).not.toBeNull();
+                expect(error).toEqual(expectedError);
+            });
+
+        });
+
+    });
+
+});
