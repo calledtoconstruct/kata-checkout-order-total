@@ -66,7 +66,18 @@ export class BulkFlatPriceDiscount implements Discount {
     }
 }
 
-abstract class UpSaleDiscount implements Discount {
+export interface UpSale {
+    readonly bulk: number,
+    readonly sale: number
+}
+
+const validateBulkQuantity: (upSale: UpSale) => void = (upSale: UpSale): void => {
+    if (upSale.bulk < 1) {
+        throw new Error('Bulk Quantity must be Greater Than Zero');
+    }
+};
+
+abstract class UpSaleDiscount implements Discount, UpSale {
     constructor(
         public readonly startDate: Date,
         public readonly endDate: Date,
@@ -78,6 +89,7 @@ abstract class UpSaleDiscount implements Discount {
 
     protected validateItemType(itemList: ItemList, type: ItemType): void {
         validateItemCode(this);
+        validateBulkQuantity(this);
         validateItemType(itemList, this.code, type);
         validateItemDateRange(this);
     }
