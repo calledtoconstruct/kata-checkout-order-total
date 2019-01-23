@@ -507,7 +507,6 @@ invalidSaleQuantityDiscountScenarios.forEach().describe('Given a', (invalidDisco
 
 });
 
-
 const invalidFractionalBulkQuantityDiscountScenarios: Parameterized<Discount, TestScenario<Discount>> = new Parameterized<Discount, TestScenario<Discount>>([
     { description: 'up sale percent discount with fractional bulk quantity', target: new UpSalePercentDiscount(new Date(), new Date(), 'by quantity item', 2.5, 1, 0.5) },
     { description: 'limited up sale percent discount with fractional bulk quantity', target: new LimitedUpSalePercentDiscount(new Date(), new Date(), 'by quantity item', 0.25, 1, 1, 8) },
@@ -523,6 +522,49 @@ invalidFractionalBulkQuantityDiscountScenarios.forEach().describe('Given a', (in
     const fakeItemList: FakeItemList = new FakeItemList();
     const itemList: ItemList = fakeItemList;
     const expectedError: Error = new Error('Bulk Quantity must be a Whole Number');
+
+    describe(scenarioDescription, () => {
+
+        fakeItemList.addFakeItem('by quantity item', new FakeByQuantityItem());
+        fakeItemList.addFakeItem('by weight item', new FakeByWeightItem());
+
+        describe('When validating', () => {
+            let error: Error | null = null;
+
+            beforeEach(() => {
+                try {
+                    invalidDiscount.validate(itemList);
+                } catch (exception) {
+                    error = exception;
+                }
+            });
+
+            it('Should raise an error.', () => {
+                expect(error).not.toBeNull();
+                expect(error).toEqual(expectedError);
+            });
+
+        });
+
+    });
+
+});
+
+const invalidFractionalSaleQuantityDiscountScenarios: Parameterized<Discount, TestScenario<Discount>> = new Parameterized<Discount, TestScenario<Discount>>([
+    { description: 'up sale percent discount with fractional sale quantity', target: new UpSalePercentDiscount(new Date(), new Date(), 'by quantity item', 2, 1.25, 0.5) },
+    { description: 'limited up sale percent discount with fractional sale quantity', target: new LimitedUpSalePercentDiscount(new Date(), new Date(), 'by quantity item', 25, 5.5, 1, 8) },
+    { description: 'up sale flat price discount with fractional sale quantity', target: new UpSaleFlatPriceDiscount(new Date(), new Date(), 'by quantity item', 1, 0.25, 1.25) },
+    { description: 'limited up sale flat price discount with fractional sale quantity', target: new LimitedUpSaleFlatPriceDiscount(new Date(), new Date(), 'by quantity item', 5, 0.9999, 1, 10) },
+    { description: 'up sale percent discount by weight with fractional sale quantity', target: new UpSalePercentDiscountByWeight(new Date(), new Date(), 'by weight item', 5, 1.2342, .5) }
+]);
+
+invalidFractionalSaleQuantityDiscountScenarios.forEach().describe('Given a', (invalidDiscountScenario: TestScenario<Discount>) => {
+
+    const scenarioDescription: string = invalidDiscountScenario.description;
+    const invalidDiscount: Discount = invalidDiscountScenario.target;
+    const fakeItemList: FakeItemList = new FakeItemList();
+    const itemList: ItemList = fakeItemList;
+    const expectedError: Error = new Error('Sale Quantity must be a Whole Number');
 
     describe(scenarioDescription, () => {
 
