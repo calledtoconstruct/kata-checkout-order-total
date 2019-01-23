@@ -108,6 +108,12 @@ describe('Given a collection of Items', () => {
 
 });
 
+class FakeItem implements Item {
+    public readonly code: string = '';
+    public readonly type: ItemType = null;
+    public validate(): void { }
+}
+
 class FakeByQuantityItem implements Item {
     public readonly code: string = 'by quantity item';
     public readonly type: ItemType = 'by quantity';
@@ -121,6 +127,7 @@ class FakeByWeightItem implements Item {
 }
 
 class FakeItemList implements ItemList {
+    private readonly items: any = {};
     public add(_: Item): void {
         throw new Error("Method not implemented.");
     }
@@ -128,11 +135,13 @@ class FakeItemList implements ItemList {
         throw new Error("Method not implemented.");
     }
     public get(code: string): Item {
-        if (code === 'by quantity item') {
-            return new FakeByQuantityItem();
-        } else if (code === 'by weight item') {
-            return new FakeByWeightItem();
-        } else throw new Error('invalid test');
+        if (this.items[code] === undefined) {
+            throw new Error('invalid test');
+        }
+        return this.items[code];
+    }
+    public addFakeItem(code: string, item: Item): void {
+        this.items[code] = item;
     }
 }
 
@@ -141,7 +150,12 @@ describe('Given a collection of Pricing Rules', () => {
     let discountList: DiscountList;
 
     beforeEach(() => {
-        const itemList: ItemList = new FakeItemList()
+        const fakeItemList: FakeItemList = new FakeItemList();
+        const itemList: ItemList = fakeItemList;
+    
+        fakeItemList.addFakeItem('by quantity item', new FakeByQuantityItem());
+        fakeItemList.addFakeItem('by weight item', new FakeByWeightItem());
+    
         discountList = new DiscountListImplementation(itemList);
     });
 
@@ -334,9 +348,13 @@ invertedDateRangeDiscountScenarios.forEach().describe('Given a pricing rule with
 
     const scenarioDescription: string = invertedDateRangeDiscountScenario.description;
     const discount: Discount = invertedDateRangeDiscountScenario.target;
-    const itemList: ItemList = new FakeItemList()
+    const fakeItemList: FakeItemList = new FakeItemList();
+    const itemList: ItemList = fakeItemList;
 
     describe(scenarioDescription, () => {
+
+        fakeItemList.addFakeItem('by quantity item', new FakeByQuantityItem());
+        fakeItemList.addFakeItem('by weight item', new FakeByWeightItem());
 
         describe('When validating', () => {
             let error: Error | null = null;
