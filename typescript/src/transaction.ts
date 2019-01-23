@@ -8,4 +8,8 @@ export class Transaction {
         return 'transaction ' + uniqueId;
     }
 
+    public total(): number {
+        return 0;
+    }
+
 }

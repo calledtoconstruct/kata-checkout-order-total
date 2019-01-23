@@ -28,6 +28,32 @@ export class TestTransaction {
 
         });
 
+        describe('Given a new transaction', () => {
+
+            let transaction: Transaction;
+            let transactionId: string;
+
+            beforeEach(() => {
+                transaction = new Transaction();
+                transactionId = transaction.start();
+            });
+
+            describe('When requesting the total', () => {
+
+                let total: number;
+
+                beforeEach(() => {
+                    total = transaction.total();
+                });
+
+                it('Should return zero.', () => {
+                    expect(total).toEqual(0);
+                });
+
+            });
+
+        });
+
     }
 
 }
