@@ -80,11 +80,12 @@ export class TestTransaction {
 
             let transaction: Transaction;
             const code: string = 'by quantity item';
+            const price: number = 3.00;
             const item: Item = new StandardItem(
                 code,
                 'some random by quantity item.',
                 'by quantity',
-                3.00
+                price
             );
 
             beforeEach(() => {
@@ -110,6 +111,10 @@ export class TestTransaction {
                     it('Then the transaction should contain a quantity of one such item.', () => {
                         expect(before).toEqual(0);
                         expect(after).toEqual(1);
+                    });
+
+                    it('Then the item total should equal the item quantity times the item price.', () => {
+                        expect(itemTotal).toEqual(after * price);
                     });
 
                 });

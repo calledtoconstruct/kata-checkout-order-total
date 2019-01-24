@@ -1,18 +1,14 @@
 
 import * as uuid from 'uuid';
-import { Item, ItemList } from './item';
+import { Item, Priced, ItemList } from './item';
 
 class TransactionItem {
 
-    constructor(private readonly item: Item) { }
+    constructor(private readonly item: Item & Priced) { }
 
     private howMany: number = 1;
 
     public code(): string {
-        // TODO: Clean this up!  Given the Lint Rules, TypeScript will enforce this.
-        if (this.item.code === null) {
-            throw new Error('Invalid item: Missing required item code.');
-        }
         return this.item.code;
     }
 
@@ -25,7 +21,7 @@ class TransactionItem {
     }
 
     public total(): number {
-        return 0;
+        return this.howMany * this.item.price;
     }
 }
 
@@ -52,13 +48,14 @@ export class Transaction {
     }
 
     public scan(code: string, weight?: number): number {
-        const scanned: Item = this.itemList.get(code);
+        const scanned: Item & Priced = this.itemList.get(code);
 
         Transaction.validateType(scanned, weight);
 
         const transactionItem: TransactionItem = new TransactionItem(scanned);
         this.item.push(transactionItem);
-        return 0;
+
+        return transactionItem.total();
     }
 
     public void(code: string, weight?: number): void {

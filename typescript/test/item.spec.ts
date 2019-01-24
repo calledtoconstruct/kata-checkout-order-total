@@ -63,10 +63,9 @@ export class TestItemList {
             });
         
             const invalidItems: Parameterized<Item, TestScenario<Item>> = new Parameterized<Item, TestScenario<Item>>([
-                { description: 'item code', target: new StandardItem(null, 'random description', 'by weight', 3.0) },
-                { description: 'description', target: new StandardItem('random item code', null, 'by quantity', 3.0) },
-                { description: 'type', target: new StandardItem('random item code', 'random description', null, 3.0) },
-                { description: 'price', target: new StandardItem('random item code', 'random description', 'by weight', null) }
+                { description: 'item code', target: new StandardItem('', 'random description', 'by weight', 3.0) },
+                { description: 'description', target: new StandardItem('random item code', '', 'by quantity', 3.0) },
+                { description: 'price', target: new StandardItem('random item code', 'random description', 'by weight', 0) }
             ]);
         
             invalidItems.forEach().describe('And an invalid item When adding it, it', (invalidItemScenario: TestScenario<Item>) => {

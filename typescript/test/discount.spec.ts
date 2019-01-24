@@ -1,7 +1,7 @@
 
 import { Parameterized, TestScenario } from './parameterized';
 
-import { ItemList, Item, ItemType } from '../src/item';
+import { ItemList, Item, Priced, ItemType } from '../src/item';
 
 import {
     Discount,
@@ -20,7 +20,7 @@ import { DateRange } from '../src/date';
 
 class FakeItem implements Item {
     public readonly code: string = '';
-    public readonly type: ItemType = null;
+    public readonly type: ItemType;
     public validate(): void { }
 }
 
@@ -44,7 +44,7 @@ class FakeItemList implements ItemList {
     public includes(_: Item): boolean {
         throw new Error("Method not implemented.");
     }
-    public get(code: string): Item {
+    public get(code: string): Item & Priced {
         if (this.items[code] === undefined) {
             throw new Error('invalid test');
         }
