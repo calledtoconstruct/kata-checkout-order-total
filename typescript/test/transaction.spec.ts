@@ -123,18 +123,23 @@ export class TestTransaction {
                 
                     let before: number;
                     let after: number;
-                    let itemTotal: number;
+                    let firstItemTotal: number;
+                    let secondItemTotal: number;
 
                     beforeEach(() => {
                         before = transaction.quantity(code);
-                        itemTotal = transaction.scan(code);
-                        itemTotal = transaction.scan(code);
+                        firstItemTotal = transaction.scan(code);
+                        secondItemTotal = transaction.scan(code);
                         after = transaction.quantity(code);
                     });
 
                     it('Then the transaction should contain a quantity of two such items.', () => {
                         expect(before).toEqual(0);
                         expect(after).toEqual(2);
+                    });
+
+                    it('Then the item total should be the quantity times price.', () => {
+                        expect(firstItemTotal + secondItemTotal).toEqual(after * price);
                     });
 
                 });
@@ -204,11 +209,12 @@ export class TestTransaction {
 
             let transaction: Transaction;
             const code: string = 'by weight item';
+            const price: number = 1.25
             const item: Item = new StandardItem(
                 code,
                 'some random by weight item.',
                 'by weight',
-                1.25
+                price
             );
 
             beforeEach(() => {
@@ -239,6 +245,7 @@ export class TestTransaction {
 
                 describe('and providing a weight', () => {
 
+                    const weight: number = 2.5;
                     let before: number;
                     let after: number;
                     let itemTotal: number;
@@ -247,7 +254,7 @@ export class TestTransaction {
 
                         beforeEach(() => {
                             before = transaction.quantity(code);
-                            itemTotal = transaction.scan(code, 2.5);
+                            itemTotal = transaction.scan(code, weight);
                             after = transaction.quantity(code);
                         });
     
@@ -256,22 +263,31 @@ export class TestTransaction {
                             expect(after).toEqual(1);
                         });
 
+                        it('Then the item total should be the weight times the price.', () => {
+                            expect(itemTotal).toEqual(weight * price);
+                        });
+
                     });
 
                     describe('for multiple packages', () => {
 
+                        const otherItemWeight: number = 3.0;
                         let otherItemTotal: number;
 
                         beforeEach(() => {
                             before = transaction.quantity(code);
-                            itemTotal = transaction.scan(code, 2.5);
-                            otherItemTotal = transaction.scan(code, 3);
+                            itemTotal = transaction.scan(code, weight);
+                            otherItemTotal = transaction.scan(code, otherItemWeight);
                             after = transaction.quantity(code);
                         });
     
                         it('Then the transaction should contain the items.', () => {
                             expect(before).toEqual(0);
                             expect(after).toEqual(2);
+                        });
+
+                        it('Then the item total should be the weight of both items times the price.', () => {
+                            expect(itemTotal + otherItemTotal).toEqual((weight + otherItemWeight) * price);
                         });
 
                     });

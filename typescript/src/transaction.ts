@@ -4,7 +4,10 @@ import { Item, Priced, ItemList } from './item';
 
 class TransactionItem {
 
-    constructor(private readonly item: Item & Priced) { }
+    constructor(
+        private readonly item: Item & Priced,
+        private readonly weight?: number
+    ) { }
 
     private howMany: number = 1;
 
@@ -21,7 +24,11 @@ class TransactionItem {
     }
 
     public total(): number {
-        return this.howMany * this.item.price;
+        const totalQuantity: number = this.weight === undefined
+            ? this.howMany
+            : this.howMany * this.weight;
+
+        return totalQuantity * this.item.price;
     }
 }
 
@@ -52,7 +59,7 @@ export class Transaction {
 
         Transaction.validateType(scanned, weight);
 
-        const transactionItem: TransactionItem = new TransactionItem(scanned);
+        const transactionItem: TransactionItem = new TransactionItem(scanned, weight);
         this.item.push(transactionItem);
 
         return transactionItem.total();
