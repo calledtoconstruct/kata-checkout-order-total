@@ -245,6 +245,15 @@
 **When** removing the item
 **Then** the transaction no longer contains the item.
 
+**Given** a transaction
+**And** an existing item code
+**And** the item type is `by weight`
+**And** one existing item has a weight of 1
+**And** another existing item has a weight of 2
+**When** removing the item with a weight of 1
+**Then** the transaction contains the item with a weight of 2
+**And** the quantity is reduced by 1.
+
 # Epic - Calculating
 
 ## *As a customer, I want the ability to see the original price per item, so that I can be sure I am not overcharged.*
