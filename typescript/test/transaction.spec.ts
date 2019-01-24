@@ -154,21 +154,41 @@ export class TestTransaction {
 
             });
 
-            describe('When voiding the item', () => {
+            describe('When voiding', () => {
 
                 let before: number;
                 let after: number;
 
-                beforeEach(() => {
-                    transaction.scan(code);
-                    before = transaction.quantity(code);
-                    transaction.remove(code);
-                    after = transaction.quantity(code);
+                describe('the one and only item', () => {
+
+                    beforeEach(() => {
+                        transaction.scan(code);
+                        before = transaction.quantity(code);
+                        transaction.remove(code);
+                        after = transaction.quantity(code);
+                    });
+    
+                    it('Then transaction should no longer have the item.', () => {
+                        expect(before).toEqual(1);
+                        expect(after).toEqual(0);
+                    });
+
                 });
 
-                it('Then transaction should no longer have the item.', () => {
-                    expect(before).toEqual(1);
-                    expect(after).toEqual(0);
+                describe('one of the two items', () => {
+
+                    beforeEach(() => {
+                        transaction.scan(code);
+                        transaction.scan(code);
+                        before = transaction.quantity(code);
+                        transaction.remove(code);
+                        after = transaction.quantity(code);
+                    });
+    
+                    it('Then transaction should no longer have the item.', () => {
+                        expect(before).toEqual(2);
+                        expect(after).toEqual(1);
+                    });
                 });
 
             });
