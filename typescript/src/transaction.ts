@@ -61,7 +61,7 @@ export class Transaction {
         return 0;
     }
 
-    public remove(code: string, weight?: number): void {
+    public void(code: string, weight?: number): void {
         const scanned: Item = this.itemList.get(code);
 
         Transaction.validateType(scanned, weight);

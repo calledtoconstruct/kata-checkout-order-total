@@ -62,7 +62,7 @@ export class TestTransaction {
 
                 beforeEach(() => {
                     try {
-                        transaction.remove(code);
+                        transaction.void(code);
                     } catch (exception) {
                         error = exception;
                     }
@@ -164,7 +164,7 @@ export class TestTransaction {
                     beforeEach(() => {
                         transaction.scan(code);
                         before = transaction.quantity(code);
-                        transaction.remove(code);
+                        transaction.void(code);
                         after = transaction.quantity(code);
                     });
     
@@ -181,7 +181,7 @@ export class TestTransaction {
                         transaction.scan(code);
                         transaction.scan(code);
                         before = transaction.quantity(code);
-                        transaction.remove(code);
+                        transaction.void(code);
                         after = transaction.quantity(code);
                     });
     
@@ -284,7 +284,7 @@ export class TestTransaction {
                     beforeEach(() => {
                         transaction.scan(code, 1.999);
                         try {
-                            transaction.remove(code);
+                            transaction.void(code);
                         } catch (exception) {
                             error = exception;
                         }
@@ -294,6 +294,29 @@ export class TestTransaction {
                         expect(error).not.toBeNull();
                     })
 
+                });
+
+                describe('and providing a weight', () => {
+
+                    let before: number;
+                    let after: number;
+                    let itemTotal: number;
+
+                    describe('for a single package', () => {
+
+                        beforeEach(() => {
+                            itemTotal = transaction.scan(code, 2.5);
+                            before = transaction.quantity(code);
+                            transaction.void(code, 2.5);
+                            after = transaction.quantity(code);
+                        });
+    
+                        it('Then the transaction should no longer contain the item.', () => {
+                            expect(before).toEqual(1);
+                            expect(after).toEqual(0);
+                        });
+
+                    });
                 });
 
             });
