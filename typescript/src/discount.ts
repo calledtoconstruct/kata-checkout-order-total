@@ -76,6 +76,26 @@ export class StandardDiscount implements Discount {
     }
 }
 
+type ItemSummary = {
+    quantity: number;
+    price: number;
+}
+
+const sumItems: (items: Array<DiscountItem>) => ItemSummary = (items: Array<DiscountItem>): ItemSummary => {
+    let quantity: number = 0;
+    let price: number = 0;
+    
+    items.forEach((item: DiscountItem): void => {
+        quantity += item.quantity;
+        price = item.price;
+    });
+
+    return {
+        quantity: quantity,
+        price: price
+    };
+}
+
 export class BulkFlatPriceDiscount implements Discount {
 
     constructor(
@@ -93,16 +113,9 @@ export class BulkFlatPriceDiscount implements Discount {
     }
 
     public total(items: Array<DiscountItem>): number {
-        let quantity: number = 0;
-        let price: number = 0;
-        
-        items.forEach((item: DiscountItem): void => {
-            quantity += item.quantity;
-            price = item.price;
-        });
-
-        const salePrice: number = Math.floor(quantity / this.quantity) * this.price * this.quantity;
-        const regularPrice: number = (quantity % this.quantity) * price;
+        const item: ItemSummary = sumItems(items);
+        const salePrice: number = Math.floor(item.quantity / this.quantity) * this.price * this.quantity;
+        const regularPrice: number = (item.quantity % this.quantity) * item.price;
         return salePrice + regularPrice;
     }
 }
@@ -179,8 +192,12 @@ export class UpSalePercentDiscount extends UpSaleDiscount {
     }
 
     public total(items: Array<DiscountItem>): number {
-        // (floor(item_quantity / (bulk_quantity + sale_quantity)) * ((bulk_quantity * item_price) + (sale_quantity * item_price * (100 - discount_percentage)))) + ((item_quantity % (bulk_quantity + sale_quantity)) * item_price)
-        return 5.94;
+        const item: ItemSummary = sumItems(items);
+        const quantity: number = this.bulk + this.sale;
+        const salePrice: number = item.price * (1 - this.percent);
+        const regularCost: number = (item.quantity % quantity) * item.price;
+        const saleCost: number = Math.floor(item.quantity / quantity) * ((this.bulk * item.price) + (this.sale * salePrice));
+        return regularCost + saleCost;
     }
 
 }

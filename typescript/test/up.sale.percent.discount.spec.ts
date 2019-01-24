@@ -64,6 +64,25 @@ export class TestUpSalePercentDiscount {
                             });
     
                         });
+    
+                        describe('And the right quantity', () => {
+
+                            let itemTotal: number;
+                            let quantity: number;
+
+                            beforeEach(() => {
+                                transaction.scan(code);
+                                transaction.scan(code);
+                                itemTotal = transaction.scan(code);
+                                quantity = transaction.quantity(code);
+                            });
+    
+                            it('Then the item total should the bulk quantity times the item price plus the sale quantity times the discount price.', () => {
+                                expect(quantity).toEqual(bulk + sale);
+                                expect(itemTotal).toEqual(bulk * price + sale * (price * (1 - discountPercent)));
+                            });
+    
+                        });
 
                     });
 
