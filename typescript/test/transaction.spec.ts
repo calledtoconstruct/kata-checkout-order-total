@@ -317,6 +317,24 @@ export class TestTransaction {
                         });
 
                     });
+
+                    describe('for multiple packages', () => {
+
+                        beforeEach(() => {
+                            itemTotal = transaction.scan(code, 1);
+                            itemTotal = transaction.scan(code, 2);
+                            before = transaction.quantity(code);
+                            transaction.void(code, 1);
+                            after = transaction.quantity(code);
+                        });
+    
+                        it('Then the quantity is reduced by one.', () => {
+                            expect(before).toEqual(2);
+                            expect(after).toEqual(1);
+                        });
+
+                    });
+
                 });
 
             });
