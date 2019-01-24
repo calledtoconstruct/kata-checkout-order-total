@@ -44,6 +44,8 @@ export class Transaction {
 
         if (scanned.type === 'by weight' && weight === undefined) {
             throw new Error('Weight is required for this type of item.');
+        } else if (scanned.type === 'by quantity' && weight !== undefined) {
+            throw new Error('Weight is not required for this type of item.');
         }
 
         const transactionItem: TransactionItem = new TransactionItem(scanned);

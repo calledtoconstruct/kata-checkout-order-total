@@ -57,7 +57,7 @@ export class TestTransaction {
 
         });
 
-        describe('Given a transaction and a single by quantity item', () => {
+        describe('Given a transaction and a by quantity item', () => {
 
             let transaction: Transaction;
             const code: string = 'by quantity item';
@@ -115,11 +115,29 @@ export class TestTransaction {
 
                 });
 
+                describe('a single time with a weight', () => {
+
+                    let error: Error | null = null;
+
+                    beforeEach(() => {
+                        try {
+                            transaction.scan(code, 4.25);
+                        } catch (exception) {
+                            error = exception;                            
+                        }
+                    })
+
+                    it('Then an error should be raised.', () => {
+                        expect(error).not.toBeNull();
+                    });
+
+                });
+
             });
 
         });
 
-        describe('Given a transaction and one or more by weight item', () => {
+        describe('Given a transaction and one or more by weight items', () => {
 
             let transaction: Transaction;
             const code: string = 'by weight item';
@@ -130,7 +148,7 @@ export class TestTransaction {
                 1.25
             );
 
-            describe('When scanning the item', () => {
+            describe('When scanning', () => {
 
                 beforeEach(() => {
                     const itemList: ItemList = new ItemListImplementation();
@@ -162,15 +180,37 @@ export class TestTransaction {
                     let after: number;
                     let itemTotal: number;
 
-                    beforeEach(() => {
-                        before = transaction.quantity(code);
-                        itemTotal = transaction.scan(code, 2.5);
-                        after = transaction.quantity(code);
+                    describe('for a single package', () => {
+
+                        beforeEach(() => {
+                            before = transaction.quantity(code);
+                            itemTotal = transaction.scan(code, 2.5);
+                            after = transaction.quantity(code);
+                        });
+    
+                        it('Then the transaction should contain the item.', () => {
+                            expect(before).toEqual(0);
+                            expect(after).toEqual(1);
+                        });
+
                     });
 
-                    it('Then the transaction should contain the item.', () => {
-                        expect(before).toEqual(0);
-                        expect(after).toEqual(1);
+                    describe('for multiple packages', () => {
+
+                        let otherItemTotal: number;
+
+                        beforeEach(() => {
+                            before = transaction.quantity(code);
+                            itemTotal = transaction.scan(code, 2.5);
+                            otherItemTotal = transaction.scan(code, 3);
+                            after = transaction.quantity(code);
+                        });
+    
+                        it('Then the transaction should contain the items.', () => {
+                            expect(before).toEqual(0);
+                            expect(after).toEqual(2);
+                        });
+
                     });
 
                 });
