@@ -200,6 +200,13 @@
 **Then** the transaction contains the existing duplicate items
 **And** the transaction contains the new duplicate item.
 
+**Given** a transaction
+**And** a new item code
+**And** the item type is `by quantity`
+**And** the weight is known
+**When** adding the item
+**Then** an error is raised.
+
 ## *As a cashier, I want the ability to void an item, so that items can be easily removed from the transaction.*
 
 ### Acceptance Criteria
