@@ -1,6 +1,7 @@
 
 import { Transaction } from '../src/transaction';
 import { StandardItem, Item, ItemListImplementation, ItemList } from '../src/item';
+import { DiscountListImplementation, DiscountList } from '../src/discount';
 
 export class TestTransaction {
 
@@ -17,7 +18,8 @@ export class TestTransaction {
 
                 beforeEach(() => {
                     const itemList: ItemList = new ItemListImplementation();
-                    transaction = new Transaction(itemList);
+                    const discountList: DiscountList = new DiscountListImplementation(itemList);
+                    transaction = new Transaction(itemList, discountList);
                     first = transaction.start();
                     second = transaction.start();
                 });
@@ -37,7 +39,8 @@ export class TestTransaction {
 
             beforeEach(() => {
                 const itemList: ItemList = new ItemListImplementation();
-                transaction = new Transaction(itemList);
+                const discountList: DiscountList = new DiscountListImplementation(itemList);
+                transaction = new Transaction(itemList, discountList);
                 transactionId = transaction.start();
             });
 
@@ -91,7 +94,8 @@ export class TestTransaction {
             beforeEach(() => {
                 const itemList: ItemList = new ItemListImplementation();
                 itemList.add(item);
-                transaction = new Transaction(itemList);
+                const discountList: DiscountList = new DiscountListImplementation(itemList);
+                transaction = new Transaction(itemList, discountList);
             });
 
             describe('When scanning the item', () => {
@@ -219,7 +223,8 @@ export class TestTransaction {
             beforeEach(() => {
                 const itemList: ItemList = new ItemListImplementation();
                 itemList.add(item);
-                transaction = new Transaction(itemList);
+                const discountList: DiscountList = new DiscountListImplementation(itemList);
+                transaction = new Transaction(itemList, discountList);
             });
 
             describe('When scanning', () => {

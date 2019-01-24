@@ -1,9 +1,18 @@
-import { ItemList, ItemType } from './item';
+import { ItemList, ItemType, Item, Priced } from './item';
 import { DateRange } from './date';
 
 export interface DiscountList {
     add(discount: Discount): void;
     includes(discount: Discount): boolean;
+    get(date: Date, code: string): Discount | undefined;
+}
+
+export class DiscountItem {
+    constructor(
+        public readonly price: number,
+        public readonly quantity: number,
+        public readonly weight?: number
+    ) {}
 }
 
 export interface Discount {
@@ -11,6 +20,7 @@ export interface Discount {
     readonly endDate: Date;
     readonly code: string;
     validate(itemList: ItemList): void;
+    total(items: Array<DiscountItem>): number;
 }
 
 const validateItemCode: (discount: Discount) => void = (discount: Discount): void => {
@@ -37,6 +47,7 @@ const validateItemDateRange: (discount: Discount) => void = (discount: Discount)
 };
 
 export class StandardDiscount implements Discount {
+
     constructor(
         public readonly startDate: Date,
         public readonly endDate: Date,
@@ -49,9 +60,24 @@ export class StandardDiscount implements Discount {
         validateItemType(itemList, this.code, 'by quantity');
         validateItemDateRange(this);
     }
+
+    public total(items: Array<DiscountItem>): number {
+        let total: number = 0;
+
+        items.forEach((item: DiscountItem): void => {
+            const totalQuantity = item.weight === undefined
+                ? item.quantity
+                : item.quantity * item.weight;
+
+            total += Math.min(item.price, this.price) * totalQuantity;
+        });
+
+        return total;
+    }
 }
 
 export class BulkFlatPriceDiscount implements Discount {
+
     constructor(
         public readonly startDate: Date,
         public readonly endDate: Date,
@@ -59,10 +85,15 @@ export class BulkFlatPriceDiscount implements Discount {
         public readonly quantity: number,
         public readonly price: number
     ) { }
+
     public validate(itemList: ItemList): void {
         validateItemCode(this);
         validateItemType(itemList, this.code, 'by quantity');
         validateItemDateRange(this);
+    }
+
+    public total(items: Array<DiscountItem>): number {
+        return 0;
     }
 }
 
@@ -96,6 +127,7 @@ const validateWholeNumberSaleQuantity: (upSale: UpSale) => void = (upSale: UpSal
 };
 
 abstract class UpSaleDiscount implements Discount, UpSale {
+
     constructor(
         public readonly startDate: Date,
         public readonly endDate: Date,
@@ -103,6 +135,7 @@ abstract class UpSaleDiscount implements Discount, UpSale {
         public readonly bulk: number,
         public readonly sale: number
     ) { }
+
     public abstract validate(itemList: ItemList): void;
 
     protected validateItemType(itemList: ItemList, type: ItemType): void {
@@ -113,6 +146,10 @@ abstract class UpSaleDiscount implements Discount, UpSale {
         validateSaleQuantity(this);
         validateItemType(itemList, this.code, type);
         validateItemDateRange(this);
+    }
+
+    public total(items: Array<DiscountItem>): number {
+        return 0;
     }
 }
 
@@ -206,7 +243,7 @@ export class DiscountListImplementation implements DiscountList {
     public add(discount: Discount): void {
         discount.validate(this.itemList);
 
-        const duplicates: Array<Discount> = this.matching(discount);
+        const duplicates: Array<Discount> = this.matching(discount.code, discount.startDate, discount.endDate);
 
         if (duplicates.length > 0) {
             throw new Error('Duplicate or overlapping discount for ' + discount.code);
@@ -215,12 +252,22 @@ export class DiscountListImplementation implements DiscountList {
         this.list.push(discount);
     }
 
-    private matching(discount: Discount): Array<Discount> {
+    private matching(code: string, startDate: Date, endDate: Date): Array<Discount> {
         return this.list.filter((existing: Discount) => {
-            const code: boolean = (existing.code === discount.code);
-            const date: boolean = (DiscountListImplementation.overlap(existing.startDate, existing.endDate, discount.startDate, discount.endDate));
-            return code && date;
+            const byCode: boolean = (existing.code === code);
+            const byDate: boolean = (DiscountListImplementation.overlap(existing.startDate, existing.endDate, startDate, endDate));
+            return byCode && byDate;
         });
+    }
+
+    public get(date: Date, code: string): Discount | undefined {
+        const matching: Array<Discount> = this.matching(code, date, date);
+
+        if (matching.length === 0) {
+            return undefined;
+        } else {
+            return matching[0];
+        }
     }
 
     public includes(discount: Discount): boolean {

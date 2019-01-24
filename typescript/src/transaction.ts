@@ -1,18 +1,27 @@
 
 import * as uuid from 'uuid';
 import { Item, Priced, ItemList } from './item';
+import { DiscountList, Discount, DiscountItem } from './discount';
 
 class TransactionItem {
 
     constructor(
         private readonly item: Item & Priced,
-        private readonly weight?: number
+        private readonly itemWeight?: number
     ) { }
 
     private howMany: number = 1;
 
     public code(): string {
         return this.item.code;
+    }
+
+    public price(): number { 
+        return this.item.price;
+    }
+
+    public weight(): number | undefined { 
+        return this.itemWeight;
     }
 
     public quantity(): number {
@@ -24,9 +33,9 @@ class TransactionItem {
     }
 
     public total(): number {
-        const totalQuantity: number = this.weight === undefined
+        const totalQuantity: number = this.itemWeight === undefined
             ? this.howMany
-            : this.howMany * this.weight;
+            : this.howMany * this.itemWeight;
 
         return totalQuantity * this.item.price;
     }
@@ -35,15 +44,23 @@ class TransactionItem {
 export class Transaction {
 
     constructor(
-        private readonly itemList: ItemList
+        private readonly itemList: ItemList,
+        private readonly discountList: DiscountList
     ) {
     }
+
+    private date: Date;
+    private transaction: string;
 
     private readonly item: Array<TransactionItem> = new Array<TransactionItem>();
 
     public start(): string {
+        this.date = new Date();
+
         const uniqueId: string = uuid();
-        return 'transaction ' + uniqueId;
+        this.transaction = 'transaction ' + uniqueId;
+
+        return this.transaction;
     }
 
     private static validateType(scanned: Item, weight?: number): void {
@@ -62,13 +79,25 @@ export class Transaction {
         const transactionItem: TransactionItem = new TransactionItem(scanned, weight);
         this.item.push(transactionItem);
 
-        let total: number = 0;
+        const discount: Discount | undefined = this.discountList.get(this.date, code);
+        const related: Array<TransactionItem> = this.items(code);
         
-        this.items(code).forEach((transactionItem: TransactionItem): void => {
-            total += transactionItem.total();
-        });
+        if (discount === undefined) {        
+            let total: number = 0;
 
-        return total;
+            related.forEach((transactionItem: TransactionItem): void => {
+                total += transactionItem.total();
+            });
+
+            return total;
+        } else {
+            const items: Array<DiscountItem> = new Array<DiscountItem>();
+            related.forEach((item: TransactionItem): void => {
+                const discountItem: DiscountItem = new DiscountItem(item.price(), item.quantity(), item.weight());
+                items.push(discountItem);
+            });
+            return discount.total(items);
+        }
     }
 
     private items(code: string): Array<TransactionItem> {
