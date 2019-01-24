@@ -1,5 +1,6 @@
 
 import * as uuid from 'uuid';
+import { Item } from './item';
 
 export class Transaction {
 
@@ -8,8 +9,16 @@ export class Transaction {
         return 'transaction ' + uniqueId;
     }
 
+    public scan(item: Item): number {
+        return 0;
+    }
+
     public total(): number {
         return 0;
+    }
+
+    public includes(item: Item): boolean {
+        return true;
     }
 
 }

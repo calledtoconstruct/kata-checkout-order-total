@@ -1,5 +1,6 @@
 
 import { Transaction } from '../src/transaction';
+import { StandardItem } from '../src/item';
 
 export class TestTransaction {
 
@@ -48,6 +49,33 @@ export class TestTransaction {
 
                 it('Should return zero.', () => {
                     expect(total).toEqual(0);
+                });
+
+            });
+
+        });
+
+        describe('Given a transaction and a by quantity item', () => {
+
+            let transaction: Transaction;
+            let itemTotal: number;
+            const item = new StandardItem(
+                'by quantity item',
+                'some random by quantity item.', 
+                'by quantity',
+                3.00
+            );
+
+            describe('When scanning the item', () => {
+
+                beforeEach(() => {
+                    transaction = new Transaction();
+                    itemTotal = transaction.scan(item);
+                });
+
+                it('Should contain the item.', () => {
+                    const result = transaction.includes(item);
+                    expect(result).toBe(true);
                 });
 
             });
