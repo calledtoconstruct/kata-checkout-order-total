@@ -358,11 +358,11 @@ sale_quantity = 1
 discount_percentage = 100%
 max_discount_quantity = 8
 
-over_quantity = (item_quantity % max_discount_quantity)
+over_quantity = (item_quantity - max_discount_quantity)
 under_quantity = (item_quantity - over_quantity)
 discount_quantity = (bulk_quantity + sale_quantity)
 
-over_quantity = 11 % 8
+over_quantity = 11 - 8
 over_quantity = 3
 
 under_quantity = 11 - 3
