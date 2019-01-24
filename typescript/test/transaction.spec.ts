@@ -123,13 +123,12 @@ export class TestTransaction {
                 
                     let before: number;
                     let after: number;
-                    let firstItemTotal: number;
-                    let secondItemTotal: number;
+                    let itemTotal: number;
 
                     beforeEach(() => {
                         before = transaction.quantity(code);
-                        firstItemTotal = transaction.scan(code);
-                        secondItemTotal = transaction.scan(code);
+                        transaction.scan(code);
+                        itemTotal = transaction.scan(code);
                         after = transaction.quantity(code);
                     });
 
@@ -139,7 +138,7 @@ export class TestTransaction {
                     });
 
                     it('Then the item total should be the quantity times price.', () => {
-                        expect(firstItemTotal + secondItemTotal).toEqual(after * price);
+                        expect(itemTotal).toEqual(after * price);
                     });
 
                 });
@@ -272,12 +271,11 @@ export class TestTransaction {
                     describe('for multiple packages', () => {
 
                         const otherItemWeight: number = 3.0;
-                        let otherItemTotal: number;
 
                         beforeEach(() => {
                             before = transaction.quantity(code);
-                            itemTotal = transaction.scan(code, weight);
-                            otherItemTotal = transaction.scan(code, otherItemWeight);
+                            transaction.scan(code, weight);
+                            itemTotal = transaction.scan(code, otherItemWeight);
                             after = transaction.quantity(code);
                         });
     
@@ -287,7 +285,7 @@ export class TestTransaction {
                         });
 
                         it('Then the item total should be the weight of both items times the price.', () => {
-                            expect(itemTotal + otherItemTotal).toEqual((weight + otherItemWeight) * price);
+                            expect(itemTotal).toEqual((weight + otherItemWeight) * price);
                         });
 
                     });

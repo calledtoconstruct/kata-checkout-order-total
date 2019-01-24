@@ -62,7 +62,17 @@ export class Transaction {
         const transactionItem: TransactionItem = new TransactionItem(scanned, weight);
         this.item.push(transactionItem);
 
-        return transactionItem.total();
+        let total: number = 0;
+        
+        this.items(code).forEach((transactionItem: TransactionItem): void => {
+            total += transactionItem.total();
+        });
+
+        return total;
+    }
+
+    private items(code: string): Array<TransactionItem> {
+        return this.item.filter((value: TransactionItem): boolean => value.code() === code);
     }
 
     public void(code: string, weight?: number): void {
@@ -70,7 +80,7 @@ export class Transaction {
 
         Transaction.validateType(scanned, weight);
 
-        const items: Array<TransactionItem> = this.item.filter((value: TransactionItem): boolean => value.code() === code);
+        const items: Array<TransactionItem> = this.items(code);
 
         if (items.length === 0) {
             throw new Error('Item could not be removed because it does not exist.');
