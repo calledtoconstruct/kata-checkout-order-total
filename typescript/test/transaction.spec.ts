@@ -206,13 +206,13 @@ export class TestTransaction {
                 1.25
             );
 
-            describe('When scanning', () => {
+            beforeEach(() => {
+                const itemList: ItemList = new ItemListImplementation();
+                itemList.add(item);
+                transaction = new Transaction(itemList);
+            });
 
-                beforeEach(() => {
-                    const itemList: ItemList = new ItemListImplementation();
-                    itemList.add(item);
-                    transaction = new Transaction(itemList);
-                });
+            describe('When scanning', () => {
 
                 describe('without providing the weight', () => {
 
@@ -270,6 +270,29 @@ export class TestTransaction {
                         });
 
                     });
+
+                });
+
+            });
+
+            describe('When voiding', () => {
+
+                describe('without providing the weight', () => {
+
+                    let error: Error | null = null;
+
+                    beforeEach(() => {
+                        transaction.scan(code, 1.999);
+                        try {
+                            transaction.remove(code);
+                        } catch (exception) {
+                            error = exception;
+                        }
+                    });
+
+                    it('Should raise an error.', () => {
+                        expect(error).not.toBeNull();
+                    })
 
                 });
 

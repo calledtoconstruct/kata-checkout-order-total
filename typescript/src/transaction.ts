@@ -21,7 +21,7 @@ class TransactionItem {
     }
 
     public decrement(): void {
-        
+
     }
 
     public total(): number {
@@ -43,22 +43,28 @@ export class Transaction {
         return 'transaction ' + uniqueId;
     }
 
-    public scan(code: string, weight?: number): number {
-        const scanned: Item = this.itemList.get(code);
-
+    private static validateType(scanned: Item, weight?: number): void {
         if (scanned.type === 'by weight' && weight === undefined) {
             throw new Error('Weight is required for this type of item.');
         } else if (scanned.type === 'by quantity' && weight !== undefined) {
             throw new Error('Weight is not required for this type of item.');
         }
+    }
+
+    public scan(code: string, weight?: number): number {
+        const scanned: Item = this.itemList.get(code);
+
+        Transaction.validateType(scanned, weight);
 
         const transactionItem: TransactionItem = new TransactionItem(scanned);
         this.item.push(transactionItem);
         return 0;
     }
 
-    public remove(code: string): void {
+    public remove(code: string, weight?: number): void {
         const scanned: Item = this.itemList.get(code);
+
+        Transaction.validateType(scanned, weight);
 
         const items: Array<TransactionItem> = this.item.filter((value: TransactionItem): boolean => value.code() === code);
 
