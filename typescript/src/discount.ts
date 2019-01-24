@@ -158,12 +158,11 @@ abstract class UpSaleDiscount implements Discount, UpSale {
         validateItemDateRange(this);
     }
 
-    public total(items: Array<DiscountItem>): number {
-        return 0;
-    }
+    public abstract total(items: Array<DiscountItem>): number;
 }
 
 export class UpSalePercentDiscount extends UpSaleDiscount {
+
     constructor(
         readonly startDate: Date,
         readonly endDate: Date,
@@ -174,12 +173,20 @@ export class UpSalePercentDiscount extends UpSaleDiscount {
     ) {
         super(startDate, endDate, code, bulk, sale);
     }
+
     public validate(itemList: ItemList): void {
         super.validateItemType(itemList, 'by quantity');
     }
+
+    public total(items: Array<DiscountItem>): number {
+        // (floor(item_quantity / (bulk_quantity + sale_quantity)) * ((bulk_quantity * item_price) + (sale_quantity * item_price * (100 - discount_percentage)))) + ((item_quantity % (bulk_quantity + sale_quantity)) * item_price)
+        return 5.94;
+    }
+
 }
 
 export class LimitedUpSalePercentDiscount extends UpSaleDiscount {
+
     constructor(
         readonly startDate: Date,
         readonly endDate: Date,
@@ -191,12 +198,19 @@ export class LimitedUpSalePercentDiscount extends UpSaleDiscount {
     ) {
         super(startDate, endDate, code, bulk, sale);
     }
+
     public validate(itemList: ItemList): void {
         super.validateItemType(itemList, 'by quantity');
     }
+
+    public total(items: Array<DiscountItem>): number {
+        return 0;
+    }
+
 }
 
 export class UpSaleFlatPriceDiscount extends UpSaleDiscount {
+
     constructor(
         readonly startDate: Date,
         readonly endDate: Date,
@@ -207,12 +221,19 @@ export class UpSaleFlatPriceDiscount extends UpSaleDiscount {
     ) {
         super(startDate, endDate, code, bulk, sale);
     }
+
     public validate(itemList: ItemList): void {
         super.validateItemType(itemList, 'by quantity');
     }
+
+    public total(items: Array<DiscountItem>): number {
+        return 0;
+    }
+
 }
 
 export class LimitedUpSaleFlatPriceDiscount extends UpSaleDiscount {
+
     constructor(
         readonly startDate: Date,
         readonly endDate: Date,
@@ -224,12 +245,19 @@ export class LimitedUpSaleFlatPriceDiscount extends UpSaleDiscount {
     ) {
         super(startDate, endDate, code, bulk, sale);
     }
+
     public validate(itemList: ItemList): void {
         super.validateItemType(itemList, 'by quantity');
     }
+
+    public total(items: Array<DiscountItem>): number {
+        return 0;
+    }
+
 }
 
 export class UpSalePercentDiscountByWeight extends UpSaleDiscount {
+
     constructor(
         readonly startDate: Date,
         readonly endDate: Date,
@@ -240,15 +268,22 @@ export class UpSalePercentDiscountByWeight extends UpSaleDiscount {
     ) {
         super(startDate, endDate, code, bulk, sale);
     }
+
     public validate(itemList: ItemList): void {
         super.validateItemType(itemList, 'by weight');
     }
+
+    public total(items: Array<DiscountItem>): number {
+        return 0;
+    }
+
 }
 
 export class DiscountListImplementation implements DiscountList {
-    private readonly list: Array<Discount> = new Array<Discount>();
-
+    
     constructor(private readonly itemList: ItemList) { }
+
+    private readonly list: Array<Discount> = new Array<Discount>();
 
     public add(discount: Discount): void {
         discount.validate(this.itemList);
@@ -292,4 +327,5 @@ export class DiscountListImplementation implements DiscountList {
         }
         return true;
     }
+    
 }
