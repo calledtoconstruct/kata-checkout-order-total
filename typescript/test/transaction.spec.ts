@@ -57,12 +57,9 @@ export class TestTransaction {
 
         });
 
-        describe('Given a transaction and a by quantity item', () => {
+        describe('Given a transaction and a single by quantity item', () => {
 
             let transaction: Transaction;
-            let before: number;
-            let after: number;
-            let itemTotal: number;
             const code: string = 'by quantity item';
             const item: Item = new StandardItem(
                 code,
@@ -77,14 +74,45 @@ export class TestTransaction {
                     const itemList: ItemList = new ItemListImplementation();
                     itemList.add(item);
                     transaction = new Transaction(itemList);
-                    before = transaction.quantity(code);
-                    itemTotal = transaction.scan(code);
-                    after = transaction.quantity(code);
                 });
 
-                it('Should contain the item.', () => {
-                    expect(before).toEqual(0);
-                    expect(after).toEqual(1);
+                describe('a single time', () => {
+                
+                    let before: number;
+                    let after: number;
+                    let itemTotal: number;
+
+                    beforeEach(() => {
+                        before = transaction.quantity(code);
+                        itemTotal = transaction.scan(code);
+                        after = transaction.quantity(code);
+                    });
+
+                    it('Then the transaction should contain a quantity of one such item.', () => {
+                        expect(before).toEqual(0);
+                        expect(after).toEqual(1);
+                    });
+
+                });
+
+                describe('twice', () => {
+                
+                    let before: number;
+                    let after: number;
+                    let itemTotal: number;
+
+                    beforeEach(() => {
+                        before = transaction.quantity(code);
+                        itemTotal = transaction.scan(code);
+                        itemTotal = transaction.scan(code);
+                        after = transaction.quantity(code);
+                    });
+
+                    it('Then the transaction should contain a quantity of two such items.', () => {
+                        expect(before).toEqual(0);
+                        expect(after).toEqual(2);
+                    });
+
                 });
 
             });
