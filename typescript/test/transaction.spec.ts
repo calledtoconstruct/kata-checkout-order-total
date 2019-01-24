@@ -1,6 +1,6 @@
 
 import { Transaction } from '../src/transaction';
-import { StandardItem } from '../src/item';
+import { StandardItem, Item, ItemListImplementation, ItemList } from '../src/item';
 
 export class TestTransaction {
 
@@ -16,7 +16,8 @@ export class TestTransaction {
                 let second: string
 
                 beforeEach(() => {
-                    transaction = new Transaction();
+                    const itemList: ItemList = new ItemListImplementation();
+                    transaction = new Transaction(itemList);
                     first = transaction.start();
                     second = transaction.start();
                 });
@@ -35,7 +36,8 @@ export class TestTransaction {
             let transactionId: string;
 
             beforeEach(() => {
-                transaction = new Transaction();
+                const itemList: ItemList = new ItemListImplementation();
+                transaction = new Transaction(itemList);
                 transactionId = transaction.start();
             });
 
@@ -58,10 +60,13 @@ export class TestTransaction {
         describe('Given a transaction and a by quantity item', () => {
 
             let transaction: Transaction;
+            let before: number;
+            let after: number;
             let itemTotal: number;
-            const item = new StandardItem(
-                'by quantity item',
-                'some random by quantity item.', 
+            const code: string = 'by quantity item';
+            const item: Item = new StandardItem(
+                code,
+                'some random by quantity item.',
                 'by quantity',
                 3.00
             );
@@ -69,13 +74,17 @@ export class TestTransaction {
             describe('When scanning the item', () => {
 
                 beforeEach(() => {
-                    transaction = new Transaction();
-                    itemTotal = transaction.scan(item);
+                    const itemList: ItemList = new ItemListImplementation();
+                    itemList.add(item);
+                    transaction = new Transaction(itemList);
+                    before = transaction.quantity(code);
+                    itemTotal = transaction.scan(code);
+                    after = transaction.quantity(code);
                 });
 
                 it('Should contain the item.', () => {
-                    const result = transaction.includes(item);
-                    expect(result).toBe(true);
+                    expect(before).toEqual(0);
+                    expect(after).toEqual(1);
                 });
 
             });
