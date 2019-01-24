@@ -119,6 +119,47 @@ export class TestTransaction {
 
         });
 
+        describe('Given a transaction and one or more by weight item', () => {
+
+            let transaction: Transaction;
+            const code: string = 'by weight item';
+            const item: Item = new StandardItem(
+                code,
+                'some random by weight item.',
+                'by weight',
+                1.25
+            );
+
+            describe('When scanning the item', () => {
+
+                beforeEach(() => {
+                    const itemList: ItemList = new ItemListImplementation();
+                    itemList.add(item);
+                    transaction = new Transaction(itemList);
+                });
+
+                describe('without providing the weight', () => {
+
+                    let error: Error | null = null;
+
+                    beforeEach(() => {
+                        try {
+                            transaction.scan(code);
+                        } catch (exception) {
+                            error = exception;
+                        }
+                    });
+
+                    it('Should raise an error.', () => {
+                        expect(error).not.toBeNull();
+                    })
+
+                });
+
+            });
+
+        });
+
     }
 
 }

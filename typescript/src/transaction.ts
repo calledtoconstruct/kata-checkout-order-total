@@ -41,6 +41,11 @@ export class Transaction {
 
     public scan(code: string): number {
         const scanned: Item = this.itemList.get(code);
+
+        if (scanned.type === 'by weight') {
+            throw new Error('Weight is required for this type of item.');
+        }
+        
         const transactionItem: TransactionItem = new TransactionItem(scanned);
         this.item.push(transactionItem);
         return 0;
