@@ -55,6 +55,25 @@ export class TestTransaction {
 
             });
 
+            describe('When removing an item', () => {
+
+                const code: string = 'some by quantity item';
+                let error: Error | null = null;
+
+                beforeEach(() => {
+                    try {
+                        transaction.remove(code);
+                    } catch (exception) {
+                        error = exception;
+                    }
+                });
+
+                it('Then an error should be rasied.', () => {
+                    expect(error).not.toBeNull();
+                });
+
+            });
+
         });
 
         describe('Given a transaction and a by quantity item', () => {

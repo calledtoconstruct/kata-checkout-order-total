@@ -53,6 +53,10 @@ export class Transaction {
         return 0;
     }
 
+    public remove(code: string): void {
+        throw new Error('Item could not be removed because it does not exist.');
+    }
+
     public total(): number {
         return 0;
     }
