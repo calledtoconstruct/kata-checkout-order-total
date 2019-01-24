@@ -254,7 +254,13 @@ export class UpSaleFlatPriceDiscount extends UpSaleDiscount {
     }
 
     public total(items: Array<DiscountItem>): number {
-        return 0;
+        const item: ItemSummary = sumItems(items);
+        const quantity: number = this.bulk + this.sale;
+        const salePrice: number = item.price * this.price;
+        const regularCost: number = (item.quantity % quantity) * item.price;
+        const bundleCost: number =  (this.bulk * item.price) + (this.sale * salePrice);
+        const bundles: number = Math.floor(item.quantity / quantity);
+        return regularCost + (bundles * bundleCost);
     }
 
 }
