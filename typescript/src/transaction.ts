@@ -39,13 +39,13 @@ export class Transaction {
         return 'transaction ' + uniqueId;
     }
 
-    public scan(code: string): number {
+    public scan(code: string, weight?: number): number {
         const scanned: Item = this.itemList.get(code);
 
-        if (scanned.type === 'by weight') {
+        if (scanned.type === 'by weight' && weight === undefined) {
             throw new Error('Weight is required for this type of item.');
         }
-        
+
         const transactionItem: TransactionItem = new TransactionItem(scanned);
         this.item.push(transactionItem);
         return 0;

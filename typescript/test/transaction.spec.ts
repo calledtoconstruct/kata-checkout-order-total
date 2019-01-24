@@ -156,6 +156,25 @@ export class TestTransaction {
 
                 });
 
+                describe('and providing a weight', () => {
+
+                    let before: number;
+                    let after: number;
+                    let itemTotal: number;
+
+                    beforeEach(() => {
+                        before = transaction.quantity(code);
+                        itemTotal = transaction.scan(code, 2.5);
+                        after = transaction.quantity(code);
+                    });
+
+                    it('Then the transaction should contain the item.', () => {
+                        expect(before).toEqual(0);
+                        expect(after).toEqual(1);
+                    });
+
+                });
+
             });
 
         });
