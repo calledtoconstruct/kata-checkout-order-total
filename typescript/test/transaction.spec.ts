@@ -87,13 +87,13 @@ export class TestTransaction {
                 3.00
             );
 
-            describe('When scanning the item', () => {
+            beforeEach(() => {
+                const itemList: ItemList = new ItemListImplementation();
+                itemList.add(item);
+                transaction = new Transaction(itemList);
+            });
 
-                beforeEach(() => {
-                    const itemList: ItemList = new ItemListImplementation();
-                    itemList.add(item);
-                    transaction = new Transaction(itemList);
-                });
+            describe('When scanning the item', () => {
 
                 describe('a single time', () => {
                 
@@ -150,6 +150,25 @@ export class TestTransaction {
                         expect(error).not.toBeNull();
                     });
 
+                });
+
+            });
+
+            describe('When voiding the item', () => {
+
+                let before: number;
+                let after: number;
+
+                beforeEach(() => {
+                    transaction.scan(code);
+                    before = transaction.quantity(code);
+                    transaction.remove(code);
+                    after = transaction.quantity(code);
+                });
+
+                it('Then transaction should no longer have the item.', () => {
+                    expect(before).toEqual(1);
+                    expect(after).toEqual(0);
                 });
 
             });

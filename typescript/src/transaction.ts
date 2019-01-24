@@ -20,6 +20,10 @@ class TransactionItem {
         return this.howMany;
     }
 
+    public decrement(): void {
+        
+    }
+
     public total(): number {
         return 0;
     }
@@ -54,7 +58,24 @@ export class Transaction {
     }
 
     public remove(code: string): void {
-        throw new Error('Item could not be removed because it does not exist.');
+        const scanned: Item = this.itemList.get(code);
+
+        const items: Array<TransactionItem> = this.item.filter((value: TransactionItem): boolean => value.code() === code);
+
+        if (items.length === 0) {
+            throw new Error('Item could not be removed because it does not exist.');
+        }
+
+        const item: TransactionItem = items[0];
+
+        if (item.quantity() > 1) {
+            item.decrement();
+        } else if (item.quantity() === 1) {
+            const index: number = this.item.indexOf(item);
+            this.item.splice(index, 1);
+        } else {
+            throw new Error('Invalid item quantity.');
+        }
     }
 
     public total(): number {
