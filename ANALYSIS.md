@@ -579,6 +579,11 @@ item_total = $10.75
 **When** validating
 **Then** an error is raised.
 
+**Given** a pricing rule with a limit
+**And** a limit that is not a multiple of the sum of the bulk and sale quantities
+**When** validating
+**Then** an error is raised.
+
 ## *As a customer, I want the ability to see the transaction total, so that I can be sure I am not overspending my budget.*
 
 ### Acceptance Criteria

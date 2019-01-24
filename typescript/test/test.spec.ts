@@ -5,6 +5,7 @@ import { TestTransaction } from './transaction.spec';
 import { TestStandardDiscount } from './standard.discount.spec';
 import { TestBulkFlatPriceDiscount } from './bulk.flat.price.discount.spec';
 import { TestUpSalePercentDiscount } from './up.sale.percent.discount.spec';
+import { TestLimitedUpSalePercentDiscount } from './limited.up.sale.percent.discount.spec';
 
 TestItemList.Scenarios();
 
@@ -19,3 +20,5 @@ TestStandardDiscount.Scenarios();
 TestBulkFlatPriceDiscount.Scenarios();
 
 TestUpSalePercentDiscount.Scenarios();
+
+TestLimitedUpSalePercentDiscount.Scenarios();

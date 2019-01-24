@@ -221,7 +221,17 @@ export class LimitedUpSalePercentDiscount extends UpSaleDiscount {
     }
 
     public total(items: Array<DiscountItem>): number {
-        return 0;
+        const item: ItemSummary = sumItems(items);
+        const over: number = item.quantity > this.limit
+            ? (item.quantity - this.limit)
+            : 0;
+        const under: number = item.quantity - over;
+        const quantity: number = this.bulk + this.sale;
+        const salePrice: number = item.price * (1 - this.percent);      
+        const overCost: number = ((under % quantity) + over) * item.price;
+        const bundleCost: number = (this.bulk * item.price) + (this.sale * salePrice);
+        const bundles: number = Math.floor(under / quantity);
+        return (bundles * bundleCost) + overCost;
     }
 
 }
