@@ -567,6 +567,18 @@ item_total = $9.75 + $1.00
 item_total = $10.75
 ```
 
+> Additional Validation
+
+**Given** a pricing rule
+**And** a percent discount greather than one hundred
+**When** validating
+**Then** an error is raised.
+
+**Given** a pricing rule
+**And** a percent discount equal to zero
+**When** validating
+**Then** an error is raised.
+
 ## *As a customer, I want the ability to see the transaction total, so that I can be sure I am not overspending my budget.*
 
 ### Acceptance Criteria
