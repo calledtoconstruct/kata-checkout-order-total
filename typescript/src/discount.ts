@@ -93,7 +93,17 @@ export class BulkFlatPriceDiscount implements Discount {
     }
 
     public total(items: Array<DiscountItem>): number {
-        return 0;
+        let quantity: number = 0;
+        let price: number = 0;
+        
+        items.forEach((item: DiscountItem): void => {
+            quantity += item.quantity;
+            price = item.price;
+        });
+
+        const salePrice: number = Math.floor(quantity / this.quantity) * this.price * this.quantity;
+        const regularPrice: number = (quantity % this.quantity) * price;
+        return salePrice + regularPrice;
     }
 }
 
