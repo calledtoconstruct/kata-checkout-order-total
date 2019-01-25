@@ -317,7 +317,31 @@ export class UpSalePercentDiscountByWeight extends UpSaleDiscount {
     }
 
     public total(items: Array<DiscountItem>): number {
-        return 0;
+
+        const sorted: Array<DiscountItem> = items.sort((red: DiscountItem, green: DiscountItem): number => {
+            const redCost: number = red.quantity * (red.weight || 0) * red.price;
+            const greenCost: number = green.quantity * (green.weight || 0) * green.price;
+            if (redCost < greenCost) {
+                return -1;
+            } else if (redCost > greenCost) {
+                return 1;
+            } else {
+                return 0
+            }
+        });
+
+        let total: number = 0;
+
+        sorted.forEach((item: DiscountItem, index: number): void => {
+            const oneBasedIndex: number = index + 1;
+            if (oneBasedIndex >= 1 && oneBasedIndex <= this.bulk) {
+                total += item.quantity * (item.weight || 0) * item.price;
+            } else {
+                total += item.quantity * (item.weight || 0) * (item.price * (1 - this.percent));
+            }
+        });
+
+        return Currency.floor(total);
     }
 
 }

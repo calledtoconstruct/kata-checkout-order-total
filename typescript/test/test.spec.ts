@@ -8,6 +8,7 @@ import { TestUpSalePercentDiscount } from './up.sale.percent.discount.spec';
 import { TestLimitedUpSalePercentDiscount } from './limited.up.sale.percent.discount.spec';
 import { TestUpSaleFlatPriceDiscount } from './up.sale.flat.price.discount.spec';
 import { TestLimitedUpSaleFlatPriceDiscount } from './limited.up.sale.flat.price.discount.spec';
+import { TestUpSalePercentDiscountByWeight } from './up.sale.percent.discount.by.weight.spec';
 
 TestItemList.scenarios();
 
@@ -28,3 +29,5 @@ TestLimitedUpSalePercentDiscount.scenarios();
 TestUpSaleFlatPriceDiscount.scenarios();
 
 TestLimitedUpSaleFlatPriceDiscount.scenarios();
+
+TestUpSalePercentDiscountByWeight.scenarios();
