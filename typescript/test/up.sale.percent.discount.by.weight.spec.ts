@@ -94,6 +94,41 @@ export class TestUpSalePercentDiscountByWeight {
 
                         });
 
+                        describe('And more than enough items', () => {
+
+                            const firstWeight: number = 2.5;
+                            const secondWeight: number = 3.25;
+                            const thirdWeight: number = 4.00;
+                            const fourthWeight: number = 1.5;
+                            const fifthWeight: number = 5.25;
+                            const sixthWeight: number = 4.00;
+                            const seventhWeight: number = 1.0;
+                            const eighthWeight: number = 3.25;
+
+                            let itemTotal: number;
+                            let quantity: number;
+
+                            beforeEach(() => {
+                                transaction.scan(code, firstWeight);
+                                transaction.scan(code, secondWeight);
+                                transaction.scan(code, thirdWeight);
+                                transaction.scan(code, fourthWeight);
+                                transaction.scan(code, fifthWeight);
+                                transaction.scan(code, sixthWeight);
+                                transaction.scan(code, seventhWeight);
+                                itemTotal = transaction.scan(code, eighthWeight);
+                                quantity = transaction.quantity(code);
+                            });
+
+                            it('Then the item total should be calculated correctly.', () => {
+                                expect(quantity).toEqual(8);
+                                const fullPrice: number = (fifthWeight + sixthWeight + secondWeight + eighthWeight + fourthWeight + seventhWeight) * price;
+                                const salePrice: number = (thirdWeight + firstWeight) * price * (1 - discountPercent);
+                                expect(itemTotal).toEqual(Currency.floor(fullPrice + salePrice));
+                            });
+
+                        });
+
                     });
 
                 });
