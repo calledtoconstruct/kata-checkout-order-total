@@ -1,6 +1,7 @@
 import { Transaction } from "../src/transaction";
 import { Priced, Item, StandardItem, ItemList, ItemListImplementation } from "../src/item";
 import { Discount, LimitedUpSalePercentDiscount, DiscountListImplementation, DiscountList } from "../src/discount";
+import { Currency } from "../src/currency";
 
 export class TestLimitedUpSalePercentDiscount {
 
@@ -81,7 +82,7 @@ export class TestLimitedUpSalePercentDiscount {
     
                             it('Then the item total should the bulk quantity times the item price plus the sale quantity times the discount price.', () => {
                                 expect(quantity).toEqual(bulk + sale);
-                                expect(itemTotal).toEqual(bulk * price + sale * (price * (1 - discountPercent)));
+                                expect(itemTotal).toEqual(Currency.floor(bulk * price + sale * (price * (1 - discountPercent))));
                             });
     
                         });
@@ -107,7 +108,7 @@ export class TestLimitedUpSalePercentDiscount {
                             it('Then the item total should be calculated correctly.', () => {
                                 expect(quantity).toEqual(9);
                                 const salePrice = price * (1 - discountPercent);
-                                expect(itemTotal).toEqual(7 * price + 2 * salePrice);
+                                expect(itemTotal).toEqual(Currency.floor(7 * price + 2 * salePrice));
                             });
     
                         });

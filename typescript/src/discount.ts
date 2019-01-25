@@ -1,5 +1,6 @@
-import { ItemList, ItemType, Item, Priced } from './item';
+import { ItemList, ItemType } from './item';
 import { DateRange } from './date';
+import { Currency } from './currency';
 
 export interface DiscountList {
     add(discount: Discount): void;
@@ -12,7 +13,7 @@ export class DiscountItem {
         public readonly price: number,
         public readonly quantity: number,
         public readonly weight?: number
-    ) {}
+    ) { }
 }
 
 export interface Discount {
@@ -84,7 +85,7 @@ type ItemSummary = {
 const sumItems: (items: Array<DiscountItem>) => ItemSummary = (items: Array<DiscountItem>): ItemSummary => {
     let quantity: number = 0;
     let price: number = 0;
-    
+
     items.forEach((item: DiscountItem): void => {
         quantity += item.quantity;
         price = item.price;
@@ -197,7 +198,7 @@ export class UpSalePercentDiscount extends UpSaleDiscount {
         const salePrice: number = item.price * (1 - this.percent);
         const regularCost: number = (item.quantity % quantity) * item.price;
         const saleCost: number = Math.floor(item.quantity / quantity) * ((this.bulk * item.price) + (this.sale * salePrice));
-        return regularCost + saleCost;
+        return Currency.floor(regularCost + saleCost);
     }
 
 }
@@ -227,11 +228,11 @@ export class LimitedUpSalePercentDiscount extends UpSaleDiscount {
             : 0;
         const under: number = item.quantity - over;
         const quantity: number = this.bulk + this.sale;
-        const salePrice: number = item.price * (1 - this.percent);      
+        const salePrice: number = item.price * (1 - this.percent);
         const overCost: number = ((under % quantity) + over) * item.price;
         const bundleCost: number = (this.bulk * item.price) + (this.sale * salePrice);
         const bundles: number = Math.floor(under / quantity);
-        return (bundles * bundleCost) + overCost;
+        return Currency.floor((bundles * bundleCost) + overCost);
     }
 
 }
@@ -258,7 +259,7 @@ export class UpSaleFlatPriceDiscount extends UpSaleDiscount {
         const quantity: number = this.bulk + this.sale;
         const salePrice: number = item.price * this.price;
         const regularCost: number = (item.quantity % quantity) * item.price;
-        const bundleCost: number =  (this.bulk * item.price) + (this.sale * salePrice);
+        const bundleCost: number = (this.bulk * item.price) + (this.sale * salePrice);
         const bundles: number = Math.floor(item.quantity / quantity);
         return regularCost + (bundles * bundleCost);
     }
@@ -284,7 +285,16 @@ export class LimitedUpSaleFlatPriceDiscount extends UpSaleDiscount {
     }
 
     public total(items: Array<DiscountItem>): number {
-        return 0;
+        const item: ItemSummary = sumItems(items);
+        const over: number = item.quantity > this.limit
+            ? (item.quantity - this.limit)
+            : 0;
+        const under: number = item.quantity - over;
+        const quantity: number = this.bulk + this.sale;
+        const overCost: number = ((under % quantity) + over) * item.price;
+        const bundleCost: number = (this.bulk * item.price) + (this.sale * this.price);
+        const bundles: number = Math.floor(under / quantity);
+        return (bundles * bundleCost) + overCost;
     }
 
 }
@@ -313,7 +323,7 @@ export class UpSalePercentDiscountByWeight extends UpSaleDiscount {
 }
 
 export class DiscountListImplementation implements DiscountList {
-    
+
     constructor(private readonly itemList: ItemList) { }
 
     private readonly list: Array<Discount> = new Array<Discount>();
@@ -360,5 +370,5 @@ export class DiscountListImplementation implements DiscountList {
         }
         return true;
     }
-    
+
 }
