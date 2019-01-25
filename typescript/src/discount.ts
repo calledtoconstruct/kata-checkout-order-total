@@ -322,9 +322,9 @@ export class UpSalePercentDiscountByWeight extends UpSaleDiscount {
             const redCost: number = red.quantity * (red.weight || 0) * red.price;
             const greenCost: number = green.quantity * (green.weight || 0) * green.price;
             if (redCost < greenCost) {
-                return -1;
-            } else if (redCost > greenCost) {
                 return 1;
+            } else if (redCost > greenCost) {
+                return -1;
             } else {
                 return 0
             }
@@ -333,7 +333,7 @@ export class UpSalePercentDiscountByWeight extends UpSaleDiscount {
         let total: number = 0;
 
         sorted.forEach((item: DiscountItem, index: number): void => {
-            const oneBasedIndex: number = index + 1;
+            const oneBasedIndex: number = (index + 1) % (this.bulk + this.sale);
             if (oneBasedIndex >= 1 && oneBasedIndex <= this.bulk) {
                 total += item.quantity * (item.weight || 0) * item.price;
             } else {

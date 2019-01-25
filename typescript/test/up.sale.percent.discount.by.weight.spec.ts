@@ -69,6 +69,31 @@ export class TestUpSalePercentDiscountByWeight {
 
                         });
 
+                        describe('And the right quantity', () => {
+
+                            const firstWeight: number = 2.5;
+                            const secondWeight: number = 3.25;
+                            const thirdWeight: number = 4.00;
+
+                            let itemTotal: number;
+                            let quantity: number;
+
+                            beforeEach(() => {
+                                transaction.scan(code, firstWeight);
+                                transaction.scan(code, secondWeight);
+                                itemTotal = transaction.scan(code, thirdWeight);
+                                quantity = transaction.quantity(code);
+                            });
+
+                            it('Then the item total should the bulk quantity times the item price plus the sale quantity times the discount price.', () => {
+                                expect(quantity).toEqual(bulk + sale);
+                                const fullPrice: number = (secondWeight + thirdWeight) * price;
+                                const salePrice: number = firstWeight * price * (1 - discountPercent);
+                                expect(itemTotal).toEqual(Currency.floor(fullPrice + salePrice));
+                            });
+
+                        });
+
                     });
 
                 });
