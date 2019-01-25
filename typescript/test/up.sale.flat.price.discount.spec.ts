@@ -4,7 +4,7 @@ import { Discount, DiscountListImplementation, DiscountList, UpSaleFlatPriceDisc
 
 export class TestUpSaleFlatPriceDiscount {
 
-    public static Scenarios() {
+    public static scenarios() {
 
         describe('Given a transaction', () => {
 

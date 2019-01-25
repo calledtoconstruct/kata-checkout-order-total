@@ -5,7 +5,7 @@ import { Currency } from "../src/currency";
 
 export class TestLimitedUpSalePercentDiscount {
 
-    public static Scenarios() {
+    public static scenarios() {
 
         describe('Given a transaction', () => {
 

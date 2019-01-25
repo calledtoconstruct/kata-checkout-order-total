@@ -5,7 +5,7 @@ import { ItemList, Item, ItemListImplementation, StandardItem } from '../src/ite
 
 export class TestItemList {
 
-    public static Scenarios(): void {
+    public static scenarios(): void {
 
         describe('Given a collection of Items', () => {
             let itemList: ItemList;

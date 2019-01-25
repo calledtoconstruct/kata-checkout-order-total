@@ -5,7 +5,7 @@ import { DiscountListImplementation, DiscountList } from '../src/discount';
 
 export class TestTransaction {
 
-    public static Scenarios(): void {
+    public static scenarios(): void {
 
         describe('Given a transaction processor', () => {
 

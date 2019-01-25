@@ -4,7 +4,7 @@ import { StandardDiscount, Discount, DiscountList, DiscountListImplementation } 
 
 export class TestStandardDiscount {
 
-    public static Scenarios() {
+    public static scenarios() {
 
         describe('Given a transaction', () => {
 

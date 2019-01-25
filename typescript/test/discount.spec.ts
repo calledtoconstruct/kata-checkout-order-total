@@ -57,7 +57,7 @@ class FakeItemList implements ItemList {
 
 export class TestDiscountList {
 
-    public static Scenarios(): void {
+    public static scenarios(): void {
 
         describe('Given a collection of Pricing Rules', () => {
 
@@ -297,7 +297,7 @@ export class TestDiscountList {
 
 export class TestDiscount {
 
-    public static Scenarios(): void {
+    public static scenarios(): void {
 
         const invalidItemCodeDiscountScenarios: Parameterized<Discount, TestScenario<Discount>> = new Parameterized<Discount, TestScenario<Discount>>([
             { description: 'standard discount with empty item code', target: new StandardDiscount(new Date(), new Date(), '', 1.0) },

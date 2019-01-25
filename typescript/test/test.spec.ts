@@ -9,22 +9,22 @@ import { TestLimitedUpSalePercentDiscount } from './limited.up.sale.percent.disc
 import { TestUpSaleFlatPriceDiscount } from './up.sale.flat.price.discount.spec';
 import { TestLimitedUpSaleFlatPriceDiscount } from './limited.up.sale.flat.price.discount.spec';
 
-TestItemList.Scenarios();
+TestItemList.scenarios();
 
-TestDiscountList.Scenarios();
+TestDiscountList.scenarios();
 
-TestDiscount.Scenarios();
+TestDiscount.scenarios();
 
-TestTransaction.Scenarios();
+TestTransaction.scenarios();
 
-TestStandardDiscount.Scenarios();
+TestStandardDiscount.scenarios();
 
-TestBulkFlatPriceDiscount.Scenarios();
+TestBulkFlatPriceDiscount.scenarios();
 
-TestUpSalePercentDiscount.Scenarios();
+TestUpSalePercentDiscount.scenarios();
 
-TestLimitedUpSalePercentDiscount.Scenarios();
+TestLimitedUpSalePercentDiscount.scenarios();
 
-TestUpSaleFlatPriceDiscount.Scenarios();
+TestUpSaleFlatPriceDiscount.scenarios();
 
-TestLimitedUpSaleFlatPriceDiscount.Scenarios();
+TestLimitedUpSaleFlatPriceDiscount.scenarios();

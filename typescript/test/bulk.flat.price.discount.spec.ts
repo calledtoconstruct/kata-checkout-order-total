@@ -4,7 +4,7 @@ import { ItemList, ItemListImplementation, Item, Priced, StandardItem } from "..
 
 export class TestBulkFlatPriceDiscount {
 
-    public static Scenarios() {
+    public static scenarios() {
 
         describe('Given a transaction', () => {
 
