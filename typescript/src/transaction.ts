@@ -134,7 +134,25 @@ export class Transaction {
     }
 
     public total(): number {
-        return 0;
+        let code: Array<string> = new Array<string>();
+
+        this.item.forEach((item: TransactionItem): void => {
+            const itemCode = item.code();
+            const index: number = code.indexOf(itemCode);
+            
+            if (index < 0) {
+                code.push(itemCode);
+            }
+        });
+
+        let total: number = 0;
+
+        code.forEach((itemCode: string): void => {
+            const itemTotal = this.itemTotal(itemCode);
+            total += itemTotal;
+        });
+
+        return total;
     }
 
     public quantity(code: string): number {

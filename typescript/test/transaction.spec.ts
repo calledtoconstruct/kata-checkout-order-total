@@ -105,11 +105,13 @@ export class TestTransaction {
                     let before: number;
                     let after: number;
                     let itemTotal: number;
+                    let saleTotal: number;
 
                     beforeEach(() => {
                         before = transaction.quantity(code);
                         itemTotal = transaction.scan(code);
                         after = transaction.quantity(code);
+                        saleTotal = transaction.total();
                     });
 
                     it('Then the transaction should contain a quantity of one such item.', () => {
@@ -121,6 +123,10 @@ export class TestTransaction {
                         expect(itemTotal).toEqual(after * price);
                     });
 
+                    it('Then the sale total should equal the item total.', () => {
+                        expect(saleTotal).toEqual(itemTotal);
+                    });
+
                 });
 
                 describe('twice', () => {
@@ -128,12 +134,14 @@ export class TestTransaction {
                     let before: number;
                     let after: number;
                     let itemTotal: number;
+                    let saleTotal: number;
 
                     beforeEach(() => {
                         before = transaction.quantity(code);
                         transaction.scan(code);
                         itemTotal = transaction.scan(code);
                         after = transaction.quantity(code);
+                        saleTotal = transaction.total();
                     });
 
                     it('Then the transaction should contain a quantity of two such items.', () => {
@@ -143,6 +151,10 @@ export class TestTransaction {
 
                     it('Then the item total should be the quantity times price.', () => {
                         expect(itemTotal).toEqual(after * price);
+                    });
+
+                    it('Then the sale total should equal the item total.', () => {
+                        expect(saleTotal).toEqual(itemTotal);
                     });
 
                 });
@@ -253,6 +265,7 @@ export class TestTransaction {
                     let before: number;
                     let after: number;
                     let itemTotal: number;
+                    let saleTotal: number;
 
                     describe('for a single package', () => {
 
@@ -260,6 +273,7 @@ export class TestTransaction {
                             before = transaction.quantity(code);
                             itemTotal = transaction.scan(code, weight);
                             after = transaction.quantity(code);
+                            saleTotal = transaction.total();
                         });
     
                         it('Then the transaction should contain the item.', () => {
@@ -269,6 +283,10 @@ export class TestTransaction {
 
                         it('Then the item total should be the weight times the price.', () => {
                             expect(itemTotal).toEqual(weight * price);
+                        });
+
+                        it('Then the sale total should equal the item total.', () => {
+                            expect(saleTotal).toEqual(itemTotal);
                         });
 
                     });
@@ -282,6 +300,7 @@ export class TestTransaction {
                             transaction.scan(code, weight);
                             itemTotal = transaction.scan(code, otherItemWeight);
                             after = transaction.quantity(code);
+                            saleTotal = transaction.total();
                         });
     
                         it('Then the transaction should contain the items.', () => {
@@ -291,6 +310,10 @@ export class TestTransaction {
 
                         it('Then the item total should be the weight of both items times the price.', () => {
                             expect(itemTotal).toEqual((weight + otherItemWeight) * price);
+                        });
+
+                        it('Then the sale total should equal the item total.', () => {
+                            expect(saleTotal).toEqual(itemTotal);
                         });
 
                     });
