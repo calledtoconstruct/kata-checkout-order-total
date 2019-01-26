@@ -310,7 +310,7 @@ export class LimitedUpSaleFlatPriceDiscount extends UpSaleDiscount {
 
 }
 
-export class UpSalePercentDiscountByWeight extends UpSaleDiscount {
+export class UpSalePercentDiscountByWeight extends UpSaleDiscount implements Percent {
 
     constructor(
         readonly startDate: Date,
@@ -318,12 +318,13 @@ export class UpSalePercentDiscountByWeight extends UpSaleDiscount {
         readonly code: string,
         readonly bulk: number,
         readonly sale: number,
-        public readonly percent: number
+        readonly percent: number
     ) {
         super(startDate, endDate, code, bulk, sale);
     }
 
     public validate(itemList: ItemList): void {
+        validatePercent(this);
         super.validateItemType(itemList, 'by weight');
     }
 

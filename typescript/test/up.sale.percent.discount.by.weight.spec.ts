@@ -137,6 +137,57 @@ export class TestUpSalePercentDiscountByWeight {
 
         });
 
+        describe('Given an up sale percent discount by weight', () => {
+
+            describe('With a percent greater than one hundred', () => {
+
+                const code: string = 'some by weight item';
+                const today: number = new Date().valueOf();
+                const bulk: number = 2;
+                const sale: number = 1;
+                const discountPercent: number = 1.20;
+
+                const discount: Discount = new UpSalePercentDiscountByWeight(
+                    new Date(today - 10),
+                    new Date(today + 10),
+                    code,
+                    bulk,
+                    sale,
+                    discountPercent
+                );
+
+                describe('When validating', () => {
+
+                    const price: number = 2.97;
+                    const item: Item & Priced = new StandardItem(
+                        code,
+                        'random description',
+                        'by weight',
+                        price
+                    );
+
+                    let error: Error | null = null;
+
+                    beforeEach(() => {
+                        const itemList: ItemList = new ItemListImplementation();
+                        itemList.add(item);
+                        try {
+                            discount.validate(itemList)
+                        } catch (exception) {
+                            error = exception;
+                        }
+                    });
+
+                    it('Should raise an error.', () => {
+                        expect(error).not.toBeNull();
+                    });
+
+                });
+
+            });
+
+        });
+
     }
 
 }
