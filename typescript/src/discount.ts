@@ -185,7 +185,7 @@ abstract class UpSaleDiscount implements Discount, UpSale {
     public abstract total(items: Array<DiscountItem>): number;
 }
 
-export class UpSalePercentDiscount extends UpSaleDiscount {
+export class UpSalePercentDiscount extends UpSaleDiscount implements Percent {
 
     constructor(
         readonly startDate: Date,
@@ -193,12 +193,13 @@ export class UpSalePercentDiscount extends UpSaleDiscount {
         readonly code: string,
         readonly bulk: number,
         readonly sale: number,
-        private readonly percent: number
+        readonly percent: number
     ) {
         super(startDate, endDate, code, bulk, sale);
     }
 
     public validate(itemList: ItemList): void {
+        validatePercent(this);
         super.validateItemType(itemList, 'by quantity');
     }
 
