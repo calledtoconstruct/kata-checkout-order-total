@@ -332,6 +332,7 @@ export class UpSalePercentDiscountByWeight extends UpSaleDiscount implements Per
     }
 
     public validate(itemList: ItemList): void {
+        validatePercentNotEqualToZero(this);
         validatePercentNotGreaterThanOneHundred(this);
         super.validateItemType(itemList, 'by weight');
     }

@@ -2,6 +2,7 @@ import { Transaction } from "../src/transaction";
 import { Priced, Item, StandardItem, ItemList, ItemListImplementation } from "../src/item";
 import { UpSalePercentDiscountByWeight, Discount, DiscountListImplementation, DiscountList } from "../src/discount";
 import { Currency } from "../src/currency";
+import { Parameterized, TestScenario } from "./parameterized";
 
 export class TestUpSalePercentDiscountByWeight {
 
@@ -139,47 +140,58 @@ export class TestUpSalePercentDiscountByWeight {
 
         describe('Given an up sale percent discount by weight', () => {
 
-            describe('With a percent greater than one hundred', () => {
+            const scenarios = new Parameterized<number, TestScenario<number>>([
+                { description: 'greater than one hundred', target: 1.20 },
+                { description: 'equal to zero', target: 0 }
+            ]);
 
-                const code: string = 'some by weight item';
-                const today: number = new Date().valueOf();
-                const bulk: number = 2;
-                const sale: number = 1;
-                const discountPercent: number = 1.20;
+            scenarios.forEach().describe('With a percent', (scenario: TestScenario<number>) => {
 
-                const discount: Discount = new UpSalePercentDiscountByWeight(
-                    new Date(today - 10),
-                    new Date(today + 10),
-                    code,
-                    bulk,
-                    sale,
-                    discountPercent
-                );
+                const description: string = scenario.description;
+                const discountPercent: number = scenario.target;
 
-                describe('When validating', () => {
+                describe(description, () => {
 
-                    const price: number = 2.97;
-                    const item: Item & Priced = new StandardItem(
+                    const code: string = 'some by weight item';
+                    const today: number = new Date().valueOf();
+                    const bulk: number = 2;
+                    const sale: number = 1;
+
+                    const discount: Discount = new UpSalePercentDiscountByWeight(
+                        new Date(today - 10),
+                        new Date(today + 10),
                         code,
-                        'random description',
-                        'by weight',
-                        price
+                        bulk,
+                        sale,
+                        discountPercent
                     );
 
-                    let error: Error | null = null;
+                    describe('When validating', () => {
 
-                    beforeEach(() => {
-                        const itemList: ItemList = new ItemListImplementation();
-                        itemList.add(item);
-                        try {
-                            discount.validate(itemList)
-                        } catch (exception) {
-                            error = exception;
-                        }
-                    });
+                        const price: number = 2.97;
+                        const item: Item & Priced = new StandardItem(
+                            code,
+                            'random description',
+                            'by weight',
+                            price
+                        );
 
-                    it('Should raise an error.', () => {
-                        expect(error).not.toBeNull();
+                        let error: Error | null = null;
+
+                        beforeEach(() => {
+                            const itemList: ItemList = new ItemListImplementation();
+                            itemList.add(item);
+                            try {
+                                discount.validate(itemList)
+                            } catch (exception) {
+                                error = exception;
+                            }
+                        });
+
+                        it('Should raise an error.', () => {
+                            expect(error).not.toBeNull();
+                        });
+
                     });
 
                 });
