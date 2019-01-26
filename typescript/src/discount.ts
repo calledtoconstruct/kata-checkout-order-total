@@ -205,6 +205,7 @@ export class UpSalePercentDiscount extends UpSaleDiscount implements Percent {
     }
 
     public validate(itemList: ItemList): void {
+        validatePercentNotEqualToZero(this);
         validatePercentNotGreaterThanOneHundred(this);
         super.validateItemType(itemList, 'by quantity');
     }
