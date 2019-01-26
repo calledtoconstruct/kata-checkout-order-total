@@ -125,9 +125,15 @@ export interface Percent {
     percent: number;
 }
 
-const validatePercent: (percent: Percent) => void = (percent: Percent): void => {
+const validatePercentNotGreaterThanOneHundred: (percent: Percent) => void = (percent: Percent): void => {
     if (percent.percent > 1) {
         throw new Error('Percent must be Less Than or Equal To One Hundred');
+    }
+};
+
+const validatePercentNotEqualToZero: (percent: Percent) => void = (percent: Percent): void => {
+    if (percent.percent === 0) {
+        throw new Error('Percent must be Greater Than Zero');
     }
 };
 
@@ -199,7 +205,7 @@ export class UpSalePercentDiscount extends UpSaleDiscount implements Percent {
     }
 
     public validate(itemList: ItemList): void {
-        validatePercent(this);
+        validatePercentNotGreaterThanOneHundred(this);
         super.validateItemType(itemList, 'by quantity');
     }
 
@@ -229,7 +235,8 @@ export class LimitedUpSalePercentDiscount extends UpSaleDiscount implements Perc
     }
 
     public validate(itemList: ItemList): void {
-        validatePercent(this);
+        validatePercentNotEqualToZero(this);
+        validatePercentNotGreaterThanOneHundred(this);
         super.validateItemType(itemList, 'by quantity');
     }
 
@@ -325,7 +332,7 @@ export class UpSalePercentDiscountByWeight extends UpSaleDiscount implements Per
     }
 
     public validate(itemList: ItemList): void {
-        validatePercent(this);
+        validatePercentNotGreaterThanOneHundred(this);
         super.validateItemType(itemList, 'by weight');
     }
 
