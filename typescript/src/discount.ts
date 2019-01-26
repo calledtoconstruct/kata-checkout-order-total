@@ -121,6 +121,16 @@ export class BulkFlatPriceDiscount implements Discount {
     }
 }
 
+export interface Percent {
+    percent: number;
+}
+
+const validatePercent: (percent: Percent) => void = (percent: Percent): void => {
+    if (percent.percent > 1) {
+        throw new Error('Percent must be Less Than or Equal To One Hundred');
+    }
+};
+
 export interface UpSale {
     readonly bulk: number,
     readonly sale: number
@@ -183,7 +193,7 @@ export class UpSalePercentDiscount extends UpSaleDiscount {
         readonly code: string,
         readonly bulk: number,
         readonly sale: number,
-        public readonly percent: number
+        private readonly percent: number
     ) {
         super(startDate, endDate, code, bulk, sale);
     }
@@ -203,7 +213,7 @@ export class UpSalePercentDiscount extends UpSaleDiscount {
 
 }
 
-export class LimitedUpSalePercentDiscount extends UpSaleDiscount {
+export class LimitedUpSalePercentDiscount extends UpSaleDiscount implements Percent {
 
     constructor(
         readonly startDate: Date,
@@ -211,13 +221,14 @@ export class LimitedUpSalePercentDiscount extends UpSaleDiscount {
         readonly code: string,
         readonly bulk: number,
         readonly sale: number,
-        public readonly percent: number,
+        readonly percent: number,
         public readonly limit: number
     ) {
         super(startDate, endDate, code, bulk, sale);
     }
 
     public validate(itemList: ItemList): void {
+        validatePercent(this);
         super.validateItemType(itemList, 'by quantity');
     }
 

@@ -23,7 +23,7 @@ export class TestLimitedUpSalePercentDiscount {
                 );
 
                 describe('And a discount rule for the same item', () => {
-                    
+
                     const today: number = new Date().valueOf();
                     const bulk: number = 2;
                     const sale: number = 1;
@@ -60,14 +60,14 @@ export class TestLimitedUpSalePercentDiscount {
                                 itemTotal = transaction.scan(code);
                                 quantity = transaction.quantity(code);
                             });
-    
+
                             it('Then the item total should be the item quantity times the item price.', () => {
                                 expect(quantity).toBeLessThan(bulk + sale);
                                 expect(itemTotal).toEqual(quantity * price);
                             });
-    
+
                         });
-    
+
                         describe('And the right quantity', () => {
 
                             let itemTotal: number;
@@ -79,14 +79,14 @@ export class TestLimitedUpSalePercentDiscount {
                                 itemTotal = transaction.scan(code);
                                 quantity = transaction.quantity(code);
                             });
-    
+
                             it('Then the item total should the bulk quantity times the item price plus the sale quantity times the discount price.', () => {
                                 expect(quantity).toEqual(bulk + sale);
                                 expect(itemTotal).toEqual(Currency.floor(bulk * price + sale * (price * (1 - discountPercent))));
                             });
-    
+
                         });
-    
+
                         describe('And a quantity over the limit', () => {
 
                             let itemTotal: number;
@@ -104,15 +104,68 @@ export class TestLimitedUpSalePercentDiscount {
                                 itemTotal = transaction.scan(code);
                                 quantity = transaction.quantity(code);
                             });
-    
+
                             it('Then the item total should be calculated correctly.', () => {
                                 expect(quantity).toEqual(9);
                                 const salePrice = price * (1 - discountPercent);
                                 expect(itemTotal).toEqual(Currency.floor(7 * price + 2 * salePrice));
                             });
-    
+
                         });
 
+                    });
+
+                });
+
+            });
+
+        });
+
+        describe('Given a limited up sale percent discount', () => {
+
+            describe('With a percent greater than one hundred', () => {
+
+                const code: string = 'some by quantity item';
+                const today: number = new Date().valueOf();
+                const bulk: number = 2;
+                const sale: number = 1;
+                const discountPercent: number = 1.20;
+                const limit: number = 6;
+
+                const discount: Discount = new LimitedUpSalePercentDiscount(
+                    new Date(today - 10),
+                    new Date(today + 10),
+                    code,
+                    bulk,
+                    sale,
+                    discountPercent,
+                    limit
+                );
+
+                describe('When validating', () => {
+
+                    const price: number = 2.97;
+                    const item: Item & Priced = new StandardItem(
+                        code,
+                        'random description',
+                        'by quantity',
+                        price
+                    );
+
+                    let error: Error | null = null;
+
+                    beforeEach(() => {
+                        const itemList: ItemList = new ItemListImplementation();
+                        itemList.add(item);
+                        try {
+                            discount.validate(itemList)
+                        } catch (exception) {
+                            error = exception;
+                        }
+                    });
+
+                    it('Should raise an error.', () => {
+                        expect(error).not.toBeNull();
                     });
 
                 });
