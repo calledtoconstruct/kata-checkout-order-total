@@ -79,6 +79,12 @@ export class Transaction {
         const transactionItem: TransactionItem = new TransactionItem(scanned, weight);
         this.item.push(transactionItem);
 
+        const itemTotal: number = this.itemTotal(code);
+
+        return itemTotal;
+    }
+
+    private itemTotal(code: string): number {
         const discount: Discount | undefined = this.discountList.get(this.date, code);
         const related: Array<TransactionItem> = this.items(code);
         
