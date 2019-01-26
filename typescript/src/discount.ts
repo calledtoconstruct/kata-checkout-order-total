@@ -137,6 +137,20 @@ const validatePercentNotEqualToZero: (percent: Percent) => void = (percent: Perc
     }
 };
 
+export interface Limited {
+    bulk: number;
+    sale: number;
+    limit: number;
+}
+
+const validateLimitIsMultipleOfBulkAndSaleQuantity: (limited: Limited) => void = (limited: Limited): void => {
+    if (limited.limit === 0) {
+        throw new Error('Limit must be Greater Than Zero');
+    } else if ((limited.limit % (limited.bulk + limited.sale)) !== 0) {
+        throw new Error('Limit must be a Multiple of the Sum of the Bulk and Sale Quantities');
+    }
+};
+
 export interface UpSale {
     readonly bulk: number,
     readonly sale: number
@@ -286,7 +300,7 @@ export class UpSaleFlatPriceDiscount extends UpSaleDiscount {
 
 }
 
-export class LimitedUpSaleFlatPriceDiscount extends UpSaleDiscount {
+export class LimitedUpSaleFlatPriceDiscount extends UpSaleDiscount implements Limited {
 
     constructor(
         readonly startDate: Date,
@@ -295,13 +309,14 @@ export class LimitedUpSaleFlatPriceDiscount extends UpSaleDiscount {
         readonly bulk: number,
         readonly sale: number,
         public readonly price: number,
-        public readonly limit: number
+        readonly limit: number
     ) {
         super(startDate, endDate, code, bulk, sale);
     }
 
     public validate(itemList: ItemList): void {
         super.validateItemType(itemList, 'by quantity');
+        validateLimitIsMultipleOfBulkAndSaleQuantity(this);
     }
 
     public total(items: Array<DiscountItem>): number {
