@@ -1,7 +1,7 @@
 
 export interface ItemList {
     get(code: string): Promise<(Item & Priced) | undefined>;
-    add(item: Item): void;
+    add(item: Item): Promise<void>;
     includes(item: Item): Promise<boolean>;
 }
 
@@ -45,7 +45,7 @@ export class StandardItem implements Item, Priced {
 export class ItemListImplementation implements ItemList {
     private readonly list: Array<Item & Priced> = new Array<Item & Priced>();
 
-    public add(item: Item & Priced): void {
+    public async add(item: Item & Priced): Promise<void> {
         item.validate();
         const copy = this.list.splice(0);
         copy.filter((value: Item): boolean => {
@@ -54,6 +54,7 @@ export class ItemListImplementation implements ItemList {
             this.list.push(value);
         });
         this.list.push(item);
+        return Promise.resolve();
     }
 
     public async includes(item: Item & Priced): Promise<boolean> {

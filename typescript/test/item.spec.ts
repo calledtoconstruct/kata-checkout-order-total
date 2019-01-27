@@ -24,8 +24,8 @@ export class TestItemList {
         
                 describe('When adding the item', () => {
         
-                    beforeEach(() => {
-                        itemList.add(item);
+                    beforeEach(async (): Promise<void> => {
+                        await itemList.add(item);
                     });
         
                     it('Should exist in the list', async (): Promise<void> => {
@@ -43,9 +43,9 @@ export class TestItemList {
                         5.0
                     );
         
-                    beforeEach(() => {
-                        itemList.add(item);
-                        itemList.add(otherItem);
+                    beforeEach(async (): Promise<void> => {
+                        await itemList.add(item);
+                        await itemList.add(otherItem);
                     });
         
                     it('the first item should not exist in the list', async (): Promise<void> => {
@@ -74,9 +74,9 @@ export class TestItemList {
                 const invalidItem: Item = invalidItemScenario.target;
                 let error: Error | null = null;
         
-                beforeEach(() => {
+                beforeEach(async (): Promise<void> => {
                     try {
-                        itemList.add(invalidItem);
+                        await itemList.add(invalidItem);
                         fail();
                     } catch (caught) {
                         error = caught;

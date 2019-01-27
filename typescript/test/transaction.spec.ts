@@ -91,9 +91,9 @@ export class TestTransaction {
                 price
             );
 
-            beforeEach(() => {
+            beforeEach(async (): Promise<void> => {
                 const itemList: ItemList = new ItemListImplementation();
-                itemList.add(item);
+                await itemList.add(item);
                 const discountList: DiscountList = new DiscountListImplementation(itemList);
                 transaction = new Transaction(itemList, discountList);
             });
@@ -232,9 +232,9 @@ export class TestTransaction {
                 price
             );
 
-            beforeEach(() => {
+            beforeEach(async (): Promise<void> => {
                 const itemList: ItemList = new ItemListImplementation();
-                itemList.add(item);
+                await itemList.add(item);
                 const discountList: DiscountList = new DiscountListImplementation(itemList);
                 transaction = new Transaction(itemList, discountList);
             });

@@ -38,7 +38,7 @@ class FakeByWeightItem implements Item {
 
 class FakeItemList implements ItemList {
     private readonly items: any = {};
-    public add(_: Item): void {
+    public async add(_: Item): Promise<void> {
         throw new Error("Method not implemented.");
     }
     public async includes(_: Item): Promise<boolean> {

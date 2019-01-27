@@ -36,7 +36,7 @@ export class TestBulkFlatPriceDiscount {
 
                     beforeEach(async (): Promise<void> => {
                         const itemList: ItemList = new ItemListImplementation();
-                        itemList.add(item);
+                        await itemList.add(item);
                         const discountList: DiscountList = new DiscountListImplementation(itemList);
                         await discountList.add(discount);
                         transaction = new Transaction(itemList, discountList);
