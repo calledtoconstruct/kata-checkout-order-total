@@ -32,11 +32,11 @@ export class TestStandardDiscount {
                         discountPrice
                     );
 
-                    beforeEach(() => {
+                    beforeEach(async (): Promise<void> => {
                         const itemList: ItemList = new ItemListImplementation();
                         itemList.add(item);
                         const discountList: DiscountList = new DiscountListImplementation(itemList);
-                        discountList.add(discount);
+                        await discountList.add(discount);
                         transaction = new Transaction(itemList, discountList);
                     });
 
@@ -45,8 +45,8 @@ export class TestStandardDiscount {
                         let itemTotal: number;
                         let quantity: number;
 
-                        beforeEach(() => {
-                            itemTotal = transaction.scan(code);
+                        beforeEach(async (): Promise<void> => {
+                            itemTotal = await transaction.scan(code);
                             quantity = transaction.quantity(code);
                         });
 
@@ -63,4 +63,5 @@ export class TestStandardDiscount {
         });
 
     }
+
 }

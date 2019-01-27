@@ -71,8 +71,8 @@ export class Transaction {
         }
     }
 
-    public scan(code: string, weight?: number): number {
-        const scanned: Item & Priced = this.itemList.get(code);
+    public async scan(code: string, weight?: number): Promise<number> {
+        const scanned: Item & Priced = await this.itemList.get(code);
 
         Transaction.validateType(scanned, weight);
 
@@ -110,8 +110,8 @@ export class Transaction {
         return this.item.filter((value: TransactionItem): boolean => value.code() === code);
     }
 
-    public void(code: string, weight?: number): void {
-        const scanned: Item = this.itemList.get(code);
+    public async void(code: string, weight?: number): Promise<void> {
+        const scanned: Item & Priced = await this.itemList.get(code);
 
         Transaction.validateType(scanned, weight);
 

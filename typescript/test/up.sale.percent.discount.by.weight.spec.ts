@@ -41,11 +41,11 @@ export class TestUpSalePercentDiscountByWeight {
 
                     describe('When calculating', () => {
 
-                        beforeEach(() => {
+                        beforeEach(async (): Promise<void> => {
                             const itemList: ItemList = new ItemListImplementation();
                             itemList.add(item);
                             const discountList: DiscountList = new DiscountListImplementation(itemList);
-                            discountList.add(discount);
+                            await discountList.add(discount);
                             transaction = new Transaction(itemList, discountList);
                         });
 
@@ -57,9 +57,9 @@ export class TestUpSalePercentDiscountByWeight {
                             let itemTotal: number;
                             let quantity: number;
 
-                            beforeEach(() => {
-                                transaction.scan(code, firstWeight);
-                                itemTotal = transaction.scan(code, secondWeight);
+                            beforeEach(async (): Promise<void> => {
+                                await transaction.scan(code, firstWeight);
+                                itemTotal = await transaction.scan(code, secondWeight);
                                 quantity = transaction.quantity(code);
                             });
 
@@ -79,10 +79,10 @@ export class TestUpSalePercentDiscountByWeight {
                             let itemTotal: number;
                             let quantity: number;
 
-                            beforeEach(() => {
-                                transaction.scan(code, firstWeight);
-                                transaction.scan(code, secondWeight);
-                                itemTotal = transaction.scan(code, thirdWeight);
+                            beforeEach(async (): Promise<void> => {
+                                await transaction.scan(code, firstWeight);
+                                await transaction.scan(code, secondWeight);
+                                itemTotal = await transaction.scan(code, thirdWeight);
                                 quantity = transaction.quantity(code);
                             });
 
@@ -109,15 +109,15 @@ export class TestUpSalePercentDiscountByWeight {
                             let itemTotal: number;
                             let quantity: number;
 
-                            beforeEach(() => {
-                                transaction.scan(code, firstWeight);
-                                transaction.scan(code, secondWeight);
-                                transaction.scan(code, thirdWeight);
-                                transaction.scan(code, fourthWeight);
-                                transaction.scan(code, fifthWeight);
-                                transaction.scan(code, sixthWeight);
-                                transaction.scan(code, seventhWeight);
-                                itemTotal = transaction.scan(code, eighthWeight);
+                            beforeEach(async (): Promise<void> => {
+                                await transaction.scan(code, firstWeight);
+                                await transaction.scan(code, secondWeight);
+                                await transaction.scan(code, thirdWeight);
+                                await transaction.scan(code, fourthWeight);
+                                await transaction.scan(code, fifthWeight);
+                                await transaction.scan(code, sixthWeight);
+                                await transaction.scan(code, seventhWeight);
+                                itemTotal = await transaction.scan(code, eighthWeight);
                                 quantity = transaction.quantity(code);
                             });
 
@@ -178,11 +178,11 @@ export class TestUpSalePercentDiscountByWeight {
 
                         let error: Error | null = null;
 
-                        beforeEach(() => {
+                        beforeEach(async (): Promise<void> => {
                             const itemList: ItemList = new ItemListImplementation();
                             itemList.add(item);
                             try {
-                                discount.validate(itemList)
+                                await discount.validate(itemList)
                             } catch (exception) {
                                 error = exception;
                             }

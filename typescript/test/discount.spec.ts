@@ -44,11 +44,11 @@ class FakeItemList implements ItemList {
     public async includes(_: Item): Promise<boolean> {
         throw new Error("Method not implemented.");
     }
-    public get(code: string): Item & Priced {
+    public async get(code: string): Promise<Item & Priced> {
         if (this.items[code] === undefined) {
             throw new Error('invalid test');
         }
-        return this.items[code];
+        return Promise.resolve(this.items[code]);
     }
     public addFakeItem(code: string, item: Item): void {
         this.items[code] = item;
@@ -63,7 +63,7 @@ export class TestDiscountList {
 
             let discountList: DiscountList;
 
-            beforeEach(() => {
+            beforeEach(async (): Promise<void> => {
                 const fakeItemList: FakeItemList = new FakeItemList();
                 const itemList: ItemList = fakeItemList;
 
@@ -93,8 +93,8 @@ export class TestDiscountList {
                 const scenarioDescription: string = discountScenario.description;
                 const discount: Discount = discountScenario.target;
 
-                beforeEach(() => {
-                    discountList.add(discount);
+                beforeEach(async (): Promise<void> => {
+                    await discountList.add(discount);
                 });
 
                 describe(scenarioDescription, () => {
@@ -131,9 +131,9 @@ export class TestDiscountList {
                 const discount: Discount = typeMismatchScenario.target;
                 let error: Error | null = null;
 
-                beforeEach(() => {
+                beforeEach(async (): Promise<void> => {
                     try {
-                        discountList.add(discount);
+                        await discountList.add(discount);
                     } catch (exception) {
                         error = exception;
                     }
@@ -208,10 +208,10 @@ export class TestDiscountList {
                         const discount: Discount = discountScenario.target;
                         let error: Error | null = null;
 
-                        beforeEach(() => {
-                            discountList.add(discount);
+                        beforeEach(async (): Promise<void> => {
+                            await discountList.add(discount);
                             try {
-                                discountList.add(overlappingDiscount);
+                                await discountList.add(overlappingDiscount);
                             } catch (exception) {
                                 error = exception;
                             }
@@ -273,9 +273,9 @@ export class TestDiscountList {
                 describe('When validating', () => {
                     let error: Error | null = null;
 
-                    beforeEach(() => {
+                    beforeEach(async (): Promise<void> => {
                         try {
-                            discount.validate(itemList);
+                            await discount.validate(itemList);
                         } catch (exception) {
                             error = exception;
                         }
@@ -324,9 +324,9 @@ export class TestDiscount {
                 describe('When validating', () => {
                     let error: Error | null = null;
 
-                    beforeEach(() => {
+                    beforeEach(async (): Promise<void> => {
                         try {
-                            invalidDiscount.validate(itemList);
+                            await invalidDiscount.validate(itemList);
                         } catch (exception) {
                             error = exception;
                         }
@@ -367,9 +367,9 @@ export class TestDiscount {
                 describe('When validating', () => {
                     let error: Error | null = null;
 
-                    beforeEach(() => {
+                    beforeEach(async (): Promise<void> => {
                         try {
-                            invalidDiscount.validate(itemList);
+                            await invalidDiscount.validate(itemList);
                         } catch (exception) {
                             error = exception;
                         }
@@ -410,9 +410,9 @@ export class TestDiscount {
                 describe('When validating', () => {
                     let error: Error | null = null;
 
-                    beforeEach(() => {
+                    beforeEach(async (): Promise<void> => {
                         try {
-                            invalidDiscount.validate(itemList);
+                            await invalidDiscount.validate(itemList);
                         } catch (exception) {
                             error = exception;
                         }
@@ -453,9 +453,9 @@ export class TestDiscount {
                 describe('When validating', () => {
                     let error: Error | null = null;
 
-                    beforeEach(() => {
+                    beforeEach(async (): Promise<void> => {
                         try {
-                            invalidDiscount.validate(itemList);
+                            await invalidDiscount.validate(itemList);
                         } catch (exception) {
                             error = exception;
                         }
@@ -496,9 +496,9 @@ export class TestDiscount {
                 describe('When validating', () => {
                     let error: Error | null = null;
 
-                    beforeEach(() => {
+                    beforeEach(async (): Promise<void> => {
                         try {
-                            invalidDiscount.validate(itemList);
+                            await invalidDiscount.validate(itemList);
                         } catch (exception) {
                             error = exception;
                         }

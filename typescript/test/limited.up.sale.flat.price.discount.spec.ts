@@ -43,11 +43,11 @@ export class TestLimitedUpSaleFlatPriceDiscount {
 
                     describe('When calculating', () => {
 
-                        beforeEach(() => {
+                        beforeEach(async (): Promise<void> => {
                             const itemList: ItemList = new ItemListImplementation();
                             itemList.add(item);
                             const discountList: DiscountList = new DiscountListImplementation(itemList);
-                            discountList.add(discount);
+                            await discountList.add(discount);
                             transaction = new Transaction(itemList, discountList);
                         });
 
@@ -56,9 +56,9 @@ export class TestLimitedUpSaleFlatPriceDiscount {
                             let itemTotal: number;
                             let quantity: number;
 
-                            beforeEach(() => {
-                                transaction.scan(code);
-                                itemTotal = transaction.scan(code);
+                            beforeEach(async (): Promise<void> => {
+                                await transaction.scan(code);
+                                itemTotal = await transaction.scan(code);
                                 quantity = transaction.quantity(code);
                             });
 
@@ -74,11 +74,11 @@ export class TestLimitedUpSaleFlatPriceDiscount {
                             let itemTotal: number;
                             let quantity: number;
 
-                            beforeEach(() => {
-                                transaction.scan(code);
-                                transaction.scan(code);
-                                transaction.scan(code);
-                                itemTotal = transaction.scan(code);
+                            beforeEach(async (): Promise<void> => {
+                                await transaction.scan(code);
+                                await transaction.scan(code);
+                                await transaction.scan(code);
+                                itemTotal = await transaction.scan(code);
                                 quantity = transaction.quantity(code);
                             });
 
@@ -94,16 +94,16 @@ export class TestLimitedUpSaleFlatPriceDiscount {
                             let itemTotal: number;
                             let quantity: number;
 
-                            beforeEach(() => {
-                                transaction.scan(code);
-                                transaction.scan(code);
-                                transaction.scan(code);
-                                transaction.scan(code);
-                                transaction.scan(code);
-                                transaction.scan(code);
-                                transaction.scan(code);
-                                transaction.scan(code);
-                                itemTotal = transaction.scan(code);
+                            beforeEach(async (): Promise<void> => {
+                                await transaction.scan(code);
+                                await transaction.scan(code);
+                                await transaction.scan(code);
+                                await transaction.scan(code);
+                                await transaction.scan(code);
+                                await transaction.scan(code);
+                                await transaction.scan(code);
+                                await transaction.scan(code);
+                                itemTotal = await transaction.scan(code);
                                 quantity = transaction.quantity(code);
                             });
 
@@ -167,11 +167,11 @@ export class TestLimitedUpSaleFlatPriceDiscount {
     
                         let error: Error | null = null;
     
-                        beforeEach(() => {
+                        beforeEach(async (): Promise<void> => {
                             const itemList: ItemList = new ItemListImplementation();
                             itemList.add(item);
                             try {
-                                discount.validate(itemList)
+                                await discount.validate(itemList)
                             } catch (exception) {
                                 error = exception;
                             }
