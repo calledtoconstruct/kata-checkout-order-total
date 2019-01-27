@@ -44,7 +44,7 @@ export class TestUpSalePercentDiscount {
 
                         beforeEach(async (): Promise<void> => {
                             const itemList: ItemList = new ItemListImplementation();
-                            itemList.add(item);
+                            await itemList.add(item);
                             const discountList: DiscountList = new DiscountListImplementation(itemList);
                             await discountList.add(discount);
                             transaction = new Transaction(itemList, discountList);
@@ -160,7 +160,7 @@ export class TestUpSalePercentDiscount {
 
                         beforeEach(async (): Promise<void> => {
                             const itemList: ItemList = new ItemListImplementation();
-                            itemList.add(item);
+                            await itemList.add(item);
                             try {
                                 await discount.validate(itemList)
                             } catch (exception) {
