@@ -4,7 +4,7 @@ import { Currency } from './currency';
 
 export interface DiscountList {
     add(discount: Discount): Promise<void>;
-    includes(discount: Discount): boolean;
+    includes(discount: Discount): Promise<boolean>;
     get(date: Date, code: string): Discount | undefined;
 }
 
@@ -424,8 +424,8 @@ export class DiscountListImplementation implements DiscountList {
         }
     }
 
-    public includes(discount: Discount): boolean {
-        return this.list.indexOf(discount) !== -1;
+    public async includes(discount: Discount): Promise<boolean> {
+        return Promise.resolve(this.list.indexOf(discount) !== -1);
     }
 
     private static overlap(firstStart: Date, firstEnd: Date, secondStart: Date, secondEnd: Date): boolean {

@@ -99,8 +99,8 @@ export class TestDiscountList {
 
                 describe(scenarioDescription, () => {
 
-                    it('Should be added to the list', () => {
-                        const result = discountList.includes(discount);
+                    it('Should be added to the list', async (): Promise<void> => {
+                        const result = await discountList.includes(discount);
                         expect(result).toBe(true);
                     });
 
@@ -145,8 +145,8 @@ export class TestDiscountList {
                         expect(error).not.toBeNull();
                     });
 
-                    it('Should not be added to the list', () => {
-                        const result = discountList.includes(discount);
+                    it('Should not be added to the list', async (): Promise<void> => {
+                        const result = await discountList.includes(discount);
                         expect(result).toBe(false);
                     });
 
@@ -223,13 +223,13 @@ export class TestDiscountList {
                                 expect(error).not.toBeNull();
                             });
 
-                            it('Should not be included.', () => {
-                                const result = discountList.includes(overlappingDiscount);
+                            it('Should not be included.', async (): Promise<void> => {
+                                const result = await discountList.includes(overlappingDiscount);
                                 expect(result).not.toBe(true)
                             });
 
-                            it('Should not replace existing.', () => {
-                                const result = discountList.includes(discount);
+                            it('Should not replace existing.', async (): Promise<void> => {
+                                const result = await discountList.includes(discount);
                                 expect(result).toBe(true);
                             });
 
