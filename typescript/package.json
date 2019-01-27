@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "tsc --outDir dist test/test.spec.ts && jasmine dist/test/test.spec.js"
+    "test": "tsc --project tsconfig.test.json && jasmine test/transpiled/test/test.spec.js"
   },
   "repository": {
     "type": "git",

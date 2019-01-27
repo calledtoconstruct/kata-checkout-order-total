@@ -2,7 +2,7 @@
 export interface ItemList {
     get(code: string): Item & Priced;
     add(item: Item): void;
-    includes(item: Item): boolean;
+    includes(item: Item): Promise<boolean>;
 }
 
 export type ItemType = 'by quantity' | 'by weight';
@@ -56,8 +56,8 @@ export class ItemListImplementation implements ItemList {
         this.list.push(item);
     }
 
-    public includes(item: Item & Priced): boolean {
-        return this.list.indexOf(item) !== -1;
+    public async includes(item: Item & Priced): Promise<boolean> {
+        return Promise.resolve(this.list.indexOf(item) !== -1);
     }
 
     public get(code: string): Item & Priced {

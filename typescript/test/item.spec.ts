@@ -28,8 +28,8 @@ export class TestItemList {
                         itemList.add(item);
                     });
         
-                    it('Should exist in the list', () => {
-                        const result = itemList.includes(item);
+                    it('Should exist in the list', async (): Promise<void> => {
+                        const result = await itemList.includes(item);
                         expect(result).toBe(true);
                     });
         
@@ -48,13 +48,13 @@ export class TestItemList {
                         itemList.add(otherItem);
                     });
         
-                    it('the first item should not exist in the list', () => {
-                        const result = itemList.includes(item);
+                    it('the first item should not exist in the list', async (): Promise<void> => {
+                        const result = await itemList.includes(item);
                         expect(result).toBe(false);
                     });
         
-                    it('the other item should exist in the list', () => {
-                        const result = itemList.includes(otherItem);
+                    it('the other item should exist in the list', async (): Promise<void> => {
+                        const result = await itemList.includes(otherItem);
                         expect(result).toBe(true);
                     });
         
@@ -87,8 +87,8 @@ export class TestItemList {
                     expect(error).not.toBeNull()
                 });
         
-                it('Should not be added to the list because it is missing ' + scenarioDescription, () => {
-                    const result = itemList.includes(invalidItem);
+                it('Should not be added to the list because it is missing ' + scenarioDescription, async (): Promise<void> => {
+                    const result = await itemList.includes(invalidItem);
                     expect(result).toBe(false);
                 });
         

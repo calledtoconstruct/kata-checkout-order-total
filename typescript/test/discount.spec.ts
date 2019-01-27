@@ -41,7 +41,7 @@ class FakeItemList implements ItemList {
     public add(_: Item): void {
         throw new Error("Method not implemented.");
     }
-    public includes(_: Item): boolean {
+    public async includes(_: Item): Promise<boolean> {
         throw new Error("Method not implemented.");
     }
     public get(code: string): Item & Priced {
