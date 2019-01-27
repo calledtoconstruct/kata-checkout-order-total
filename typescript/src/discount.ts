@@ -1,9 +1,9 @@
-import { ItemList, ItemType } from './item';
+import { ItemList, ItemType, Item, Priced } from './item';
 import { DateRange } from './date';
 import { Currency } from './currency';
 
 export interface DiscountList {
-    add(discount: Discount): void;
+    add(discount: Discount): Promise<void>;
     includes(discount: Discount): boolean;
     get(date: Date, code: string): Discount | undefined;
 }
@@ -20,7 +20,7 @@ export interface Discount {
     readonly startDate: Date;
     readonly endDate: Date;
     readonly code: string;
-    validate(itemList: ItemList): void;
+    validate(itemList: ItemList): Promise<void>;
     total(items: Array<DiscountItem>): number;
 }
 
@@ -30,8 +30,13 @@ const validateItemCode: (discount: Discount) => void = (discount: Discount): voi
     }
 };
 
-const validateItemType: (itemList: ItemList, code: string, type: ItemType) => void = (itemList: ItemList, code: string, type: ItemType): void => {
-    const item = itemList.get(code);
+const validateItemType = async (itemList: ItemList, code: string, type: ItemType): Promise<void> => {
+    const item: (Item & Priced) | undefined = await itemList.get(code);
+
+    if (item === undefined) {
+        throw new Error('Requested Item Does Not Exist.');
+    }
+
     if (item.type !== type) {
         throw new Error('Item Type Mismatch');
     }
@@ -56,9 +61,9 @@ export class StandardDiscount implements Discount {
         public readonly price: number
     ) { }
 
-    public validate(itemList: ItemList): void {
+    public async validate(itemList: ItemList): Promise<void> {
         validateItemCode(this);
-        validateItemType(itemList, this.code, 'by quantity');
+        await validateItemType(itemList, this.code, 'by quantity');
         validateItemDateRange(this);
     }
 
@@ -107,9 +112,9 @@ export class BulkFlatPriceDiscount implements Discount {
         public readonly price: number
     ) { }
 
-    public validate(itemList: ItemList): void {
+    public async validate(itemList: ItemList): Promise<void> {
         validateItemCode(this);
-        validateItemType(itemList, this.code, 'by quantity');
+        await validateItemType(itemList, this.code, 'by quantity');
         validateItemDateRange(this);
     }
 
@@ -190,15 +195,15 @@ abstract class UpSaleDiscount implements Discount, UpSale {
         public readonly sale: number
     ) { }
 
-    public abstract validate(itemList: ItemList): void;
+    public abstract async validate(itemList: ItemList): Promise<void>;
 
-    protected validateItemType(itemList: ItemList, type: ItemType): void {
+    protected async validateItemType(itemList: ItemList, type: ItemType): Promise<void> {
         validateItemCode(this);
         validateWholeNumberBulkQuantity(this);
         validateBulkQuantity(this);
         validateWholeNumberSaleQuantity(this);
         validateSaleQuantity(this);
-        validateItemType(itemList, this.code, type);
+        await validateItemType(itemList, this.code, type);
         validateItemDateRange(this);
     }
 
@@ -218,10 +223,10 @@ export class UpSalePercentDiscount extends UpSaleDiscount implements Percent {
         super(startDate, endDate, code, bulk, sale);
     }
 
-    public validate(itemList: ItemList): void {
+    public async validate(itemList: ItemList): Promise<void> {
         validatePercentNotEqualToZero(this);
         validatePercentNotGreaterThanOneHundred(this);
-        super.validateItemType(itemList, 'by quantity');
+        await super.validateItemType(itemList, 'by quantity');
     }
 
     public total(items: Array<DiscountItem>): number {
@@ -249,10 +254,10 @@ export class LimitedUpSalePercentDiscount extends UpSaleDiscount implements Perc
         super(startDate, endDate, code, bulk, sale);
     }
 
-    public validate(itemList: ItemList): void {
+    public async validate(itemList: ItemList): Promise<void> {
         validatePercentNotEqualToZero(this);
         validatePercentNotGreaterThanOneHundred(this);
-        super.validateItemType(itemList, 'by quantity');
+        await super.validateItemType(itemList, 'by quantity');
     }
 
     public total(items: Array<DiscountItem>): number {
@@ -284,8 +289,8 @@ export class UpSaleFlatPriceDiscount extends UpSaleDiscount {
         super(startDate, endDate, code, bulk, sale);
     }
 
-    public validate(itemList: ItemList): void {
-        super.validateItemType(itemList, 'by quantity');
+    public async validate(itemList: ItemList): Promise<void> {
+        await super.validateItemType(itemList, 'by quantity');
     }
 
     public total(items: Array<DiscountItem>): number {
@@ -314,8 +319,8 @@ export class LimitedUpSaleFlatPriceDiscount extends UpSaleDiscount implements Li
         super(startDate, endDate, code, bulk, sale);
     }
 
-    public validate(itemList: ItemList): void {
-        super.validateItemType(itemList, 'by quantity');
+    public async validate(itemList: ItemList): Promise<void> {
+        await super.validateItemType(itemList, 'by quantity');
         validateLimitIsMultipleOfBulkAndSaleQuantity(this);
     }
 
@@ -347,10 +352,10 @@ export class UpSalePercentDiscountByWeight extends UpSaleDiscount implements Per
         super(startDate, endDate, code, bulk, sale);
     }
 
-    public validate(itemList: ItemList): void {
+    public async validate(itemList: ItemList): Promise<void> {
         validatePercentNotEqualToZero(this);
         validatePercentNotGreaterThanOneHundred(this);
-        super.validateItemType(itemList, 'by weight');
+        await super.validateItemType(itemList, 'by weight');
     }
 
     public total(items: Array<DiscountItem>): number {
@@ -389,8 +394,8 @@ export class DiscountListImplementation implements DiscountList {
 
     private readonly list: Array<Discount> = new Array<Discount>();
 
-    public add(discount: Discount): void {
-        discount.validate(this.itemList);
+    public async add(discount: Discount): Promise<void> {
+        await discount.validate(this.itemList);
 
         const duplicates: Array<Discount> = this.matching(discount.code, discount.startDate, discount.endDate);
 
