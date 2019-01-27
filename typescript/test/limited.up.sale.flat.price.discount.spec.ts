@@ -1,3 +1,4 @@
+
 import { Transaction } from "../src/transaction";
 import { LimitedUpSaleFlatPriceDiscount, Discount, DiscountListImplementation, DiscountList } from "../src/discount";
 import { Priced, Item, StandardItem, ItemList, ItemListImplementation } from "../src/item";
@@ -144,7 +145,7 @@ export class TestLimitedUpSaleFlatPriceDiscount {
                     const code: string = 'some by quantity item';
                     const today: number = new Date().valueOf();
                     const price: number = 1.00;
-    
+
                     const discount: Discount = new LimitedUpSaleFlatPriceDiscount(
                         new Date(today - 10),
                         new Date(today + 10),
@@ -154,9 +155,9 @@ export class TestLimitedUpSaleFlatPriceDiscount {
                         price,
                         limit
                     );
-    
+
                     describe('When validating', () => {
-    
+
                         const price: number = 2.97;
                         const item: Item & Priced = new StandardItem(
                             code,
@@ -164,7 +165,7 @@ export class TestLimitedUpSaleFlatPriceDiscount {
                             'by quantity',
                             price
                         );
-    
+
                         let error: Error | null = null;
     
                         beforeEach(async (): Promise<void> => {
@@ -176,11 +177,11 @@ export class TestLimitedUpSaleFlatPriceDiscount {
                                 error = exception;
                             }
                         });
-    
+
                         it('Should raise an error.', () => {
                             expect(error).not.toBeNull();
                         });
-    
+
                     });
 
                 });

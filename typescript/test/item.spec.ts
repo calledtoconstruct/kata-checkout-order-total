@@ -1,6 +1,5 @@
 
 import { Parameterized, TestScenario } from './parameterized';
-
 import { ItemList, Item, ItemListImplementation, StandardItem } from '../src/item';
 
 export class TestItemList {
@@ -9,19 +8,20 @@ export class TestItemList {
 
         describe('Given a collection of Items', () => {
             let itemList: ItemList;
-        
+
             beforeEach(() => {
                 itemList = new ItemListImplementation();
             });
-        
+
             describe('And a new item containing an Item Code, Description, Type, and Price', () => {
+
                 const item = new StandardItem(
                     'random item code',
                     'random description',
                     'by quantity',
                     3.0
                 );
-        
+
                 describe('When adding the item', () => {
         
                     beforeEach(async (): Promise<void> => {
@@ -32,10 +32,11 @@ export class TestItemList {
                         const result = await itemList.includes(item);
                         expect(result).toBe(true);
                     });
-        
+
                 });
-        
+
                 describe('When adding the item again', () => {
+
                     const otherItem = new StandardItem(
                         'random item code',
                         'random description',
@@ -57,19 +58,19 @@ export class TestItemList {
                         const result = await itemList.includes(otherItem);
                         expect(result).toBe(true);
                     });
-        
+
                 });
-        
+
             });
-        
+
             const invalidItems: Parameterized<Item, TestScenario<Item>> = new Parameterized<Item, TestScenario<Item>>([
                 { description: 'item code', target: new StandardItem('', 'random description', 'by weight', 3.0) },
                 { description: 'description', target: new StandardItem('random item code', '', 'by quantity', 3.0) },
                 { description: 'price', target: new StandardItem('random item code', 'random description', 'by weight', 0) }
             ]);
-        
+
             invalidItems.forEach().describe('And an invalid item When adding it, it', (invalidItemScenario: TestScenario<Item>) => {
-        
+
                 const scenarioDescription: string = invalidItemScenario.description;
                 const invalidItem: Item = invalidItemScenario.target;
                 let error: Error | null = null;
@@ -82,7 +83,7 @@ export class TestItemList {
                         error = caught;
                     }
                 });
-        
+
                 it('Should reject the item because it is missing ' + scenarioDescription, () => {
                     expect(error).not.toBeNull()
                 });
@@ -91,9 +92,9 @@ export class TestItemList {
                     const result = await itemList.includes(invalidItem);
                     expect(result).toBe(false);
                 });
-        
+
             });
-        
+
         });
 
     }

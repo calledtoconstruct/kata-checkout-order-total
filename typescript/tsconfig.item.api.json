@@ -1,7 +1,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "outDir": "./test/transpiled",
+    "outDir": "./item",
     "sourceMap": true,
     "declaration": false,
     "moduleResolution": "node",
@@ -30,6 +30,6 @@
     ]
   },
   "include": [
-    "test/*.ts"
+    "src/*"
   ]
 }

@@ -35,13 +35,12 @@ export class TestTransaction {
         describe('Given a new transaction', () => {
 
             let transaction: Transaction;
-            let transactionId: string;
 
             beforeEach(() => {
                 const itemList: ItemList = new ItemListImplementation();
                 const discountList: DiscountList = new DiscountListImplementation(itemList);
                 transaction = new Transaction(itemList, discountList);
-                transactionId = transaction.start();
+                transaction.start();
             });
 
             describe('When requesting the total', () => {
@@ -101,7 +100,7 @@ export class TestTransaction {
             describe('When scanning the item', () => {
 
                 describe('a single time', () => {
-                
+
                     let before: number;
                     let after: number;
                     let itemTotal: number;
@@ -130,7 +129,7 @@ export class TestTransaction {
                 });
 
                 describe('twice', () => {
-                
+
                     let before: number;
                     let after: number;
                     let itemTotal: number;
@@ -167,7 +166,7 @@ export class TestTransaction {
                         try {
                             await transaction.scan(code, 4.25);
                         } catch (exception) {
-                            error = exception;                            
+                            error = exception;
                         }
                     })
 
@@ -192,7 +191,7 @@ export class TestTransaction {
                         await transaction.void(code);
                         after = transaction.quantity(code);
                     });
-    
+
                     it('Then transaction should no longer have the item.', () => {
                         expect(before).toEqual(1);
                         expect(after).toEqual(0);
@@ -209,7 +208,7 @@ export class TestTransaction {
                         await transaction.void(code);
                         after = transaction.quantity(code);
                     });
-    
+
                     it('Then transaction should no longer have the item.', () => {
                         expect(before).toEqual(2);
                         expect(after).toEqual(1);
@@ -275,7 +274,7 @@ export class TestTransaction {
                             after = transaction.quantity(code);
                             saleTotal = await transaction.total();
                         });
-    
+
                         it('Then the transaction should contain the item.', () => {
                             expect(before).toEqual(0);
                             expect(after).toEqual(1);
@@ -302,7 +301,7 @@ export class TestTransaction {
                             after = transaction.quantity(code);
                             saleTotal = await transaction.total();
                         });
-    
+
                         it('Then the transaction should contain the items.', () => {
                             expect(before).toEqual(0);
                             expect(after).toEqual(2);
@@ -351,33 +350,46 @@ export class TestTransaction {
 
                     describe('for a single package', () => {
 
+                        const weight: number = 2.5;
+
                         beforeEach(async (): Promise<void> => {
-                            itemTotal = await transaction.scan(code, 2.5);
+                            itemTotal = await transaction.scan(code, weight);
                             before = transaction.quantity(code);
-                            await transaction.void(code, 2.5);
+                            await transaction.void(code, weight);
                             after = transaction.quantity(code);
                         });
-    
+
                         it('Then the transaction should no longer contain the item.', () => {
                             expect(before).toEqual(1);
                             expect(after).toEqual(0);
+                        });
+
+                        it('Then the sale item total should decrease by the item amount.', () => {
+                            expect(itemTotal).toEqual(weight * price);
                         });
 
                     });
 
                     describe('for multiple packages', () => {
 
+                        const firstWeight: number = 1;
+                        const secondWeight: number = 2;
+
                         beforeEach(async (): Promise<void> => {
-                            await transaction.scan(code, 1);
-                            itemTotal = await transaction.scan(code, 2);
+                            await transaction.scan(code, firstWeight);
+                            itemTotal = await transaction.scan(code, secondWeight);
                             before = transaction.quantity(code);
                             await transaction.void(code, 1);
                             after = transaction.quantity(code);
                         });
-    
+
                         it('Then the quantity is reduced by one.', () => {
                             expect(before).toEqual(2);
                             expect(after).toEqual(1);
+                        });
+
+                        it('Then the sale item total should decrease by the item amount.', () => {
+                            expect(itemTotal).toEqual((firstWeight + secondWeight) * price);
                         });
 
                     });

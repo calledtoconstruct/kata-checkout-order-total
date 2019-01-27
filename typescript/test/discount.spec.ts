@@ -1,6 +1,5 @@
 
 import { Parameterized, TestScenario } from './parameterized';
-
 import { ItemList, Item, Priced, ItemType } from '../src/item';
 
 import {
@@ -63,7 +62,7 @@ export class TestDiscountList {
 
             let discountList: DiscountList;
 
-            beforeEach(async (): Promise<void> => {
+            beforeEach(() => {
                 const fakeItemList: FakeItemList = new FakeItemList();
                 const itemList: ItemList = fakeItemList;
 
