@@ -5,7 +5,7 @@ import { Currency } from './currency';
 export interface DiscountList {
     add(discount: Discount): Promise<void>;
     includes(discount: Discount): Promise<boolean>;
-    get(date: Date, code: string): Discount | undefined;
+    get(date: Date, code: string): Promise<Discount | undefined>;
 }
 
 export class DiscountItem {
@@ -414,7 +414,7 @@ export class DiscountListImplementation implements DiscountList {
         });
     }
 
-    public get(date: Date, code: string): Discount | undefined {
+    public async get(date: Date, code: string): Promise<Discount | undefined> {
         const matching: Array<Discount> = this.matching(code, date, date);
 
         if (matching.length === 0) {

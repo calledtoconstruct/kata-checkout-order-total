@@ -48,8 +48,8 @@ export class TestTransaction {
 
                 let total: number;
 
-                beforeEach(() => {
-                    total = transaction.total();
+                beforeEach(async (): Promise<void> => {
+                    total = await transaction.total();
                 });
 
                 it('Should return zero.', () => {
@@ -111,7 +111,7 @@ export class TestTransaction {
                         before = transaction.quantity(code);
                         itemTotal = await transaction.scan(code);
                         after = transaction.quantity(code);
-                        saleTotal = transaction.total();
+                        saleTotal = await transaction.total();
                     });
 
                     it('Then the transaction should contain a quantity of one such item.', () => {
@@ -141,7 +141,7 @@ export class TestTransaction {
                         await transaction.scan(code);
                         itemTotal = await transaction.scan(code);
                         after = transaction.quantity(code);
-                        saleTotal = transaction.total();
+                        saleTotal = await transaction.total();
                     });
 
                     it('Then the transaction should contain a quantity of two such items.', () => {
@@ -273,7 +273,7 @@ export class TestTransaction {
                             before = transaction.quantity(code);
                             itemTotal = await transaction.scan(code, weight);
                             after = transaction.quantity(code);
-                            saleTotal = transaction.total();
+                            saleTotal = await transaction.total();
                         });
     
                         it('Then the transaction should contain the item.', () => {
@@ -300,7 +300,7 @@ export class TestTransaction {
                             await transaction.scan(code, weight);
                             itemTotal = await transaction.scan(code, otherItemWeight);
                             after = transaction.quantity(code);
-                            saleTotal = transaction.total();
+                            saleTotal = await transaction.total();
                         });
     
                         it('Then the transaction should contain the items.', () => {
