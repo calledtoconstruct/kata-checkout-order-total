@@ -73,11 +73,16 @@ export class Transaction {
     }
 
     public async scan(code: string, weight?: number): Promise<number> {
-        const scanned: Item & Priced = await this.itemList.get(code);
+        const scanned: (Item & Priced) | undefined = await this.itemList.get(code);
+
+        if (scanned === undefined) {
+            throw new Error('Requested Item Does Not Exist.');
+        }
 
         Transaction.validateType(scanned, weight);
 
         const transactionItem: TransactionItem = new TransactionItem(scanned, weight);
+        
         this.item.push(transactionItem);
 
         const itemTotal: number = await this.itemTotal(code);
@@ -112,7 +117,11 @@ export class Transaction {
     }
 
     public async void(code: string, weight?: number): Promise<void> {
-        const scanned: Item & Priced = await this.itemList.get(code);
+        const scanned: (Item & Priced) | undefined = await this.itemList.get(code);
+
+        if (scanned === undefined) {
+            throw new Error('Requested Item Does Not Exist.');
+        }
 
         Transaction.validateType(scanned, weight);
 

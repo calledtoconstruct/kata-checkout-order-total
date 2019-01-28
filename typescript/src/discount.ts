@@ -1,4 +1,4 @@
-import { ItemList, ItemType } from './item';
+import { ItemList, ItemType, Item, Priced } from './item';
 import { DateRange } from './date';
 import { Currency } from './currency';
 
@@ -31,7 +31,12 @@ const validateItemCode: (discount: Discount) => void = (discount: Discount): voi
 };
 
 const validateItemType = async (itemList: ItemList, code: string, type: ItemType): Promise<void> => {
-    const item = await itemList.get(code);
+    const item: (Item & Priced) | undefined = await itemList.get(code);
+
+    if (item === undefined) {
+        throw new Error('Requested Item Does Not Exist.');
+    }
+
     if (item.type !== type) {
         throw new Error('Item Type Mismatch');
     }

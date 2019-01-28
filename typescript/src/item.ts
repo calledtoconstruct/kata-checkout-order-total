@@ -1,6 +1,6 @@
 
 export interface ItemList {
-    get(code: string): Promise<Item & Priced>;
+    get(code: string): Promise<(Item & Priced) | undefined>;
     add(item: Item): Promise<void>;
     includes(item: Item): Promise<boolean>;
 }
@@ -61,7 +61,7 @@ export class ItemListImplementation implements ItemList {
         return Promise.resolve(this.list.indexOf(item) !== -1);
     }
 
-    public async get(code: string): Promise<Item & Priced> {
+    public async get(code: string): Promise<(Item & Priced) | undefined> {
         const items = this.list.filter((value: Item): boolean => value.code === code);
         if (items.length === 0) {
             throw new Error('Requested Item Does Not Exist');
