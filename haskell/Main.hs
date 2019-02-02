@@ -55,8 +55,26 @@ module Main where
     discountPercent = 0.50
   }
 
+  itemTurkey :: Item
+  itemTurkey = ByQuantityItem {
+    itemCode = "turkey",
+    itemDescription = "15 lbs whole turkey.",
+    itemPrice = 20.00
+  }
+
+  discountTurkey :: Discount
+  discountTurkey = LimitedUpSalePercentDiscount {
+    discountCode = "turkey",
+    discountStartDate = fromGregorian 2019 1 1,
+    discountEndDate = fromGregorian 2019 12 31,
+    discountBulk = 2,
+    discountSale = 1,
+    discountPercent = 1.0,
+    discountLimit = 6
+  }
+
   main :: IO ()
   main = print $ transactionTotal transaction
     where transaction     = createTransaction $ fromGregorian 2019 4 30
-          itemList        = addItems createItemList $ itemDogFood: itemCrisps: itemCatFood: []
-          discountList    = addDiscounts createDiscountList (getItem itemList) $ discountDogFood: discountCrisps: discountCatFood: []
+          itemList        = addItems createItemList $ itemDogFood: itemCrisps: itemCatFood: itemTurkey: []
+          discountList    = addDiscounts createDiscountList (getItem itemList) $ discountDogFood: discountCrisps: discountCatFood: discountTurkey: []
