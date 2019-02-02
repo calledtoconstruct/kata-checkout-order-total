@@ -73,8 +73,25 @@ module Main where
     discountLimit = 6
   }
 
+  itemSwissCheese :: Item
+  itemSwissCheese = ByQuantityItem {
+    itemCode = "swiss cheese",
+    itemDescription = "12 oz package of swiss chese.",
+    itemPrice = 2.1
+  }
+
+  discountSwissCheese :: Discount
+  discountSwissCheese = UpSaleFlatPriceDiscount {
+    discountCode = "swiss cheese",
+    discountStartDate = fromGregorian 2019 1 1,
+    discountEndDate = fromGregorian 2019 12 31,
+    discountBulk = 2,
+    discountSale = 1,
+    discountPrice = 1.0
+  }
+
   main :: IO ()
   main = print $ transactionTotal transaction
     where transaction     = createTransaction $ fromGregorian 2019 4 30
-          itemList        = addItems createItemList $ itemDogFood: itemCrisps: itemCatFood: itemTurkey: []
-          discountList    = addDiscounts createDiscountList (getItem itemList) $ discountDogFood: discountCrisps: discountCatFood: discountTurkey: []
+          itemList        = addItems createItemList $ itemDogFood: itemCrisps: itemCatFood: itemTurkey: itemSwissCheese: []
+          discountList    = addDiscounts createDiscountList (getItem itemList) $ discountDogFood: discountCrisps: discountCatFood: discountTurkey: discountSwissCheese: []
