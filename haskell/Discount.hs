@@ -20,6 +20,13 @@ module Discount ( Discount (..), getTotal, isApplicable, isValidDiscount ) where
     discountEndDate :: Day,
     discountBulk :: Int,
     discountPrice :: Double
+  } | UpSalePercentDiscount {
+    discountCode :: String,
+    discountStartDate :: Day,
+    discountEndDate :: Day,
+    discountBulk :: Int,
+    discountSale :: Int,
+    discountPercent :: Double
   }
 
   calculateStandard :: Discount -> [Item] -> Double
@@ -35,12 +42,26 @@ module Discount ( Discount (..), getTotal, isApplicable, isValidDiscount ) where
           regular_price       = (*) (itemPrice item) $ fromIntegral $ mod item_quantity $ discountBulk discount
           item_quantity       = getCountOfMatchingItems discount list
 
+  calculateUpSalePercent :: Discount -> [Item] -> Double
+  calculateUpSalePercent discount []                          = 0
+  calculateUpSalePercent discount list@(item: _)              = (bundles * bundle_cost) + extra_price
+    where bulk_cost           = (*) (itemPrice item) $ fromIntegral $ discountBulk discount
+          sale_price          = (*) (itemPrice item) $ 1.0 - discountPercent discount
+          sale_cost           = (*) sale_price $ fromIntegral $ discountSale discount
+          extra_quantity      = fromIntegral $ mod item_quantity bundle_quantity
+          extra_price         = extra_quantity * itemPrice item
+          bundle_quantity     = discountBulk discount + discountSale discount
+          bundle_cost         = bulk_cost + sale_cost
+          bundles             = fromIntegral $ div item_quantity bundle_quantity
+          item_quantity       = getCountOfMatchingItems discount list
+
   instance DiscountClass Discount where
     getTotal _ [] _                             = 0
     getTotal currentDate list@(item: items) discount
       | sameCode && saleBegan && saleNotEnded   = case discount of
         StandardDiscount{}                        -> calculateStandard discount list
         BulkFlatPriceDiscount{}                   -> calculateBulkFlatPrice discount list
+        UpSalePercentDiscount{}                   -> calculateUpSalePercent discount list
       | sameCode                                = (itemPrice item) + getTotal currentDate items discount
       | otherwise                               = getTotal currentDate items discount
       where sameCode                              = itemCode item == discountCode discount
@@ -50,10 +71,13 @@ module Discount ( Discount (..), getTotal, isApplicable, isValidDiscount ) where
     getCountOfMatchingItems discount list       = length $ filter (isApplicable discount) list
     isValidDiscount discount itemLookup         = case discount of
       StandardDiscount{}                          -> hasCode && hasItem && hasStartDate && hasEndDate && hasPrice
-      BulkFlatPriceDiscount{}                     -> hasCode && hasItem && hasStartDate && hasEndDate && hasPrice && hasBulk
+      BulkFlatPriceDiscount{}                     -> hasCode && hasItem && hasStartDate && hasEndDate && hasBulk && hasPrice
+      UpSalePercentDiscount{}                     -> hasCode && hasItem && hasStartDate && hasEndDate && hasBulk && hasSale && hasPercent
       where hasCode                               = length (discountCode discount) > 0
             hasItem                               = length (itemLookup (discountCode discount)) == 1
             hasStartDate                          = True
             hasEndDate                            = True
             hasPrice                              = (discountPrice discount) > 0.0
             hasBulk                               = (discountBulk discount) > 0
+            hasSale                               = (discountSale discount) > 0
+            hasPercent                            = (discountPercent discount) > 0.0 && (discountPercent discount) <= 1.0

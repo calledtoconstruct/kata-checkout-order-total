@@ -38,8 +38,25 @@ module Main where
     discountPrice = 1.00
   }
 
+  itemCatFood :: Item
+  itemCatFood = ByQuantityItem {
+    itemCode = "cat food",
+    itemDescription = "12 oz can of cat food.",
+    itemPrice = 1.25
+  }
+
+  discountCatFood :: Discount
+  discountCatFood = UpSalePercentDiscount {
+    discountCode = "cat food",
+    discountStartDate = fromGregorian 2019 1 1,
+    discountEndDate = fromGregorian 2019 12 31,
+    discountBulk = 2,
+    discountSale = 1,
+    discountPercent = 0.50
+  }
+
   main :: IO ()
   main = print $ transactionTotal transaction
     where transaction     = createTransaction $ fromGregorian 2019 4 30
-          itemList        = addItems createItemList $ itemDogFood: itemCrisps: []
-          discountList    = addDiscounts createDiscountList (getItem itemList) $ discountDogFood: discountCrisps: []
+          itemList        = addItems createItemList $ itemDogFood: itemCrisps: itemCatFood: []
+          discountList    = addDiscounts createDiscountList (getItem itemList) $ discountDogFood: discountCrisps: discountCatFood: []
