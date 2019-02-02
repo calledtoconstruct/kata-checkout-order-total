@@ -5,3 +5,4 @@ module Test where
   import TestUpSalePercentDiscount
   import TestLimitedUpSalePercentDiscount
   import TestUpSaleFlatPriceDiscount
+  import TestLimitedUpSaleFlatPriceDiscount

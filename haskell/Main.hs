@@ -90,6 +90,24 @@ module Main where
     discountPrice = 1.0
   }
 
+  itemBologna :: Item
+  itemBologna = ByQuantityItem {
+    itemCode = "bologna",
+    itemDescription = "32 oz of premium bologna.",
+    itemPrice = 3.25
+  }
+
+  discountBologna :: Discount
+  discountBologna = LimitedUpSaleFlatPriceDiscount {
+    discountCode = "bologna",
+    discountStartDate = fromGregorian 2019 1 1,
+    discountEndDate = fromGregorian 2019 12 31,
+    discountBulk = 2,
+    discountSale = 1,
+    discountPrice = 1.5,
+    discountLimit = 6
+  }
+
   main :: IO ()
   main = print $ transactionTotal transaction
     where transaction     = createTransaction $ fromGregorian 2019 4 30
