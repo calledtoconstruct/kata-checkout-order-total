@@ -1,8 +1,8 @@
 
 export interface ItemList {
-    get(code: string): Item & Priced;
-    add(item: Item): void;
-    includes(item: Item): boolean;
+    get(code: string): Promise<(Item & Priced) | undefined>;
+    add(item: Item): Promise<void>;
+    includes(item: Item): Promise<boolean>;
 }
 
 export type ItemType = 'by quantity' | 'by weight';
@@ -45,7 +45,7 @@ export class StandardItem implements Item, Priced {
 export class ItemListImplementation implements ItemList {
     private readonly list: Array<Item & Priced> = new Array<Item & Priced>();
 
-    public add(item: Item & Priced): void {
+    public async add(item: Item & Priced): Promise<void> {
         item.validate();
         const copy = this.list.splice(0);
         copy.filter((value: Item): boolean => {
@@ -54,17 +54,18 @@ export class ItemListImplementation implements ItemList {
             this.list.push(value);
         });
         this.list.push(item);
+        return Promise.resolve();
     }
 
-    public includes(item: Item & Priced): boolean {
-        return this.list.indexOf(item) !== -1;
+    public async includes(item: Item & Priced): Promise<boolean> {
+        return Promise.resolve(this.list.indexOf(item) !== -1);
     }
 
-    public get(code: string): Item & Priced {
+    public async get(code: string): Promise<(Item & Priced) | undefined> {
         const items = this.list.filter((value: Item): boolean => value.code === code);
         if (items.length === 0) {
             throw new Error('Requested Item Does Not Exist');
         }
-        return items[0];
+        return Promise.resolve(items[0]);
     }
 }

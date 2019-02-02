@@ -48,8 +48,8 @@ export class TestTransaction {
 
                 let total: number;
 
-                beforeEach(() => {
-                    total = transaction.total();
+                beforeEach(async (): Promise<void> => {
+                    total = await transaction.total();
                 });
 
                 it('Should return zero.', () => {
@@ -63,9 +63,9 @@ export class TestTransaction {
                 const code: string = 'some by quantity item';
                 let error: Error | null = null;
 
-                beforeEach(() => {
+                beforeEach(async (): Promise<void> => {
                     try {
-                        transaction.void(code);
+                        await transaction.void(code);
                     } catch (exception) {
                         error = exception;
                     }
@@ -91,9 +91,9 @@ export class TestTransaction {
                 price
             );
 
-            beforeEach(() => {
+            beforeEach(async (): Promise<void> => {
                 const itemList: ItemList = new ItemListImplementation();
-                itemList.add(item);
+                await itemList.add(item);
                 const discountList: DiscountList = new DiscountListImplementation(itemList);
                 transaction = new Transaction(itemList, discountList);
             });
@@ -107,11 +107,11 @@ export class TestTransaction {
                     let itemTotal: number;
                     let saleTotal: number;
 
-                    beforeEach(() => {
+                    beforeEach(async (): Promise<void> => {
                         before = transaction.quantity(code);
-                        itemTotal = transaction.scan(code);
+                        itemTotal = await transaction.scan(code);
                         after = transaction.quantity(code);
-                        saleTotal = transaction.total();
+                        saleTotal = await transaction.total();
                     });
 
                     it('Then the transaction should contain a quantity of one such item.', () => {
@@ -136,12 +136,12 @@ export class TestTransaction {
                     let itemTotal: number;
                     let saleTotal: number;
 
-                    beforeEach(() => {
+                    beforeEach(async (): Promise<void> => {
                         before = transaction.quantity(code);
-                        transaction.scan(code);
-                        itemTotal = transaction.scan(code);
+                        await transaction.scan(code);
+                        itemTotal = await transaction.scan(code);
                         after = transaction.quantity(code);
-                        saleTotal = transaction.total();
+                        saleTotal = await transaction.total();
                     });
 
                     it('Then the transaction should contain a quantity of two such items.', () => {
@@ -163,9 +163,9 @@ export class TestTransaction {
 
                     let error: Error | null = null;
 
-                    beforeEach(() => {
+                    beforeEach(async (): Promise<void> => {
                         try {
-                            transaction.scan(code, 4.25);
+                            await transaction.scan(code, 4.25);
                         } catch (exception) {
                             error = exception;                            
                         }
@@ -186,10 +186,10 @@ export class TestTransaction {
 
                 describe('the one and only item', () => {
 
-                    beforeEach(() => {
-                        transaction.scan(code);
+                    beforeEach(async (): Promise<void> => {
+                        await transaction.scan(code);
                         before = transaction.quantity(code);
-                        transaction.void(code);
+                        await transaction.void(code);
                         after = transaction.quantity(code);
                     });
     
@@ -202,11 +202,11 @@ export class TestTransaction {
 
                 describe('one of the two items', () => {
 
-                    beforeEach(() => {
-                        transaction.scan(code);
-                        transaction.scan(code);
+                    beforeEach(async (): Promise<void> => {
+                        await transaction.scan(code);
+                        await transaction.scan(code);
                         before = transaction.quantity(code);
-                        transaction.void(code);
+                        await transaction.void(code);
                         after = transaction.quantity(code);
                     });
     
@@ -232,9 +232,9 @@ export class TestTransaction {
                 price
             );
 
-            beforeEach(() => {
+            beforeEach(async (): Promise<void> => {
                 const itemList: ItemList = new ItemListImplementation();
-                itemList.add(item);
+                await itemList.add(item);
                 const discountList: DiscountList = new DiscountListImplementation(itemList);
                 transaction = new Transaction(itemList, discountList);
             });
@@ -245,9 +245,9 @@ export class TestTransaction {
 
                     let error: Error | null = null;
 
-                    beforeEach(() => {
+                    beforeEach(async (): Promise<void> => {
                         try {
-                            transaction.scan(code);
+                            await transaction.scan(code);
                         } catch (exception) {
                             error = exception;
                         }
@@ -269,11 +269,11 @@ export class TestTransaction {
 
                     describe('for a single package', () => {
 
-                        beforeEach(() => {
+                        beforeEach(async (): Promise<void> => {
                             before = transaction.quantity(code);
-                            itemTotal = transaction.scan(code, weight);
+                            itemTotal = await transaction.scan(code, weight);
                             after = transaction.quantity(code);
-                            saleTotal = transaction.total();
+                            saleTotal = await transaction.total();
                         });
     
                         it('Then the transaction should contain the item.', () => {
@@ -295,12 +295,12 @@ export class TestTransaction {
 
                         const otherItemWeight: number = 3.0;
 
-                        beforeEach(() => {
+                        beforeEach(async (): Promise<void> => {
                             before = transaction.quantity(code);
-                            transaction.scan(code, weight);
-                            itemTotal = transaction.scan(code, otherItemWeight);
+                            await transaction.scan(code, weight);
+                            itemTotal = await transaction.scan(code, otherItemWeight);
                             after = transaction.quantity(code);
-                            saleTotal = transaction.total();
+                            saleTotal = await transaction.total();
                         });
     
                         it('Then the transaction should contain the items.', () => {
@@ -328,10 +328,10 @@ export class TestTransaction {
 
                     let error: Error | null = null;
 
-                    beforeEach(() => {
-                        transaction.scan(code, 1.999);
+                    beforeEach(async (): Promise<void> => {
+                        await transaction.scan(code, 1.999);
                         try {
-                            transaction.void(code);
+                            await transaction.void(code);
                         } catch (exception) {
                             error = exception;
                         }
@@ -351,10 +351,10 @@ export class TestTransaction {
 
                     describe('for a single package', () => {
 
-                        beforeEach(() => {
-                            itemTotal = transaction.scan(code, 2.5);
+                        beforeEach(async (): Promise<void> => {
+                            itemTotal = await transaction.scan(code, 2.5);
                             before = transaction.quantity(code);
-                            transaction.void(code, 2.5);
+                            await transaction.void(code, 2.5);
                             after = transaction.quantity(code);
                         });
     
@@ -367,11 +367,11 @@ export class TestTransaction {
 
                     describe('for multiple packages', () => {
 
-                        beforeEach(() => {
-                            itemTotal = transaction.scan(code, 1);
-                            itemTotal = transaction.scan(code, 2);
+                        beforeEach(async (): Promise<void> => {
+                            await transaction.scan(code, 1);
+                            itemTotal = await transaction.scan(code, 2);
                             before = transaction.quantity(code);
-                            transaction.void(code, 1);
+                            await transaction.void(code, 1);
                             after = transaction.quantity(code);
                         });
     

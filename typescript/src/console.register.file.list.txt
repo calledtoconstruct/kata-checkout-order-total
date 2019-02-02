@@ -1,6 +1,0 @@
-src/console.register.ts
-src/currency.ts
-src/date.ts
-src/discount.ts
-src/item.ts
-src/transaction.ts

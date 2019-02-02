@@ -34,11 +34,11 @@ export class TestBulkFlatPriceDiscount {
                         discountPrice
                     );
 
-                    beforeEach(() => {
+                    beforeEach(async (): Promise<void> => {
                         const itemList: ItemList = new ItemListImplementation();
-                        itemList.add(item);
+                        await itemList.add(item);
                         const discountList: DiscountList = new DiscountListImplementation(itemList);
-                        discountList.add(discount);
+                        await discountList.add(discount);
                         transaction = new Transaction(itemList, discountList);
                     });
 
@@ -49,9 +49,9 @@ export class TestBulkFlatPriceDiscount {
                             let itemTotal: number;
                             let quantity: number;
 
-                            beforeEach(() => {
-                                transaction.scan(code);
-                                itemTotal = transaction.scan(code);
+                            beforeEach(async (): Promise<void> => {
+                                await transaction.scan(code);
+                                itemTotal = await transaction.scan(code);
                                 quantity = transaction.quantity(code);
                             });
     
@@ -67,10 +67,10 @@ export class TestBulkFlatPriceDiscount {
                             let itemTotal: number;
                             let quantity: number;
 
-                            beforeEach(() => {
-                                transaction.scan(code);
-                                transaction.scan(code);
-                                itemTotal = transaction.scan(code);
+                            beforeEach(async (): Promise<void> => {
+                                await transaction.scan(code);
+                                await transaction.scan(code);
+                                itemTotal = await transaction.scan(code);
                                 quantity = transaction.quantity(code);
                             });
     
@@ -86,12 +86,12 @@ export class TestBulkFlatPriceDiscount {
                             let itemTotal: number;
                             let quantity: number;
 
-                            beforeEach(() => {
-                                transaction.scan(code);
-                                transaction.scan(code);
-                                transaction.scan(code);
-                                transaction.scan(code);
-                                itemTotal = transaction.scan(code);
+                            beforeEach(async (): Promise<void> => {
+                                await transaction.scan(code);
+                                await transaction.scan(code);
+                                await transaction.scan(code);
+                                await transaction.scan(code);
+                                itemTotal = await transaction.scan(code);
                                 quantity = transaction.quantity(code);
                             });
     

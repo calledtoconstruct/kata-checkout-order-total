@@ -2,6 +2,7 @@
 import * as uuid from 'uuid';
 import { Item, Priced, ItemList } from './item';
 import { DiscountList, Discount, DiscountItem } from './discount';
+import { asyncForEach } from './async.for.each';
 
 class TransactionItem {
 
@@ -71,21 +72,26 @@ export class Transaction {
         }
     }
 
-    public scan(code: string, weight?: number): number {
-        const scanned: Item & Priced = this.itemList.get(code);
+    public async scan(code: string, weight?: number): Promise<number> {
+        const scanned: (Item & Priced) | undefined = await this.itemList.get(code);
+
+        if (scanned === undefined) {
+            throw new Error('Requested Item Does Not Exist.');
+        }
 
         Transaction.validateType(scanned, weight);
 
         const transactionItem: TransactionItem = new TransactionItem(scanned, weight);
+        
         this.item.push(transactionItem);
 
-        const itemTotal: number = this.itemTotal(code);
+        const itemTotal: number = await this.itemTotal(code);
 
         return itemTotal;
     }
 
-    private itemTotal(code: string): number {
-        const discount: Discount | undefined = this.discountList.get(this.date, code);
+    private async itemTotal(code: string): Promise<number> {
+        const discount: Discount | undefined = await this.discountList.get(this.date, code);
         const related: Array<TransactionItem> = this.items(code);
         
         if (discount === undefined) {        
@@ -110,8 +116,12 @@ export class Transaction {
         return this.item.filter((value: TransactionItem): boolean => value.code() === code);
     }
 
-    public void(code: string, weight?: number): void {
-        const scanned: Item = this.itemList.get(code);
+    public async void(code: string, weight?: number): Promise<void> {
+        const scanned: (Item & Priced) | undefined = await this.itemList.get(code);
+
+        if (scanned === undefined) {
+            throw new Error('Requested Item Does Not Exist.');
+        }
 
         Transaction.validateType(scanned, weight);
 
@@ -133,7 +143,7 @@ export class Transaction {
         }
     }
 
-    public total(): number {
+    public async total(): Promise<number> {
         let code: Array<string> = new Array<string>();
 
         this.item.forEach((item: TransactionItem): void => {
@@ -147,8 +157,8 @@ export class Transaction {
 
         let total: number = 0;
 
-        code.forEach((itemCode: string): void => {
-            const itemTotal = this.itemTotal(itemCode);
+        await asyncForEach(code, async (itemCode: string): Promise<void> => {
+            const itemTotal = await this.itemTotal(itemCode);
             total += itemTotal;
         });
 

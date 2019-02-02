@@ -1,5 +1,5 @@
 import { Transaction } from "./transaction";
-import { ItemListImplementation, ItemList, Item, StandardItem } from "./item";
+import { ItemListImplementation, ItemList, Item, StandardItem, Priced } from "./item";
 import { DiscountListImplementation, DiscountList, Discount, StandardDiscount, UpSalePercentDiscountByWeight } from "./discount";
 
 const readline = require('readline');
@@ -13,15 +13,15 @@ class Application {
 
   constructor(
     private readonly transaction: Transaction
-  ) {    
+  ) {
     this.input.on('close', () => {
       process.exit();
     });
   }
 
-  private addByWeightItem(item: Item, weight: number): number {
+  private async addByWeightItem(item: Item, weight: number): Promise<number> {
     try {
-      const itemTotal: number = this.transaction.scan(item.code, weight);
+      const itemTotal: number = await this.transaction.scan(item.code, weight);
       console.log('Added ' + weight + ' lbs of ' + item.type + ' item ' + item.code);
       return itemTotal;
     } catch (error) {
@@ -31,10 +31,10 @@ class Application {
     }
     return 0;
   }
-  
-  private addByQuantityItem(item: Item): number {
+
+  private async addByQuantityItem(item: Item): Promise<number> {
     try {
-      const itemTotal: number = this.transaction.scan(item.code);
+      const itemTotal: number = await this.transaction.scan(item.code);
       console.log('Added ' + item.type + ' item ' + item.code);
       return itemTotal;
     } catch (error) {
@@ -45,28 +45,29 @@ class Application {
     return 0;
   }
 
-  private processWeight(item: Item): (weight: number) => void {
-    return (weight: number): void => {
-      this.addByWeightItem(item, weight);
-      this.next();
+  private processWeight(item: Item & Priced): (weight: number) => void {
+    return async (weight: number): Promise<void> => {
+      await this.addByWeightItem(item, weight);
+      await this.next();
     }
   }
-  
-  private processCode(code: string): void {
+
+  private async processCode(code: string): Promise<void> {
     if (code === 'done') {
-      const total: number = this.transaction.total();
+      const total: number = await this.transaction.total();
       console.log('Thank you for your patronage.  ' + total + ' was charged to your account.');
       this.input.close();
     } else {
-      let item: Item;
       try {
-        item = itemList.get(code);
-        if (item.type === 'by weight') {
-          console.log('Weigh the item: ');
-          this.input.question('>', (weight: number) => this.processWeight(item)(weight));
-        } else {
-          this.addByQuantityItem(item);
-          this.next();
+        const item: (Item & Priced) | undefined = await itemList.get(code);
+        if (item !== undefined) {
+          if (item.type === 'by weight') {
+            console.log('Weigh the item: ');
+            this.input.question('>', async (weight: number) => await this.processWeight(item)(weight));
+          } else {
+            await this.addByQuantityItem(item);
+            await this.next();
+          }
         }
       } catch (error) {
         if (error instanceof Error) {
@@ -76,13 +77,13 @@ class Application {
     }
   }
 
-  public next(): void {
-    const total: number = this.transaction.total();
-  
+  public async next(): Promise<void> {
+    const total: number = await this.transaction.total();
+
     console.log('The current transaction total is: ' + total);
     console.log('Scan the next item: ');
-  
-    this.input.question('>', (code: string) => this.processCode(code));
+
+    this.input.question('>', async (code: string) => await this.processCode(code));
   }
 }
 
