@@ -1,11 +1,12 @@
 
 import * as express from 'express';
 import * as cors from 'cors';
+import * as env from './env';
 import { ItemListImplementation, ItemList, Item, StandardItem, Priced } from './item';
 import { asyncForEach } from './async.for.each';
 
 const application = express();
-const port: number = 8081;
+const port: number = env.ITEM_API_PORT;
 
 application.use(cors());
 

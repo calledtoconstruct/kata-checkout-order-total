@@ -1,8 +1,9 @@
 
 import * as express from 'express';
+import * as env from './env';
 
 const application = express();
-const port: number = 8080;
+const port: number = env.APPLICATION_PORT;
 
 const applicationScript: string = `<script src='/script'></script>`;
 const head: string = `<head>${applicationScript}</head>`;
@@ -19,7 +20,7 @@ application.get('/', async (_: express.Request, response: express.Response): Pro
 });
 
 application.get('/script', async (_: express.Request, response: express.Response): Promise<void> => {
-    response.sendFile('/code/kata-checkout-order-total/typescript/application/main.js');
+    response.sendFile(__dirname + '/main.js');
 });
 
 application.listen(port, (): void => {
