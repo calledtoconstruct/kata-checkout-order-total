@@ -1,5 +1,5 @@
 import { TestScenario, Parameterized } from "./parameterized";
-import { Discount, StandardDiscount, DiscountTypeFactory, BulkFlatPriceDiscount } from "../src/discount";
+import { Discount, StandardDiscount, DiscountTypeFactory, BulkFlatPriceDiscount, UpSalePercentDiscount, LimitedUpSalePercentDiscount } from "../src/discount";
 import { Typed, TypeFactory } from "../src/typed";
 
 export class TestDiscountTypeFactory {
@@ -8,7 +8,9 @@ export class TestDiscountTypeFactory {
 
         const serializationScenarios = new Parameterized<DiscountSerializationScenario, TestScenario<DiscountSerializationScenario>>([
             { description: 'standard discount', target: new StandardDiscountSerializationScenario() },
-            { description: 'bulk flat price discount', target: new BulkFlatPriceDiscountSerializationScenario() }
+            { description: 'bulk flat price discount', target: new BulkFlatPriceDiscountSerializationScenario() },
+            { description: 'up sale percent discount', target: new UpSalePercentDiscountSerializationScenario() },
+            { description: 'limited up sale percent discount', target: new LimitedUpSalePercentDiscountSerializationScenario() }
         ]);
 
         describe('Given the discount type factory', () => {
@@ -66,10 +68,11 @@ const startDate: Date = new Date(new Date(2019, 1, 1));
 const endDate: Date = new Date(new Date(2019, 2, 1));
 const code: string = 'cat food';
 const quantity: number = 3;
-// const bulk: number = 2;
-// const sale: number = 1;
-// const percent: number = 0.25;
+const bulk: number = 2;
+const sale: number = 1;
+const percent: number = 0.25;
 const price: number = 1.00;
+const limit: number = 3;
 
 class StandardDiscountSerializationScenario extends DiscountSerializationScenario {
     constructor() {
@@ -83,6 +86,22 @@ class BulkFlatPriceDiscountSerializationScenario extends DiscountSerializationSc
     constructor() {
         const discount: BulkFlatPriceDiscount = new BulkFlatPriceDiscount(startDate, endDate, code, quantity, price);
         const text: string = '{"type":"BulkFlatPriceDiscount","thing":{"startDate":"2019-02-01T05:00:00.000Z","endDate":"2019-03-01T05:00:00.000Z","code":"cat food","quantity":3,"price":1}}';
+        super(discount, text);
+    }
+}
+
+class UpSalePercentDiscountSerializationScenario extends DiscountSerializationScenario {
+    constructor() {
+        const discount: UpSalePercentDiscount = new UpSalePercentDiscount(startDate, endDate, code, bulk, sale, percent);
+        const text: string = '{"type":"UpSalePercentDiscount","thing":{"startDate":"2019-02-01T05:00:00.000Z","endDate":"2019-03-01T05:00:00.000Z","code":"cat food","bulk":2,"sale":1,"percent":0.25}}';
+        super(discount, text);
+    }
+}
+
+class LimitedUpSalePercentDiscountSerializationScenario extends DiscountSerializationScenario {
+    constructor() {
+        const discount: LimitedUpSalePercentDiscount = new LimitedUpSalePercentDiscount(startDate, endDate, code, bulk, sale, percent, limit);
+        const text: string = '{"type":"LimitedUpSalePercentDiscount","thing":{"startDate":"2019-02-01T05:00:00.000Z","endDate":"2019-03-01T05:00:00.000Z","code":"cat food","bulk":2,"sale":1,"percent":0.25,"limit":3}}';
         super(discount, text);
     }
 }
