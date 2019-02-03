@@ -1,5 +1,5 @@
 import { TestScenario, Parameterized } from "./parameterized";
-import { Discount, StandardDiscount, DiscountTypeFactory, BulkFlatPriceDiscount, UpSalePercentDiscount, LimitedUpSalePercentDiscount, UpSaleFlatPriceDiscount, LimitedUpSaleFlatPriceDiscount } from "../src/discount";
+import { Discount, StandardDiscount, DiscountTypeFactory, BulkFlatPriceDiscount, UpSalePercentDiscount, LimitedUpSalePercentDiscount, UpSaleFlatPriceDiscount, LimitedUpSaleFlatPriceDiscount, UpSalePercentDiscountByWeight } from "../src/discount";
 import { Typed, TypeFactory } from "../src/typed";
 
 export class TestDiscountTypeFactory {
@@ -12,7 +12,8 @@ export class TestDiscountTypeFactory {
             { description: 'up sale percent discount', target: new UpSalePercentDiscountSerializationScenario() },
             { description: 'limited up sale percent discount', target: new LimitedUpSalePercentDiscountSerializationScenario() },
             { description: 'up sale flat price discount', target: new UpSaleFlatPriceDiscountSerializationScenario() },
-            { description: 'limited up sale flat price discount', target: new LimitedUpSaleFlatPriceDiscountSerializationScenario() }
+            { description: 'limited up sale flat price discount', target: new LimitedUpSaleFlatPriceDiscountSerializationScenario() },
+            { description: 'up sale percent discount by weight', target: new UpSalePercentDiscountByWeightSerializationScenario() }
         ]);
 
         describe('Given the discount type factory', () => {
@@ -47,6 +48,7 @@ export class TestDiscountTypeFactory {
                         expect(output.total).not.toBeUndefined();
                         expect(output.validate).not.toBeUndefined();
                         expect(output.getTypeName).not.toBeUndefined();
+                        expect(output.getTypeName()).toEqual(scenario.target.instance.getTypeName());
                     });
 
                 });
@@ -120,6 +122,14 @@ class LimitedUpSaleFlatPriceDiscountSerializationScenario extends DiscountSerial
     constructor() {
         const discount: LimitedUpSaleFlatPriceDiscount = new LimitedUpSaleFlatPriceDiscount(startDate, endDate, code, bulk, sale, price, limit);
         const text: string = '{"type":"LimitedUpSaleFlatPriceDiscount","thing":{"startDate":"2019-02-01T05:00:00.000Z","endDate":"2019-03-01T05:00:00.000Z","code":"cat food","bulk":2,"sale":1,"price":1,"limit":3}}';
+        super(discount, text);
+    }
+}
+
+class UpSalePercentDiscountByWeightSerializationScenario extends DiscountSerializationScenario {
+    constructor() {
+        const discount: UpSalePercentDiscountByWeight = new UpSalePercentDiscountByWeight(startDate, endDate, code, bulk, sale, price);
+        const text: string = '{"type":"UpSalePercentDiscountByWeight","thing":{"startDate":"2019-02-01T05:00:00.000Z","endDate":"2019-03-01T05:00:00.000Z","code":"cat food","bulk":2,"sale":1,"percent":1}}';
         super(discount, text);
     }
 }
