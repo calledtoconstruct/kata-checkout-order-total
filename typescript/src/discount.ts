@@ -1,6 +1,7 @@
 import { ItemList, ItemType, Item, Priced } from './item';
 import { DateRange } from './date';
 import { Currency } from './currency';
+import { Typed, TypeFactory } from './typed';
 
 export interface DiscountList {
     add(discount: Discount): Promise<void>;
@@ -22,6 +23,7 @@ export interface Discount {
     readonly code: string;
     validate(itemList: ItemList): Promise<void>;
     total(items: Array<DiscountItem>): number;
+    getTypeName(): string;
 }
 
 const validateItemCode = (discount: Discount): void => {
@@ -53,6 +55,7 @@ const validateItemDateRange: (discount: Discount) => void = (discount: Discount)
 };
 
 export class StandardDiscount implements Discount {
+    private static typeName: string = "StandardDiscount";
 
     constructor(
         public readonly startDate: Date,
@@ -60,6 +63,8 @@ export class StandardDiscount implements Discount {
         public readonly code: string,
         public readonly price: number
     ) { }
+
+    public getTypeName(): string { return StandardDiscount.typeName; }
 
     public async validate(itemList: ItemList): Promise<void> {
         validateItemCode(this);
@@ -103,6 +108,7 @@ const sumItems: (items: Array<DiscountItem>) => ItemSummary = (items: Array<Disc
 }
 
 export class BulkFlatPriceDiscount implements Discount {
+    private static typeName: string = "BulkFlatPriceDiscount";
 
     constructor(
         public readonly startDate: Date,
@@ -111,6 +117,8 @@ export class BulkFlatPriceDiscount implements Discount {
         public readonly quantity: number,
         public readonly price: number
     ) { }
+
+    public getTypeName(): string { return BulkFlatPriceDiscount.typeName; }
 
     public async validate(itemList: ItemList): Promise<void> {
         validateItemCode(this);
@@ -195,6 +203,8 @@ abstract class UpSaleDiscount implements Discount, UpSale {
         public readonly sale: number
     ) { }
 
+    public abstract getTypeName(): string;
+
     public abstract async validate(itemList: ItemList): Promise<void>;
 
     protected async validateItemType(itemList: ItemList, type: ItemType): Promise<void> {
@@ -211,6 +221,7 @@ abstract class UpSaleDiscount implements Discount, UpSale {
 }
 
 export class UpSalePercentDiscount extends UpSaleDiscount implements Percent {
+    private static readonly typeName: string = "UpSalePercentDiscount";
 
     constructor(
         readonly startDate: Date,
@@ -221,6 +232,10 @@ export class UpSalePercentDiscount extends UpSaleDiscount implements Percent {
         readonly percent: number
     ) {
         super(startDate, endDate, code, bulk, sale);
+    }
+
+    public getTypeName(): string {
+        return UpSalePercentDiscount.typeName;
     }
 
     public async validate(itemList: ItemList): Promise<void> {
@@ -241,6 +256,7 @@ export class UpSalePercentDiscount extends UpSaleDiscount implements Percent {
 }
 
 export class LimitedUpSalePercentDiscount extends UpSaleDiscount implements Percent {
+    private static readonly typeName: string = "LimitedUpSalePercentDiscount";
 
     constructor(
         readonly startDate: Date,
@@ -252,6 +268,10 @@ export class LimitedUpSalePercentDiscount extends UpSaleDiscount implements Perc
         public readonly limit: number
     ) {
         super(startDate, endDate, code, bulk, sale);
+    }
+
+    public getTypeName(): string {
+        return LimitedUpSalePercentDiscount.typeName;
     }
 
     public async validate(itemList: ItemList): Promise<void> {
@@ -277,6 +297,7 @@ export class LimitedUpSalePercentDiscount extends UpSaleDiscount implements Perc
 }
 
 export class UpSaleFlatPriceDiscount extends UpSaleDiscount {
+    private static readonly typeName: string = "UpSaleFlatPriceDiscount";
 
     constructor(
         readonly startDate: Date,
@@ -287,6 +308,10 @@ export class UpSaleFlatPriceDiscount extends UpSaleDiscount {
         public readonly price: number
     ) {
         super(startDate, endDate, code, bulk, sale);
+    }
+
+    public getTypeName(): string {
+        return UpSaleFlatPriceDiscount.typeName;
     }
 
     public async validate(itemList: ItemList): Promise<void> {
@@ -306,6 +331,7 @@ export class UpSaleFlatPriceDiscount extends UpSaleDiscount {
 }
 
 export class LimitedUpSaleFlatPriceDiscount extends UpSaleDiscount implements Limited {
+    private static readonly typeName: string = "LimitedUpSaleFlatPriceDiscount";
 
     constructor(
         readonly startDate: Date,
@@ -317,6 +343,10 @@ export class LimitedUpSaleFlatPriceDiscount extends UpSaleDiscount implements Li
         readonly limit: number
     ) {
         super(startDate, endDate, code, bulk, sale);
+    }
+
+    public getTypeName(): string {
+        return LimitedUpSaleFlatPriceDiscount.typeName;
     }
 
     public async validate(itemList: ItemList): Promise<void> {
@@ -340,6 +370,7 @@ export class LimitedUpSaleFlatPriceDiscount extends UpSaleDiscount implements Li
 }
 
 export class UpSalePercentDiscountByWeight extends UpSaleDiscount implements Percent {
+    private static readonly typeName: string = "UpSalePercentDiscountByWeight";
 
     constructor(
         readonly startDate: Date,
@@ -350,6 +381,10 @@ export class UpSalePercentDiscountByWeight extends UpSaleDiscount implements Per
         readonly percent: number
     ) {
         super(startDate, endDate, code, bulk, sale);
+    }
+
+    public getTypeName(): string {
+        return UpSalePercentDiscountByWeight.typeName;
     }
 
     public async validate(itemList: ItemList): Promise<void> {
@@ -437,4 +472,36 @@ export class DiscountListImplementation implements DiscountList {
         return true;
     }
 
+}
+
+export class DiscountTypeFactory implements TypeFactory<Discount> {
+    private readonly discounts: any = {
+        StandardDiscount: (from: Discount): Discount => {
+            const source: StandardDiscount = <StandardDiscount>from;
+            return new StandardDiscount(source.startDate, source.endDate, source.code, source.price);
+        },
+        BulkFlatPriceDiscount: (from: Discount): Discount => {
+            const source: BulkFlatPriceDiscount = <BulkFlatPriceDiscount>from;
+            return new BulkFlatPriceDiscount(source.startDate, source.endDate, source.code, source.quantity, source.price);
+        }
+    };
+
+    public type(instance: Discount): Typed<Discount> {
+        const name: string = instance.getTypeName();
+        this.get(name);
+        return new Typed<Discount>(name, instance);
+    }
+
+    public make(from: Typed<Discount>): Discount {
+        const factory: (from: Discount) => Discount = this.get(from.type);
+        return factory(from.thing);
+    }
+
+    private get(name: string): (from: Discount) => Discount {
+        const factory: (from: Discount) => Discount = this.discounts[name];
+        if (factory === undefined) {
+            throw new Error(`Type ${name} is not buildable.`);
+        }
+        return factory;
+    }
 }
