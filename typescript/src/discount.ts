@@ -491,6 +491,14 @@ export class DiscountTypeFactory implements TypeFactory<Discount> {
         LimitedUpSalePercentDiscount: (from: Discount): Discount => {
             const source: LimitedUpSalePercentDiscount = <LimitedUpSalePercentDiscount>from;
             return new LimitedUpSalePercentDiscount(source.startDate, source.endDate, source.code, source.bulk, source.sale, source.percent, source.limit);
+        },
+        UpSaleFlatPriceDiscount: (from: Discount): Discount => {
+            const source: UpSaleFlatPriceDiscount = <UpSaleFlatPriceDiscount>from;
+            return new UpSaleFlatPriceDiscount(source.startDate, source.endDate, source.code, source.bulk, source.sale, source.price);
+        },
+        LimitedUpSaleFlatPriceDiscount: (from: Discount): Discount => {
+            const source: LimitedUpSaleFlatPriceDiscount = <LimitedUpSaleFlatPriceDiscount>from;
+            return new LimitedUpSaleFlatPriceDiscount(source.startDate, source.endDate, source.code, source.bulk, source.sale, source.price, source.limit);
         }
     };
 
