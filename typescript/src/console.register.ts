@@ -1,6 +1,8 @@
 import { Transaction } from "./transaction";
-import { ItemListImplementation, ItemList, Item, StandardItem, Priced } from "./item";
-import { DiscountListImplementation, DiscountList, Discount, StandardDiscount, UpSalePercentDiscountByWeight } from "./discount";
+import { ItemList, Item, Priced } from "./item";
+import { DiscountList } from "./discount";
+import { ItemListClient } from "./item.list.client";
+import { DiscountListClient } from "./discount.list.client";
 
 const readline = require('readline');
 
@@ -87,45 +89,13 @@ class Application {
   }
 }
 
-const itemList: ItemList = new ItemListImplementation();
+const itemList: ItemList = new ItemListClient();
 
-const items: Array<Item> = [
-  new StandardItem('dog food', 'A 32oz package of premium dog food.', 'by quantity', 5.00),
-  new StandardItem('cat food', 'A 12oz can of premium cat food.', 'by quantity', 1.25),
-  new StandardItem('ground beef', 'Ground Chuck', 'by weight', 2.00)
-];
-
-items.forEach((item: Item): void => {
-  try {
-    itemList.add(item);
-  } catch (error) {
-    if (error instanceof Error) {
-      console.log(error.message);
-    }
-  }
-});
-
-const startDate: Date = new Date(new Date().valueOf() - 10);
-const endDate: Date = new Date(new Date().valueOf() + 10);
-
-const discountList: DiscountList = new DiscountListImplementation(itemList);
-
-const discounts: Array<Discount> = [
-  new StandardDiscount(startDate, endDate, 'cat food', 1.00),
-  new UpSalePercentDiscountByWeight(startDate, endDate, 'ground beef', 2, 1, .5)
-];
-
-discounts.forEach((discount: Discount): void => {
-  try {
-    discountList.add(discount);
-  } catch (error) {
-    if (error instanceof Error) {
-      console.log(error.message);
-    }
-  }
-});
+const discountList: DiscountList = new DiscountListClient();
 
 const transaction: Transaction = new Transaction(itemList, discountList);
+
+transaction.start();
 
 const application: Application = new Application(transaction);
 
