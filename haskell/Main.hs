@@ -108,8 +108,37 @@ module Main where
     discountLimit = 6
   }
 
+  add :: DiscountList -> ItemList -> TransactionType -> [Item] -> IO Double
+  add discountList itemList transaction []      = do
+    putStrLn "Item not found!"
+    prompt discountList itemList transaction
+  add discountList itemList transaction [item]  = do
+    let nextTransaction = scanItem transaction (getDiscount discountList) item
+    putStrLn $ show $ transactionTotal nextTransaction
+    prompt discountList itemList nextTransaction
+
+  prompt :: DiscountList -> ItemList -> TransactionType -> IO Double
+  prompt discountList itemList transaction = do
+    nextCode <- putStr "Enter a product code: " *> getLine
+    waitForScan discountList itemList transaction nextCode
+
+  scan :: DiscountList -> ItemList -> TransactionType -> String -> IO Double
+  scan discountList itemList transaction code = add discountList itemList transaction (getItem itemList code)
+
+  waitForScan :: DiscountList -> ItemList -> TransactionType -> String -> IO Double
+  waitForScan discountList itemList transaction code = case code of
+    "exit"              -> return $ transactionTotal transaction
+    otherwise           -> scan discountList itemList transaction code
+
   main :: IO ()
-  main = print $ transactionTotal transaction
-    where transaction     = createTransaction $ fromGregorian 2019 4 30
-          itemList        = addItems createItemList $ itemDogFood: itemCrisps: itemCatFood: itemTurkey: itemSwissCheese: []
-          discountList    = addDiscounts createDiscountList (getItem itemList) $ discountDogFood: discountCrisps: discountCatFood: discountTurkey: discountSwissCheese: []
+  main
+    | invalidDiscount   = print "Invalid Discount"
+    | invalidItem       = print "Invalid Item"
+    | otherwise         = do
+      total               <- prompt discountList itemList transaction
+      putStr "Total: " *> print total
+    where invalidDiscount = any (==False) $ flip isValidDiscount (getItem itemList) <$> (transactionDiscounts transaction)
+          invalidItem     = any (==False) $ isValidItem <$> transactionItems transaction
+          transaction     = createTransaction $ fromGregorian 2019 4 30
+          itemList        = addItems createItemList $ itemDogFood: itemCrisps: itemCatFood: itemTurkey: itemSwissCheese: itemBologna: []
+          discountList    = addDiscounts createDiscountList (getItem itemList) $ discountDogFood: discountCrisps: discountCatFood: discountTurkey: discountSwissCheese: discountBologna: []

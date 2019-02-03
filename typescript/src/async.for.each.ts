@@ -4,8 +4,4 @@ export const asyncForEach = async <Target>(source: Array<Target>, action: (value
         const value: Target = source[index];
         await action(value);
     }
-<<<<<<< HEAD
 };
-=======
-};
->>>>>>> web
