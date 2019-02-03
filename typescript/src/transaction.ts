@@ -17,11 +17,11 @@ class TransactionItem {
         return this.item.code;
     }
 
-    public price(): number { 
+    public price(): number {
         return this.item.price;
     }
 
-    public weight(): number | undefined { 
+    public weight(): number | undefined {
         return this.itemWeight;
     }
 
@@ -85,16 +85,14 @@ export class Transaction {
         
         this.item.push(transactionItem);
 
-        const itemTotal: number = await this.itemTotal(code);
-
-        return itemTotal;
+        return await this.itemTotal(code);
     }
 
     private async itemTotal(code: string): Promise<number> {
         const discount: Discount | undefined = await this.discountList.get(this.date, code);
         const related: Array<TransactionItem> = this.items(code);
-        
-        if (discount === undefined) {        
+
+        if (discount === undefined) {
             let total: number = 0;
 
             related.forEach((transactionItem: TransactionItem): void => {
@@ -104,10 +102,12 @@ export class Transaction {
             return total;
         } else {
             const items: Array<DiscountItem> = new Array<DiscountItem>();
+
             related.forEach((item: TransactionItem): void => {
                 const discountItem: DiscountItem = new DiscountItem(item.price(), item.quantity(), item.weight());
                 items.push(discountItem);
             });
+
             return discount.total(items);
         }
     }
@@ -147,9 +147,9 @@ export class Transaction {
         let code: Array<string> = new Array<string>();
 
         this.item.forEach((item: TransactionItem): void => {
-            const itemCode = item.code();
+            const itemCode: string = item.code();
             const index: number = code.indexOf(itemCode);
-            
+
             if (index < 0) {
                 code.push(itemCode);
             }
@@ -167,10 +167,13 @@ export class Transaction {
 
     public quantity(code: string): number {
         const matching: Array<TransactionItem> = this.item.filter((value: TransactionItem): boolean => value.code() === code);
+
         let count: number = 0;
+
         matching.forEach((value: TransactionItem): void => {
             count += value.quantity()
         });
+
         return count;
     }
 

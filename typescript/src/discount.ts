@@ -24,7 +24,7 @@ export interface Discount {
     total(items: Array<DiscountItem>): number;
 }
 
-const validateItemCode: (discount: Discount) => void = (discount: Discount): void => {
+const validateItemCode = (discount: Discount): void => {
     if (discount.code.length === 0) {
         throw new Error('Invalid Item Code');
     }

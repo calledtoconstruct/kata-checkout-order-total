@@ -25,7 +25,7 @@ export class TestUpSalePercentDiscount {
                 );
 
                 describe('And a discount rule for the same item', () => {
-                    
+
                     const today: number = new Date().valueOf();
                     const bulk: number = 2;
                     const sale: number = 1;
@@ -60,14 +60,14 @@ export class TestUpSalePercentDiscount {
                                 itemTotal = await transaction.scan(code);
                                 quantity = transaction.quantity(code);
                             });
-    
+
                             it('Then the item total should be the item quantity times the item price.', () => {
                                 expect(quantity).toBeLessThan(bulk + sale);
                                 expect(itemTotal).toEqual(quantity * price);
                             });
-    
+
                         });
-    
+
                         describe('And the right quantity', () => {
 
                             let itemTotal: number;
@@ -79,14 +79,14 @@ export class TestUpSalePercentDiscount {
                                 itemTotal = await transaction.scan(code);
                                 quantity = transaction.quantity(code);
                             });
-    
+
                             it('Then the item total should the bulk quantity times the item price plus the sale quantity times the discount price.', () => {
                                 expect(quantity).toEqual(bulk + sale);
                                 expect(itemTotal).toEqual(Currency.floor(bulk * price + sale * (price * (1 - discountPercent))));
                             });
-    
+
                         });
-    
+
                         describe('And too high a quantity', () => {
 
                             let itemTotal: number;
@@ -100,14 +100,14 @@ export class TestUpSalePercentDiscount {
                                 itemTotal = await transaction.scan(code);
                                 quantity = transaction.quantity(code);
                             });
-    
+
                             it('Then the item total should be calculated correctly.', () => {
                                 expect(quantity).toBeGreaterThan(bulk + sale);
                                 const regularPriceQuantity = quantity - sale;
                                 const salePrice = price * (1 - discountPercent);
                                 expect(itemTotal).toEqual(Currency.floor(regularPriceQuantity * price + sale * salePrice));
                             });
-    
+
                         });
 
                     });

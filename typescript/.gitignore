@@ -1,3 +1,6 @@
-node_modules
+application
 console
+discount
+item
+node_modules
 test/transpiled

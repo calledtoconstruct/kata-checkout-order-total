@@ -1,3 +1,4 @@
+
 import { Transaction } from "../src/transaction";
 import { BulkFlatPriceDiscount, Discount, DiscountListImplementation, DiscountList } from "../src/discount";
 import { ItemList, ItemListImplementation, Item, Priced, StandardItem } from "../src/item";
@@ -54,7 +55,7 @@ export class TestBulkFlatPriceDiscount {
                                 itemTotal = await transaction.scan(code);
                                 quantity = transaction.quantity(code);
                             });
-    
+
                             it('Then the item total should be the quantity times the item price.', () => {
                                 expect(quantity).toBeLessThan(bulk);
                                 expect(itemTotal).toEqual(quantity * price);
@@ -73,7 +74,7 @@ export class TestBulkFlatPriceDiscount {
                                 itemTotal = await transaction.scan(code);
                                 quantity = transaction.quantity(code);
                             });
-    
+
                             it('Then the item total should be the quantity times the discount price.', () => {
                                 expect(quantity).toEqual(bulk);
                                 expect(itemTotal).toEqual(quantity * discountPrice);
@@ -94,7 +95,7 @@ export class TestBulkFlatPriceDiscount {
                                 itemTotal = await transaction.scan(code);
                                 quantity = transaction.quantity(code);
                             });
-    
+
                             it('Then the item total should be the quantity times the discount price.', () => {
                                 expect(quantity).toBeGreaterThan(bulk);
                                 expect(itemTotal).toEqual((bulk * discountPrice) + ((quantity - bulk) * price));

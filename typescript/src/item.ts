@@ -58,13 +58,13 @@ export class ItemListImplementation implements ItemList {
     }
 
     public async includes(item: Item & Priced): Promise<boolean> {
-        return Promise.resolve(this.list.indexOf(item) !== -1);
+        return this.list.indexOf(item) !== -1;
     }
 
     public async get(code: string): Promise<(Item & Priced) | undefined> {
         const items = this.list.filter((value: Item): boolean => value.code === code);
         if (items.length === 0) {
-            throw new Error('Requested Item Does Not Exist');
+            return undefined;
         }
         return Promise.resolve(items[0]);
     }
