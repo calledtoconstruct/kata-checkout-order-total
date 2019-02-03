@@ -1,29 +1,8 @@
 
-class ActiveXObject {
-    constructor(_: string) { }
-}
-
-const factories = [
-    function () { return new XMLHttpRequest() },
-    function () { return new ActiveXObject("Msxml3.XMLHTTP") },
-    function () { return new ActiveXObject("Msxml2.XMLHTTP.6.0") },
-    function () { return new ActiveXObject("Msxml2.XMLHTTP.3.0") },
-    function () { return new ActiveXObject("Msxml2.XMLHTTP") },
-    function () { return new ActiveXObject("Microsoft.XMLHTTP") }
-];
+var xhrRequest = require('xhr-request');
 
 const createClient = (): any => {
-    let client: any = null;
-
-    factories.forEach((factory: () => any): void => {
-        if (null === client) {
-            try {
-                client = factory();
-            } catch {
-            }
-        }
-    });
-
+    let client: any = xhrRequest;
     return client;
 }
 
@@ -33,34 +12,34 @@ export const sendRequest = async <Response>(url: string, postData?: any): Promis
         var client: any = createClient();
 
         if (client) {
-            const method = (postData) ? "POST" : "GET";
+            const method: string = (postData) ? "POST" : "GET";
 
-            client.open(method, url, true);
+            const headers: any = (postData) ? {
+                'Content-type': 'application/x-www-form-urlencoded'
+            } : {}
 
-            if (postData) {
-                client.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-            }
-
-            client.onreadystatechange = function () {
-                if (client.readyState != 4) {
-                    return;
-                }
-
-                if (client.status != 200 && client.status != 304) {
-                    if (client.status === 404) {
-                        reject(client.status);
+            client(url, {
+                headers: headers,
+                method: method,
+                json: true,
+                body: postData,
+                responseType: 'text'
+            }, (err: number, data: any): void => {
+                if (err) {
+                    if (err === 404) {
+                        reject(err);
                     }
-                    return;
+                } else {
+                    if (data === 'Not Found') {
+                        reject(404);
+                    } else {
+                        resolve(JSON.parse(data));
+                    }
+
                 }
 
-                resolve(JSON.parse(client.response));
-            }
+            });
 
-            if (client.readyState == 4) {
-                return;
-            }
-
-            client.send(postData);
         }
 
     });
