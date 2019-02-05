@@ -11,6 +11,7 @@ module TestUpSaleFlatPriceDiscount where
   itemSwissCheese = ByQuantityItem {
     itemCode = "swiss cheese",
     itemDescription = "12 oz package of swiss chese.",
+    itemType = "by quantity",
     itemPrice = 2.1
   }
 

@@ -11,6 +11,7 @@ module TestUpSalePercentDiscount where
   itemCatFood = ByQuantityItem {
     itemCode = "cat food",
     itemDescription = "12 oz can of cat food.",
+    itemType = "by quantity",
     itemPrice = 1.25
   }
 

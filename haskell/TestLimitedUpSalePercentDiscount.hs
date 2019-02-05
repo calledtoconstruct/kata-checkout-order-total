@@ -14,6 +14,7 @@ module TestLimitedUpSalePercentDiscount where
   itemTurkey = ByQuantityItem {
     itemCode = "turkey",
     itemDescription = "15 lbs whole turkey.",
+    itemType = "by quantity",
     itemPrice = 20.00
   }
 

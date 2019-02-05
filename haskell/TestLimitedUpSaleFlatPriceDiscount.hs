@@ -11,6 +11,7 @@ module TestLimitedUpSaleFlatPriceDiscount where
   itemBologna = ByQuantityItem {
     itemCode = "bologna",
     itemDescription = "32 oz of premium bologna.",
+    itemType = "by quantity",
     itemPrice = 3.25
   }
 

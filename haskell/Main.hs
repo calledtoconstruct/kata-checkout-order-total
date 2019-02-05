@@ -11,6 +11,7 @@ module Main where
   itemDogFood = ByQuantityItem {
     itemCode = "dog food",
     itemDescription = "2 lbs bag of dry dog food.",
+    itemType = "by quantity",
     itemPrice = 9.99
   }
 
@@ -26,6 +27,7 @@ module Main where
   itemCrisps = ByQuantityItem {
     itemCode = "crisps",
     itemDescription = "12 oz bag of salted crisps.",
+    itemType = "by quantity",
     itemPrice = 0.55
   }
 
@@ -42,6 +44,7 @@ module Main where
   itemCatFood = ByQuantityItem {
     itemCode = "cat food",
     itemDescription = "12 oz can of cat food.",
+    itemType = "by quantity",
     itemPrice = 1.25
   }
 
@@ -59,6 +62,7 @@ module Main where
   itemTurkey = ByQuantityItem {
     itemCode = "turkey",
     itemDescription = "15 lbs whole turkey.",
+    itemType = "by quantity",
     itemPrice = 20.00
   }
 
@@ -77,6 +81,7 @@ module Main where
   itemSwissCheese = ByQuantityItem {
     itemCode = "swiss cheese",
     itemDescription = "12 oz package of swiss chese.",
+    itemType = "by quantity",
     itemPrice = 2.1
   }
 
@@ -94,6 +99,7 @@ module Main where
   itemBologna = ByQuantityItem {
     itemCode = "bologna",
     itemDescription = "32 oz of premium bologna.",
+    itemType = "by quantity",
     itemPrice = 3.25
   }
 

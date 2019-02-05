@@ -11,6 +11,7 @@ module TestStandardDiscount where
   itemDogFood = ByQuantityItem {
     itemCode = "dog food",
     itemDescription = "2 lbs bag of dry dog food.",
+    itemType = "by quantity",
     itemPrice = 9.99
   }
 

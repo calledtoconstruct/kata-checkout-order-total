@@ -8,6 +8,7 @@ module Item ( Item (..), isByQuantityItem, isByWeightItem, isValidItem ) where
   data Item = ByQuantityItem {
     itemCode          :: String,
     itemDescription   :: String,
+    itemType          :: String,
     itemPrice         :: Double
   }
 

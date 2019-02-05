@@ -11,6 +11,7 @@ module TestBulkFlatPriceDiscount where
   itemCrisps = ByQuantityItem {
     itemCode = "crisps",
     itemDescription = "12 oz bag of salted crisps.",
+    itemType = "by quantity",
     itemPrice = 0.55
   }
 
