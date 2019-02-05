@@ -36,7 +36,7 @@
     "xhr-request": "^1.1.0"
   },
   "devDependencies": {
-    "terser": "^3.14.1",
+    "terser": "3.14.1",
     "tslint": "^5.12.1",
     "typescript": "^3.2.4",
     "webpack": "^4.29.0",
