@@ -14,11 +14,11 @@ class TransactionItem {
     private howMany: number = 1;
 
     public code(): string {
-        return this.item.code;
+        return this.item.itemCode;
     }
 
     public price(): number {
-        return this.item.price;
+        return this.item.itemPrice;
     }
 
     public weight(): number | undefined {
@@ -38,7 +38,7 @@ class TransactionItem {
             ? this.howMany
             : this.howMany * this.itemWeight;
 
-        return totalQuantity * this.item.price;
+        return totalQuantity * this.item.itemPrice;
     }
 }
 
@@ -65,9 +65,9 @@ export class Transaction {
     }
 
     private static validateType(scanned: Item, weight?: number): void {
-        if (scanned.type === 'by weight' && weight === undefined) {
+        if (scanned.itemType === 'by weight' && weight === undefined) {
             throw new Error('Weight is required for this type of item.');
-        } else if (scanned.type === 'by quantity' && weight !== undefined) {
+        } else if (scanned.itemType === 'by quantity' && weight !== undefined) {
             throw new Error('Weight is not required for this type of item.');
         }
     }

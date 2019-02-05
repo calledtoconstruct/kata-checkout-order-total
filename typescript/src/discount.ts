@@ -18,16 +18,16 @@ export class DiscountItem {
 }
 
 export interface Discount {
-    readonly startDate: Date;
-    readonly endDate: Date;
-    readonly code: string;
+    readonly discountStartDate: Date;
+    readonly discountEndDate: Date;
+    readonly discountCode: string;
     validate(itemList: ItemList): Promise<void>;
     total(items: Array<DiscountItem>): number;
     getTypeName(): string;
 }
 
 const validateItemCode = (discount: Discount): void => {
-    if (discount.code.length === 0) {
+    if (discount.discountCode.length === 0) {
         throw new Error('Invalid Item Code');
     }
 };
@@ -39,7 +39,7 @@ const validateItemType = async (itemList: ItemList, code: string, type: ItemType
         throw new Error('Requested Item Does Not Exist.');
     }
 
-    if (item.type !== type) {
+    if (item.itemType !== type) {
         throw new Error('Item Type Mismatch');
     }
 };
@@ -49,7 +49,7 @@ const fallbackDateRange: DateRange = {
 };
 
 const validateItemDateRange: (discount: Discount) => void = (discount: Discount): void => {
-    if ((discount.startDate || fallbackDateRange.startDate).valueOf() >= (discount.endDate || fallbackDateRange.endDate).valueOf()) {
+    if ((discount.discountStartDate || fallbackDateRange.startDate).valueOf() >= (discount.discountEndDate || fallbackDateRange.endDate).valueOf()) {
         throw new Error('The end date must be after the start date.');
     }
 };
@@ -58,17 +58,17 @@ export class StandardDiscount implements Discount {
     private static typeName: string = "StandardDiscount";
 
     constructor(
-        public readonly startDate: Date,
-        public readonly endDate: Date,
-        public readonly code: string,
-        public readonly price: number
+        public readonly discountStartDate: Date,
+        public readonly discountEndDate: Date,
+        public readonly discountCode: string,
+        public readonly discountPrice: number
     ) { }
 
     public getTypeName(): string { return StandardDiscount.typeName; }
 
     public async validate(itemList: ItemList): Promise<void> {
         validateItemCode(this);
-        await validateItemType(itemList, this.code, 'by quantity');
+        await validateItemType(itemList, this.discountCode, 'by quantity');
         validateItemDateRange(this);
     }
 
@@ -80,7 +80,7 @@ export class StandardDiscount implements Discount {
                 ? item.quantity
                 : item.quantity * item.weight;
 
-            total += Math.min(item.price, this.price) * totalQuantity;
+            total += Math.min(item.price, this.discountPrice) * totalQuantity;
         });
 
         return total;
@@ -111,84 +111,84 @@ export class BulkFlatPriceDiscount implements Discount {
     private static typeName: string = "BulkFlatPriceDiscount";
 
     constructor(
-        public readonly startDate: Date,
-        public readonly endDate: Date,
-        public readonly code: string,
-        public readonly quantity: number,
-        public readonly price: number
+        public readonly discountStartDate: Date,
+        public readonly discountEndDate: Date,
+        public readonly discountCode: string,
+        public readonly discountBulk: number,
+        public readonly discountPrice: number
     ) { }
 
     public getTypeName(): string { return BulkFlatPriceDiscount.typeName; }
 
     public async validate(itemList: ItemList): Promise<void> {
         validateItemCode(this);
-        await validateItemType(itemList, this.code, 'by quantity');
+        await validateItemType(itemList, this.discountCode, 'by quantity');
         validateItemDateRange(this);
     }
 
     public total(items: Array<DiscountItem>): number {
         const item: ItemSummary = sumItems(items);
-        const salePrice: number = Math.floor(item.quantity / this.quantity) * this.price * this.quantity;
-        const regularPrice: number = (item.quantity % this.quantity) * item.price;
+        const salePrice: number = Math.floor(item.quantity / this.discountBulk) * this.discountPrice * this.discountBulk;
+        const regularPrice: number = (item.quantity % this.discountBulk) * item.price;
         return salePrice + regularPrice;
     }
 }
 
 export interface Percent {
-    percent: number;
+    discountPercent: number;
 }
 
 const validatePercentNotGreaterThanOneHundred: (percent: Percent) => void = (percent: Percent): void => {
-    if (percent.percent > 1) {
+    if (percent.discountPercent > 1) {
         throw new Error('Percent must be Less Than or Equal To One Hundred');
     }
 };
 
 const validatePercentNotEqualToZero: (percent: Percent) => void = (percent: Percent): void => {
-    if (percent.percent === 0) {
+    if (percent.discountPercent === 0) {
         throw new Error('Percent must be Greater Than Zero');
     }
 };
 
 export interface Limited {
-    bulk: number;
-    sale: number;
-    limit: number;
+    discountBulk: number;
+    discountSale: number;
+    discountLimit: number;
 }
 
 const validateLimitIsMultipleOfBulkAndSaleQuantity: (limited: Limited) => void = (limited: Limited): void => {
-    if (limited.limit === 0) {
+    if (limited.discountLimit === 0) {
         throw new Error('Limit must be Greater Than Zero');
-    } else if ((limited.limit % (limited.bulk + limited.sale)) !== 0) {
+    } else if ((limited.discountLimit % (limited.discountBulk + limited.discountSale)) !== 0) {
         throw new Error('Limit must be a Multiple of the Sum of the Bulk and Sale Quantities');
     }
 };
 
 export interface UpSale {
-    readonly bulk: number,
-    readonly sale: number
+    readonly discountBulk: number,
+    readonly discountSale: number
 }
 
 const validateBulkQuantity: (upSale: UpSale) => void = (upSale: UpSale): void => {
-    if (upSale.bulk < 1) {
+    if (upSale.discountBulk < 1) {
         throw new Error('Bulk Quantity must be Greater Than Zero');
     }
 };
 
 const validateSaleQuantity: (upSale: UpSale) => void = (upSale: UpSale): void => {
-    if (upSale.sale < 1) {
+    if (upSale.discountSale < 1) {
         throw new Error('Sale Quantity must be Greater Than Zero');
     }
 };
 
 const validateWholeNumberBulkQuantity: (upSale: UpSale) => void = (upSale: UpSale): void => {
-    if (Math.floor(upSale.bulk) !== upSale.bulk) {
+    if (Math.floor(upSale.discountBulk) !== upSale.discountBulk) {
         throw new Error('Bulk Quantity must be a Whole Number');
     }
 };
 
 const validateWholeNumberSaleQuantity: (upSale: UpSale) => void = (upSale: UpSale): void => {
-    if (Math.floor(upSale.sale) !== upSale.sale) {
+    if (Math.floor(upSale.discountSale) !== upSale.discountSale) {
         throw new Error('Sale Quantity must be a Whole Number');
     }
 };
@@ -196,11 +196,11 @@ const validateWholeNumberSaleQuantity: (upSale: UpSale) => void = (upSale: UpSal
 abstract class UpSaleDiscount implements Discount, UpSale {
 
     constructor(
-        public readonly startDate: Date,
-        public readonly endDate: Date,
-        public readonly code: string,
-        public readonly bulk: number,
-        public readonly sale: number
+        public readonly discountStartDate: Date,
+        public readonly discountEndDate: Date,
+        public readonly discountCode: string,
+        public readonly discountBulk: number,
+        public readonly discountSale: number
     ) { }
 
     public abstract getTypeName(): string;
@@ -213,7 +213,7 @@ abstract class UpSaleDiscount implements Discount, UpSale {
         validateBulkQuantity(this);
         validateWholeNumberSaleQuantity(this);
         validateSaleQuantity(this);
-        await validateItemType(itemList, this.code, type);
+        await validateItemType(itemList, this.discountCode, type);
         validateItemDateRange(this);
     }
 
@@ -224,14 +224,14 @@ export class UpSalePercentDiscount extends UpSaleDiscount implements Percent {
     private static readonly typeName: string = "UpSalePercentDiscount";
 
     constructor(
-        readonly startDate: Date,
-        readonly endDate: Date,
-        readonly code: string,
-        readonly bulk: number,
-        readonly sale: number,
-        readonly percent: number
+        readonly discountStartDate: Date,
+        readonly discountEndDate: Date,
+        readonly discountCode: string,
+        readonly discountBulk: number,
+        readonly discountSale: number,
+        readonly discountPercent: number
     ) {
-        super(startDate, endDate, code, bulk, sale);
+        super(discountStartDate, discountEndDate, discountCode, discountBulk, discountSale);
     }
 
     public getTypeName(): string {
@@ -246,10 +246,10 @@ export class UpSalePercentDiscount extends UpSaleDiscount implements Percent {
 
     public total(items: Array<DiscountItem>): number {
         const item: ItemSummary = sumItems(items);
-        const quantity: number = this.bulk + this.sale;
-        const salePrice: number = item.price * (1 - this.percent);
+        const quantity: number = this.discountBulk + this.discountSale;
+        const salePrice: number = item.price * (1 - this.discountPercent);
         const regularCost: number = (item.quantity % quantity) * item.price;
-        const saleCost: number = Math.floor(item.quantity / quantity) * ((this.bulk * item.price) + (this.sale * salePrice));
+        const saleCost: number = Math.floor(item.quantity / quantity) * ((this.discountBulk * item.price) + (this.discountSale * salePrice));
         return Currency.floor(regularCost + saleCost);
     }
 
@@ -259,15 +259,15 @@ export class LimitedUpSalePercentDiscount extends UpSaleDiscount implements Perc
     private static readonly typeName: string = "LimitedUpSalePercentDiscount";
 
     constructor(
-        readonly startDate: Date,
-        readonly endDate: Date,
-        readonly code: string,
-        readonly bulk: number,
-        readonly sale: number,
-        readonly percent: number,
-        public readonly limit: number
+        readonly discountStartDate: Date,
+        readonly discountEndDate: Date,
+        readonly discountCode: string,
+        readonly discountBulk: number,
+        readonly discountSale: number,
+        readonly discountPercent: number,
+        public readonly discountLimit: number
     ) {
-        super(startDate, endDate, code, bulk, sale);
+        super(discountStartDate, discountEndDate, discountCode, discountBulk, discountSale);
     }
 
     public getTypeName(): string {
@@ -282,14 +282,14 @@ export class LimitedUpSalePercentDiscount extends UpSaleDiscount implements Perc
 
     public total(items: Array<DiscountItem>): number {
         const item: ItemSummary = sumItems(items);
-        const over: number = item.quantity > this.limit
-            ? (item.quantity - this.limit)
+        const over: number = item.quantity > this.discountLimit
+            ? (item.quantity - this.discountLimit)
             : 0;
         const under: number = item.quantity - over;
-        const quantity: number = this.bulk + this.sale;
-        const salePrice: number = item.price * (1 - this.percent);
+        const quantity: number = this.discountBulk + this.discountSale;
+        const salePrice: number = item.price * (1 - this.discountPercent);
         const overCost: number = ((under % quantity) + over) * item.price;
-        const bundleCost: number = (this.bulk * item.price) + (this.sale * salePrice);
+        const bundleCost: number = (this.discountBulk * item.price) + (this.discountSale * salePrice);
         const bundles: number = Math.floor(under / quantity);
         return Currency.floor((bundles * bundleCost) + overCost);
     }
@@ -300,14 +300,14 @@ export class UpSaleFlatPriceDiscount extends UpSaleDiscount {
     private static readonly typeName: string = "UpSaleFlatPriceDiscount";
 
     constructor(
-        readonly startDate: Date,
-        readonly endDate: Date,
-        readonly code: string,
-        readonly bulk: number,
-        readonly sale: number,
-        public readonly price: number
+        readonly discountStartDate: Date,
+        readonly discountEndDate: Date,
+        readonly discountCode: string,
+        readonly discountBulk: number,
+        readonly discountSale: number,
+        public readonly discountPrice: number
     ) {
-        super(startDate, endDate, code, bulk, sale);
+        super(discountStartDate, discountEndDate, discountCode, discountBulk, discountSale);
     }
 
     public getTypeName(): string {
@@ -320,10 +320,10 @@ export class UpSaleFlatPriceDiscount extends UpSaleDiscount {
 
     public total(items: Array<DiscountItem>): number {
         const item: ItemSummary = sumItems(items);
-        const quantity: number = this.bulk + this.sale;
-        const salePrice: number = item.price * this.price;
+        const quantity: number = this.discountBulk + this.discountSale;
+        const salePrice: number = item.price * this.discountPrice;
         const regularCost: number = (item.quantity % quantity) * item.price;
-        const bundleCost: number = (this.bulk * item.price) + (this.sale * salePrice);
+        const bundleCost: number = (this.discountBulk * item.price) + (this.discountSale * salePrice);
         const bundles: number = Math.floor(item.quantity / quantity);
         return regularCost + (bundles * bundleCost);
     }
@@ -334,15 +334,15 @@ export class LimitedUpSaleFlatPriceDiscount extends UpSaleDiscount implements Li
     private static readonly typeName: string = "LimitedUpSaleFlatPriceDiscount";
 
     constructor(
-        readonly startDate: Date,
-        readonly endDate: Date,
-        readonly code: string,
-        readonly bulk: number,
-        readonly sale: number,
-        public readonly price: number,
-        readonly limit: number
+        readonly discountStartDate: Date,
+        readonly discountEndDate: Date,
+        readonly discountCode: string,
+        readonly discountBulk: number,
+        readonly discountSale: number,
+        public readonly discountPrice: number,
+        readonly discountLimit: number
     ) {
-        super(startDate, endDate, code, bulk, sale);
+        super(discountStartDate, discountEndDate, discountCode, discountBulk, discountSale);
     }
 
     public getTypeName(): string {
@@ -356,13 +356,13 @@ export class LimitedUpSaleFlatPriceDiscount extends UpSaleDiscount implements Li
 
     public total(items: Array<DiscountItem>): number {
         const item: ItemSummary = sumItems(items);
-        const over: number = item.quantity > this.limit
-            ? (item.quantity - this.limit)
+        const over: number = item.quantity > this.discountLimit
+            ? (item.quantity - this.discountLimit)
             : 0;
         const under: number = item.quantity - over;
-        const quantity: number = this.bulk + this.sale;
+        const quantity: number = this.discountBulk + this.discountSale;
         const overCost: number = ((under % quantity) + over) * item.price;
-        const bundleCost: number = (this.bulk * item.price) + (this.sale * this.price);
+        const bundleCost: number = (this.discountBulk * item.price) + (this.discountSale * this.discountPrice);
         const bundles: number = Math.floor(under / quantity);
         return (bundles * bundleCost) + overCost;
     }
@@ -373,14 +373,14 @@ export class UpSalePercentDiscountByWeight extends UpSaleDiscount implements Per
     private static readonly typeName: string = "UpSalePercentDiscountByWeight";
 
     constructor(
-        readonly startDate: Date,
-        readonly endDate: Date,
-        readonly code: string,
-        readonly bulk: number,
-        readonly sale: number,
-        readonly percent: number
+        readonly discountStartDate: Date,
+        readonly discountEndDate: Date,
+        readonly discountCode: string,
+        readonly discountBulk: number,
+        readonly discountSale: number,
+        readonly discountPercent: number
     ) {
-        super(startDate, endDate, code, bulk, sale);
+        super(discountStartDate, discountEndDate, discountCode, discountBulk, discountSale);
     }
 
     public getTypeName(): string {
@@ -410,11 +410,11 @@ export class UpSalePercentDiscountByWeight extends UpSaleDiscount implements Per
         let total: number = 0;
 
         sorted.forEach((item: DiscountItem, index: number): void => {
-            const oneBasedIndex: number = (index + 1) % (this.bulk + this.sale);
-            if (oneBasedIndex >= 1 && oneBasedIndex <= this.bulk) {
+            const oneBasedIndex: number = (index + 1) % (this.discountBulk + this.discountSale);
+            if (oneBasedIndex >= 1 && oneBasedIndex <= this.discountBulk) {
                 total += item.quantity * (item.weight || 0) * item.price;
             } else {
-                total += item.quantity * (item.weight || 0) * (item.price * (1 - this.percent));
+                total += item.quantity * (item.weight || 0) * (item.price * (1 - this.discountPercent));
             }
         });
 
@@ -432,10 +432,10 @@ export class DiscountListImplementation implements DiscountList {
     public async add(discount: Discount): Promise<void> {
         await discount.validate(this.itemList);
 
-        const duplicates: Array<Discount> = this.matching(discount.code, discount.startDate, discount.endDate);
+        const duplicates: Array<Discount> = this.matching(discount.discountCode, discount.discountStartDate, discount.discountEndDate);
 
         if (duplicates.length > 0) {
-            throw new Error('Duplicate or overlapping discount for ' + discount.code);
+            throw new Error('Duplicate or overlapping discount for ' + discount.discountCode);
         }
 
         this.list.push(discount);
@@ -443,8 +443,8 @@ export class DiscountListImplementation implements DiscountList {
 
     private matching(code: string, startDate: Date, endDate: Date): Array<Discount> {
         return this.list.filter((existing: Discount) => {
-            const byCode: boolean = (existing.code === code);
-            const byDate: boolean = (DiscountListImplementation.overlap(existing.startDate, existing.endDate, startDate, endDate));
+            const byCode: boolean = (existing.discountCode === code);
+            const byDate: boolean = (DiscountListImplementation.overlap(existing.discountStartDate, existing.discountEndDate, startDate, endDate));
             return byCode && byDate;
         });
     }
@@ -478,31 +478,31 @@ export class DiscountTypeFactory implements TypeFactory<Discount> {
     private readonly discounts: any = {
         StandardDiscount: (from: Discount): Discount => {
             const source: StandardDiscount = <StandardDiscount>from;
-            return new StandardDiscount(source.startDate, source.endDate, source.code, source.price);
+            return new StandardDiscount(source.discountStartDate, source.discountEndDate, source.discountCode, source.discountPrice);
         },
         BulkFlatPriceDiscount: (from: Discount): Discount => {
             const source: BulkFlatPriceDiscount = <BulkFlatPriceDiscount>from;
-            return new BulkFlatPriceDiscount(source.startDate, source.endDate, source.code, source.quantity, source.price);
+            return new BulkFlatPriceDiscount(source.discountStartDate, source.discountEndDate, source.discountCode, source.discountBulk, source.discountPrice);
         },
         UpSalePercentDiscount: (from: Discount): Discount => {
             const source: UpSalePercentDiscount = <UpSalePercentDiscount>from;
-            return new UpSalePercentDiscount(source.startDate, source.endDate, source.code, source.bulk, source.sale, source.percent);
+            return new UpSalePercentDiscount(source.discountStartDate, source.discountEndDate, source.discountCode, source.discountBulk, source.discountSale, source.discountPercent);
         },
         LimitedUpSalePercentDiscount: (from: Discount): Discount => {
             const source: LimitedUpSalePercentDiscount = <LimitedUpSalePercentDiscount>from;
-            return new LimitedUpSalePercentDiscount(source.startDate, source.endDate, source.code, source.bulk, source.sale, source.percent, source.limit);
+            return new LimitedUpSalePercentDiscount(source.discountStartDate, source.discountEndDate, source.discountCode, source.discountBulk, source.discountSale, source.discountPercent, source.discountLimit);
         },
         UpSaleFlatPriceDiscount: (from: Discount): Discount => {
             const source: UpSaleFlatPriceDiscount = <UpSaleFlatPriceDiscount>from;
-            return new UpSaleFlatPriceDiscount(source.startDate, source.endDate, source.code, source.bulk, source.sale, source.price);
+            return new UpSaleFlatPriceDiscount(source.discountStartDate, source.discountEndDate, source.discountCode, source.discountBulk, source.discountSale, source.discountPrice);
         },
         LimitedUpSaleFlatPriceDiscount: (from: Discount): Discount => {
             const source: LimitedUpSaleFlatPriceDiscount = <LimitedUpSaleFlatPriceDiscount>from;
-            return new LimitedUpSaleFlatPriceDiscount(source.startDate, source.endDate, source.code, source.bulk, source.sale, source.price, source.limit);
+            return new LimitedUpSaleFlatPriceDiscount(source.discountStartDate, source.discountEndDate, source.discountCode, source.discountBulk, source.discountSale, source.discountPrice, source.discountLimit);
         },
         UpSalePercentDiscountByWeight: (from: Discount): Discount => {
             const source: UpSalePercentDiscountByWeight = <UpSalePercentDiscountByWeight>from;
-            return new UpSalePercentDiscountByWeight(source.startDate, source.endDate, source.code, source.bulk, source.sale, source.percent);
+            return new UpSalePercentDiscountByWeight(source.discountStartDate, source.discountEndDate, source.discountCode, source.discountBulk, source.discountSale, source.discountPercent);
         }
     };
 

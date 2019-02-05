@@ -18,20 +18,20 @@ import {
 import { DateRange } from '../src/date';
 
 class FakeItem implements Item {
-    public readonly code: string = '';
-    public readonly type: ItemType;
+    public readonly itemCode: string = '';
+    public readonly itemType: ItemType;
     public validate(): void { }
 }
 
 class FakeByQuantityItem implements Item {
-    public readonly code: string = 'by quantity item';
-    public readonly type: ItemType = 'by quantity';
+    public readonly itemCode: string = 'by quantity item';
+    public readonly itemType: ItemType = 'by quantity';
     public validate(): void { }
 }
 
 class FakeByWeightItem implements Item {
-    public readonly code: string = 'by weight item';
-    public readonly type: ItemType = 'by weight';
+    public readonly itemCode: string = 'by weight item';
+    public readonly itemType: ItemType = 'by weight';
     public validate(): void { }
 }
 
@@ -199,7 +199,7 @@ export class TestDiscountList {
 
                     const scenarioDescription: string = overlappingDiscountScenario.description;
                     const overlappingDiscount: Discount = overlappingDiscountScenario.target;
-                    const whenSameCode = (validDiscountScenario: TestScenario<Discount>): boolean => validDiscountScenario.target.code === overlappingDiscount.code;
+                    const whenSameCode = (validDiscountScenario: TestScenario<Discount>): boolean => validDiscountScenario.target.discountCode === overlappingDiscount.discountCode;
 
                     validDiscountScenarios.forEach(whenSameCode).describe(scenarioDescription, (discountScenario: TestScenario<Discount>) => {
 

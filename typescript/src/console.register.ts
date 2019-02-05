@@ -23,8 +23,8 @@ class Application {
 
   private async addByWeightItem(item: Item, weight: number): Promise<number> {
     try {
-      const itemTotal: number = await this.transaction.scan(item.code, weight);
-      console.log('Added ' + weight + ' lbs of ' + item.type + ' item ' + item.code);
+      const itemTotal: number = await this.transaction.scan(item.itemCode, weight);
+      console.log('Added ' + weight + ' lbs of ' + item.itemType + ' item ' + item.itemCode);
       return itemTotal;
     } catch (error) {
       if (error instanceof Error) {
@@ -36,8 +36,8 @@ class Application {
 
   private async addByQuantityItem(item: Item): Promise<number> {
     try {
-      const itemTotal: number = await this.transaction.scan(item.code);
-      console.log('Added ' + item.type + ' item ' + item.code);
+      const itemTotal: number = await this.transaction.scan(item.itemCode);
+      console.log('Added ' + item.itemType + ' item ' + item.itemCode);
       return itemTotal;
     } catch (error) {
       if (error instanceof Error) {
@@ -63,7 +63,7 @@ class Application {
       try {
         const item: (Item & Priced) | undefined = await itemList.get(code);
         if (item !== undefined) {
-          if (item.type === 'by weight') {
+          if (item.itemType === 'by weight') {
             console.log('Weigh the item: ');
             this.input.question('>', async (weight: number) => await this.processWeight(item)(weight));
           } else {
