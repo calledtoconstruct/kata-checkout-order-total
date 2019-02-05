@@ -127,7 +127,7 @@ module Main where
 
   waitForScan :: DiscountList -> ItemList -> TransactionType -> String -> IO Double
   waitForScan discountList itemList transaction code = case code of
-    "exit"              -> return $ transactionTotal transaction
+    "done"              -> return $ transactionTotal transaction
     otherwise           -> scan discountList itemList transaction code
 
   main :: IO ()
