@@ -8,6 +8,7 @@ module ItemAPI where
   import Network.Wai.Middleware.Cors
   import Web.Scotty
   import Item
+  import ItemList
 
   itemDogFood :: Item
   itemDogFood = ByQuantityItem {
@@ -57,11 +58,8 @@ module ItemAPI where
     itemPrice = 3.25
   }
 
-  items :: [Item]
-  items = itemDogFood: itemCrisps: itemCatFood: itemTurkey: itemSwissCheese: itemBologna: []
-
-  matchesCode :: String -> Item -> Bool
-  matchesCode code item = code == itemCode item
+  itemList :: ItemList
+  itemList = addItems createItemList $ itemDogFood: itemCrisps: itemCatFood: itemTurkey: itemSwissCheese: itemBologna: []
 
   main = do
     putStrLn "Starting Server..."
@@ -69,6 +67,7 @@ module ItemAPI where
       middleware simpleCors
       get "/item/:code" $ do
           code <- param "code"
-          case (filter (matchesCode code) items) of
+          let items = getItem itemList code
+          case items of
             []      -> status status404 *> text "Not Found"
             [item]  -> json item
