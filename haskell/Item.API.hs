@@ -4,70 +4,47 @@
 
 module ItemAPI where
 
+  import Data.ByteString.Lazy.UTF8 (fromString)
+  import Data.Aeson (decode)
   import Network.HTTP.Types.Status
   import Network.Wai.Middleware.Cors
   import Web.Scotty
+  import System.IO
   import Item
   import ItemList
 
-  itemDogFood :: Item
-  itemDogFood = ByQuantityItem {
-    itemCode = "dog food",
-    itemDescription = "2 lbs bag of dry dog food.",
-    itemType = "by quantity",
-    itemPrice = 9.99
-  }
+  loadItem :: Handle -> IO ItemList -> IO ItemList
+  loadItem handle itemList = do
+    eof <- hIsEOF handle
+    updated <- case eof of
+      False -> do
+        line <- hGetLine handle
+        updated <- case (decode $ fromString line) :: Maybe Item of
+          Just item -> do
+            loadItem handle $ pure . flip addItem item =<< itemList
+          Nothing -> do
+            hClose handle
+            itemList
+        return updated
+      True -> do
+        hClose handle
+        itemList
+    return updated
 
-  itemCrisps :: Item
-  itemCrisps = ByQuantityItem {
-    itemCode = "crisps",
-    itemDescription = "12 oz bag of salted crisps.",
-    itemType = "by quantity",
-    itemPrice = 0.55
-  }
+  load :: IO ItemList -> IO ItemList
+  load itemList = do
+    handle <- openFile "./Items.json" ReadMode
+    loadItem handle itemList
 
-  itemCatFood :: Item
-  itemCatFood = ByQuantityItem {
-    itemCode = "cat food",
-    itemDescription = "12 oz can of cat food.",
-    itemType = "by quantity",
-    itemPrice = 1.25
-  }
-
-  itemTurkey :: Item
-  itemTurkey = ByQuantityItem {
-    itemCode = "turkey",
-    itemDescription = "15 lbs whole turkey.",
-    itemType = "by quantity",
-    itemPrice = 20.00
-  }
-
-  itemSwissCheese :: Item
-  itemSwissCheese = ByQuantityItem {
-    itemCode = "swiss cheese",
-    itemDescription = "12 oz package of swiss chese.",
-    itemType = "by quantity",
-    itemPrice = 2.1
-  }
-
-  itemBologna :: Item
-  itemBologna = ByQuantityItem {
-    itemCode = "bologna",
-    itemDescription = "32 oz of premium bologna.",
-    itemType = "by quantity",
-    itemPrice = 3.25
-  }
-
-  itemList :: ItemList
-  itemList = addItems createItemList $ itemDogFood: itemCrisps: itemCatFood: itemTurkey: itemSwissCheese: itemBologna: []
-
+  main :: IO ()
   main = do
     putStrLn "Starting Server..."
+    itemList <- load $ pure createItemList
     scotty 3000 $ do
       middleware simpleCors
       get "/item/:code" $ do
-          code <- param "code"
-          let items = getItem itemList code
-          case items of
-            []      -> status status404 *> text "Not Found"
-            [item]  -> json item
+        code <- param "code"
+        let items = getItem itemList code
+        case items of
+          []      -> status status404 *> text "Not Found"
+          [item]  -> json item
