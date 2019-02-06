@@ -7,28 +7,12 @@ module Main where
   import ItemList
   import DiscountList
 
-  itemDogFood :: Item
-  itemDogFood = ByQuantityItem {
-    itemCode = "dog food",
-    itemDescription = "2 lbs bag of dry dog food.",
-    itemType = "by quantity",
-    itemPrice = 9.99
-  }
-
   discountDogFood :: Discount
   discountDogFood = StandardDiscount {
     discountCode = "dog food",
     discountStartDate = fromGregorian 2019 1 1,
     discountEndDate = fromGregorian 2019 12 31,
     discountPrice = 3.00
-  }
-
-  itemCrisps :: Item
-  itemCrisps = ByQuantityItem {
-    itemCode = "crisps",
-    itemDescription = "12 oz bag of salted crisps.",
-    itemType = "by quantity",
-    itemPrice = 0.55
   }
 
   discountCrisps :: Discount
@@ -40,14 +24,6 @@ module Main where
     discountPrice = 1.00
   }
 
-  itemCatFood :: Item
-  itemCatFood = ByQuantityItem {
-    itemCode = "cat food",
-    itemDescription = "12 oz can of cat food.",
-    itemType = "by quantity",
-    itemPrice = 1.25
-  }
-
   discountCatFood :: Discount
   discountCatFood = UpSalePercentDiscount {
     discountCode = "cat food",
@@ -56,14 +32,6 @@ module Main where
     discountBulk = 2,
     discountSale = 1,
     discountPercent = 0.50
-  }
-
-  itemTurkey :: Item
-  itemTurkey = ByQuantityItem {
-    itemCode = "turkey",
-    itemDescription = "15 lbs whole turkey.",
-    itemType = "by quantity",
-    itemPrice = 20.00
   }
 
   discountTurkey :: Discount
@@ -77,14 +45,6 @@ module Main where
     discountLimit = 6
   }
 
-  itemSwissCheese :: Item
-  itemSwissCheese = ByQuantityItem {
-    itemCode = "swiss cheese",
-    itemDescription = "12 oz package of swiss chese.",
-    itemType = "by quantity",
-    itemPrice = 2.1
-  }
-
   discountSwissCheese :: Discount
   discountSwissCheese = UpSaleFlatPriceDiscount {
     discountCode = "swiss cheese",
@@ -93,14 +53,6 @@ module Main where
     discountBulk = 2,
     discountSale = 1,
     discountPrice = 1.0
-  }
-
-  itemBologna :: Item
-  itemBologna = ByQuantityItem {
-    itemCode = "bologna",
-    itemDescription = "32 oz of premium bologna.",
-    itemType = "by quantity",
-    itemPrice = 3.25
   }
 
   discountBologna :: Discount
@@ -136,8 +88,8 @@ module Main where
     "done"              -> return $ transactionTotal transaction
     otherwise           -> scan discountList itemList transaction code
 
-  main :: IO ()
-  main
+  console :: ItemList -> IO ()
+  console itemList
     | invalidDiscount   = print "Invalid Discount"
     | invalidItem       = print "Invalid Item"
     | otherwise         = do
@@ -146,5 +98,9 @@ module Main where
     where invalidDiscount = any (==False) $ flip isValidDiscount (getItem itemList) <$> (transactionDiscounts transaction)
           invalidItem     = any (==False) $ isValidItem <$> transactionItems transaction
           transaction     = createTransaction $ fromGregorian 2019 4 30
-          itemList        = addItems createItemList $ itemDogFood: itemCrisps: itemCatFood: itemTurkey: itemSwissCheese: itemBologna: []
           discountList    = addDiscounts createDiscountList (getItem itemList) $ discountDogFood: discountCrisps: discountCatFood: discountTurkey: discountSwissCheese: discountBologna: []
+
+  main :: IO ()
+  main = do
+    itemList            <- load "./Items.json" $ pure createItemList
+    console itemList
