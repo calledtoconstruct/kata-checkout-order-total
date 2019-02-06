@@ -4,7 +4,7 @@
 
 module Item ( Item (..), isByQuantityItem, isByWeightItem, isValidItem ) where
 
-  import Data.Aeson (FromJSON, ToJSON)
+  import Data.Aeson (FromJSON, ToJSON, withObject, parseJSON, (.:))
   import GHC.Generics
 
   class ItemClass item where
@@ -17,7 +17,12 @@ module Item ( Item (..), isByQuantityItem, isByWeightItem, isValidItem ) where
     itemDescription   :: String,
     itemType          :: String,
     itemPrice         :: Double
-  } deriving (Generic)
+  } | ByWeightItem {
+    itemCode          :: String,
+    itemDescription   :: String,
+    itemType          :: String,
+    itemPrice         :: Double
+  } deriving (Generic, Show)
 
   instance ItemClass Item where
     isByQuantityItem item   = case item of
@@ -29,6 +34,6 @@ module Item ( Item (..), isByQuantityItem, isByWeightItem, isValidItem ) where
             hasDescription    = not $ null $ itemDescription item
             hasPrice          = (itemPrice item) > 0.0
 
-  instance FromJSON Item where
-
   instance ToJSON Item where
+
+  instance FromJSON Item where
