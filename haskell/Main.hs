@@ -102,5 +102,5 @@ module Main where
 
   main :: IO ()
   main = do
-    itemList            <- load "./Items.json" $ pure createItemList
+    itemList            <- loadItems "./Items.json" $ pure createItemList
     console itemList

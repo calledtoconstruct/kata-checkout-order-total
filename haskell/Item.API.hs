@@ -13,8 +13,8 @@ module ItemAPI where
   main :: IO ()
   main = do
     putStrLn "Starting Server..."
-    itemList <- load "./Items.json" $ pure createItemList
-    scotty 3000 $ do
+    itemList <- loadItems "./Items.json" $ pure createItemList
+    scotty 8082 $ do
       middleware simpleCors
       get "/item/:code" $ do
         code <- param "code"

@@ -1,4 +1,4 @@
-module ItemList ( ItemList, createItemList, getItem, addItems, load ) where
+module ItemList ( ItemList, createItemList, getItem, addItems, loadItems ) where
 
   import Data.ByteString.Lazy.UTF8 (fromString)
   import Data.Aeson (decode)
@@ -52,7 +52,7 @@ module ItemList ( ItemList, createItemList, getItem, addItems, load ) where
         itemList
     return updated
 
-  load :: String -> IO ItemList -> IO ItemList
-  load fileName itemList = do
+  loadItems :: String -> IO ItemList -> IO ItemList
+  loadItems fileName itemList = do
     handle <- openFile fileName ReadMode
     loadItem handle itemList
