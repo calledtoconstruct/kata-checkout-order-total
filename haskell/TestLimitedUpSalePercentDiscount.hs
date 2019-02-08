@@ -1,5 +1,10 @@
+
+{-# LANGUAGE OverloadedStrings #-}
+
 module TestLimitedUpSalePercentDiscount where
 
+  import Data.Aeson (encode, decode)
+  import Data.ByteString.Lazy.UTF8 (fromString)
   import Data.Time
   import Discount
   import Item
@@ -35,6 +40,7 @@ module TestLimitedUpSalePercentDiscount where
   -- >>> item                       = head (getItem itemList "turkey")
   -- >>> currentTransaction         = createTransaction $ fromGregorian 2019 4 30
   -- >>> oldTransaction             = createTransaction $ fromGregorian 2018 4 30
+  -- >>> discountTurkeyJSON         = "{\"tag\":\"LimitedUpSalePercentDiscount\",\"discountBulk\":2,\"discountLimit\":6,\"discountPercent\":1,\"discountEndDate\":\"2019-12-31\",\"discountSale\":1,\"discountStartDate\":\"2019-01-01\",\"discountCode\":\"turkey\"}"
 
   -- | scanItem for turkey with and without limited up sale percent discount
   -- >>> transactionTotal $ scanItem currentTransaction (getDiscount discountList) item
@@ -57,3 +63,11 @@ module TestLimitedUpSalePercentDiscount where
   -- 40.0
   -- >>> transactionTotal $ (!!3) $ iterate (\t -> scanItem t (getDiscount discountList) item) oldTransaction
   -- 60.0
+
+  -- | Serialization of Limited Up Sale Percent Discount
+  -- >>> encode discountTurkey
+  -- "{\"tag\":\"LimitedUpSalePercentDiscount\",\"discountBulk\":2,\"discountLimit\":6,\"discountPercent\":1,\"discountEndDate\":\"2019-12-31\",\"discountSale\":1,\"discountStartDate\":\"2019-01-01\",\"discountCode\":\"turkey\"}"
+
+  -- | Deserialization of Limited Up Sale Percent Discount
+  -- >>> case (decode $ fromString discountTurkeyJSON) :: Maybe Discount of Just discount -> discount; Nothing -> error "Invalid input"
+  -- LimitedUpSalePercentDiscount {discountCode = "turkey", discountStartDate = 2019-01-01, discountEndDate = 2019-12-31, discountBulk = 2, discountSale = 1, discountPercent = 1.0, discountLimit = 6}
