@@ -1,4 +1,11 @@
+
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DeriveGeneric #-}
+
 module Discount ( Discount (..), getTotal, isApplicable, isValidDiscount ) where
+
+  import Data.Aeson (FromJSON, ToJSON, withObject, parseJSON, (.:))
+  import GHC.Generics
 
   import Data.Time
   import Item
@@ -50,7 +57,7 @@ module Discount ( Discount (..), getTotal, isApplicable, isValidDiscount ) where
     discountSale :: Int,
     discountPrice :: Double,
     discountLimit :: Int
-  }
+  } deriving (Generic, Show)
 
   calculateStandard :: Discount -> [Item] -> Double
   calculateStandard discount []                               = 0
@@ -149,3 +156,7 @@ module Discount ( Discount (..), getTotal, isApplicable, isValidDiscount ) where
             hasSale                               = (discountSale discount) > 0
             hasPercent                            = (discountPercent discount) > 0.0 && (discountPercent discount) <= 1.0
             hasLimit                              = (discountLimit discount) > 0
+
+  instance ToJSON Discount where
+
+  instance FromJSON Discount where

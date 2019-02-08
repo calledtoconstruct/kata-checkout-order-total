@@ -1,4 +1,4 @@
-module ItemList ( ItemList, createItemList, getItem, load ) where
+module ItemList ( ItemList, createItemList, getItem, addItems, load ) where
 
   import Data.ByteString.Lazy.UTF8 (fromString)
   import Data.Aeson (decode)
