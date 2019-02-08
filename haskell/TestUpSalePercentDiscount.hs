@@ -1,5 +1,10 @@
+
+{-# LANGUAGE OverloadedStrings #-}
+
 module TestUpSalePercentDiscount where
 
+  import Data.Aeson (encode, decode)
+  import Data.ByteString.Lazy.UTF8 (fromString)
   import Data.Time
   import Discount
   import Item
@@ -34,6 +39,7 @@ module TestUpSalePercentDiscount where
   -- >>> item                       = head (getItem itemList "cat food")
   -- >>> currentTransaction         = createTransaction $ fromGregorian 2019 4 30
   -- >>> oldTransaction             = createTransaction $ fromGregorian 2018 4 30
+  -- >>> discountCatFoodJSON        = "{\"tag\":\"UpSalePercentDiscount\",\"discountBulk\":2,\"discountPercent\":0.5,\"discountEndDate\":\"2019-12-31\",\"discountSale\":1,\"discountStartDate\":\"2019-01-01\",\"discountCode\":\"cat food\"}"
 
   -- | scanItem for cat food with and without up sale percent discount
   -- >>> transactionTotal $ scanItem currentTransaction (getDiscount discountList) item
@@ -56,3 +62,11 @@ module TestUpSalePercentDiscount where
   -- 2.5
   -- >>> transactionTotal $ (!!3) $ iterate (\t -> scanItem t (getDiscount discountList) item) oldTransaction
   -- 3.75
+
+  -- | Serialization of Up Sale Percent Discount
+  -- >>> encode discountCatFood
+  -- "{\"tag\":\"UpSalePercentDiscount\",\"discountBulk\":2,\"discountPercent\":0.5,\"discountEndDate\":\"2019-12-31\",\"discountSale\":1,\"discountStartDate\":\"2019-01-01\",\"discountCode\":\"cat food\"}"
+
+  -- | Deserialization of Up Sale Percent Discount
+  -- >>> case (decode $ fromString discountCatFoodJSON) :: Maybe Discount of Just discount -> discount; Nothing -> error "Invalid input"
+  -- UpSalePercentDiscount {discountCode = "cat food", discountStartDate = 2019-01-01, discountEndDate = 2019-12-31, discountBulk = 2, discountSale = 1, discountPercent = 0.5}
