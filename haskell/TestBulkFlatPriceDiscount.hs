@@ -1,5 +1,10 @@
+
+{-# LANGUAGE OverloadedStrings #-}
+
 module TestBulkFlatPriceDiscount where
 
+  import Data.Aeson (encode, decode)
+  import Data.ByteString.Lazy.UTF8 (fromString)
   import Data.Time
   import Discount
   import Item
@@ -33,6 +38,7 @@ module TestBulkFlatPriceDiscount where
   -- >>> item                       = head $ getItem itemList "crisps"
   -- >>> currentTransaction         = createTransaction $ fromGregorian 2019 4 30
   -- >>> oldTransaction             = createTransaction $ fromGregorian 2018 4 30
+  -- >>> discountCrispsJSON         = "{\"tag\":\"BulkFlatPriceDiscount\",\"discountBulk\":3,\"discountPrice\":1,\"discountEndDate\":\"2019-12-31\",\"discountStartDate\":\"2019-01-01\",\"discountCode\":\"crisps\"}"
 
   -- | scanItem for crisps with and without bulk flat price discount
   -- >>> transactionTotal $ scanItem currentTransaction (getDiscount discountList) item
@@ -55,3 +61,11 @@ module TestBulkFlatPriceDiscount where
   -- 1.1
   -- >>> transactionTotal $ (!!3) $ iterate (\t -> scanItem t (getDiscount discountList) item) oldTransaction
   -- 1.65
+
+  -- | Serialization of Bulk Flat Price Discount
+  -- >>> encode discountCrisps
+  -- "{\"tag\":\"BulkFlatPriceDiscount\",\"discountBulk\":3,\"discountPrice\":1,\"discountEndDate\":\"2019-12-31\",\"discountStartDate\":\"2019-01-01\",\"discountCode\":\"crisps\"}"
+
+  -- | Deserialization of Bulk Flat Price Discount
+  -- >>> case (decode $ fromString discountCrispsJSON) :: Maybe Discount of Just discount -> discount; Nothing -> error "Invalid input"
+  -- BulkFlatPriceDiscount {discountCode = "crisps", discountStartDate = 2019-01-01, discountEndDate = 2019-12-31, discountBulk = 3, discountPrice = 1.0}
