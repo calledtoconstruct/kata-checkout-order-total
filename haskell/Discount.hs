@@ -14,7 +14,7 @@ module Discount ( Discount (..), getTotal, isApplicable, isValidDiscount ) where
     getTotal                :: Day -> [Item] -> discount -> Double
     isApplicable            :: discount -> Item -> Bool
     getCountOfMatchingItems :: discount -> [Item] -> Int
-    isValidDiscount         :: discount -> (String -> [Item]) -> Bool
+    isValidDiscount         :: discount -> (String -> IO [Item]) -> IO Bool
 
   data Discount = StandardDiscount {
     discountCode :: String,
@@ -140,15 +140,16 @@ module Discount ( Discount (..), getTotal, isApplicable, isValidDiscount ) where
             saleNotEnded                          = discountEndDate discount >= currentDate
     isApplicable discount item                  = itemCode item == discountCode discount
     getCountOfMatchingItems discount list       = length $ filter (isApplicable discount) list
-    isValidDiscount discount itemLookup         = case discount of
-      StandardDiscount{}                          -> hasCode && hasItem && hasStartDate && hasEndDate && hasPrice
-      BulkFlatPriceDiscount{}                     -> hasCode && hasItem && hasStartDate && hasEndDate && hasBulk && hasPrice
-      UpSalePercentDiscount{}                     -> hasCode && hasItem && hasStartDate && hasEndDate && hasBulk && hasSale && hasPercent
-      LimitedUpSalePercentDiscount{}              -> hasCode && hasItem && hasStartDate && hasEndDate && hasBulk && hasSale && hasPercent && hasLimit
-      UpSaleFlatPriceDiscount{}                   -> hasCode && hasItem && hasStartDate && hasEndDate && hasBulk && hasSale && hasPrice
-      LimitedUpSaleFlatPriceDiscount{}            -> hasCode && hasItem && hasStartDate && hasEndDate && hasBulk && hasSale && hasPrice && hasLimit
-      where hasCode                               = length (discountCode discount) > 0
-            hasItem                               = length (itemLookup (discountCode discount)) == 1
+    isValidDiscount discount itemLookup         = do
+      hasItem <- referencesItem discount itemLookup
+      return $ case discount of
+        StandardDiscount{}                          -> hasCode && hasItem && hasStartDate && hasEndDate && hasPrice
+        BulkFlatPriceDiscount{}                     -> hasCode && hasItem && hasStartDate && hasEndDate && hasBulk && hasPrice
+        UpSalePercentDiscount{}                     -> hasCode && hasItem && hasStartDate && hasEndDate && hasBulk && hasSale && hasPercent
+        LimitedUpSalePercentDiscount{}              -> hasCode && hasItem && hasStartDate && hasEndDate && hasBulk && hasSale && hasPercent && hasLimit
+        UpSaleFlatPriceDiscount{}                   -> hasCode && hasItem && hasStartDate && hasEndDate && hasBulk && hasSale && hasPrice
+        LimitedUpSaleFlatPriceDiscount{}            -> hasCode && hasItem && hasStartDate && hasEndDate && hasBulk && hasSale && hasPrice && hasLimit
+      where hasCode                               = not $ null $ discountCode discount
             hasStartDate                          = True
             hasEndDate                            = True
             hasPrice                              = (discountPrice discount) > 0.0
@@ -156,6 +157,10 @@ module Discount ( Discount (..), getTotal, isApplicable, isValidDiscount ) where
             hasSale                               = (discountSale discount) > 0
             hasPercent                            = (discountPercent discount) > 0.0 && (discountPercent discount) <= 1.0
             hasLimit                              = (discountLimit discount) > 0
+
+  referencesItem discount itemLookup          = do
+    items <- itemLookup $ discountCode discount
+    return $ (==) 1 $ length items
 
   instance ToJSON Discount where
 

@@ -10,9 +10,9 @@ module ItemList ( ItemList, createItemList, getItem, addItems, loadItems ) where
   }
 
   class ItemListClass itemList where
-    getItem         :: itemList -> String -> [Item]
-    addItem         :: itemList -> Item -> ItemList
-    addItems        :: itemList -> [Item] -> ItemList
+    getItem         :: itemList -> String -> IO [Item]
+    addItem         :: itemList -> Item -> itemList
+    addItems        :: itemList -> [Item] -> itemList
 
   createItemList :: ItemList
   createItemList              = ItemList { items = [] }
@@ -22,7 +22,7 @@ module ItemList ( ItemList, createItemList, getItem, addItems, loadItems ) where
 
   instance ItemListClass ItemList where
 
-    getItem itemList code     = filter (sameCode code) $ items itemList
+    getItem itemList code     = return $ filter (sameCode code) $ items itemList
 
     addItem itemList item
       | isValidItem item      = ItemList { items = item: items itemList }

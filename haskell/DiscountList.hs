@@ -12,8 +12,8 @@ module DiscountList ( DiscountList, createDiscountList, getDiscount, addDiscount
 
   class DiscountListClass discountList where
     getDiscount       :: discountList -> String -> [Discount]
-    addDiscount       :: discountList -> (String -> [Item]) -> Discount -> DiscountList
-    addDiscounts      :: discountList -> (String -> [Item]) -> [Discount] -> DiscountList
+    addDiscount       :: discountList -> (String -> IO [Item]) -> Discount -> IO DiscountList
+    addDiscounts      :: discountList -> (String -> IO [Item]) -> [Discount] -> IO DiscountList
 
   createDiscountList :: DiscountList
   createDiscountList                            = DiscountList { discounts = [] }
@@ -25,17 +25,21 @@ module DiscountList ( DiscountList, createDiscountList, getDiscount, addDiscount
 
     getDiscount discountList code               = filter (sameCode code) (discounts discountList)
 
-    addDiscount discountList itemLookup discount
-      | isValidDiscount discount itemLookup     = DiscountList { discounts = discount: discounts discountList }
-      | otherwise                               = discountList
+    addDiscount discountList itemLookup discount = do
+      valid <- isValidDiscount discount itemLookup
+      return $ case valid of
+        True -> DiscountList { discounts = discount: discounts discountList }
+        False -> discountList
 
-    addDiscounts discountList _ []              = discountList
-    addDiscounts discountList itemLookup (discount: remaining)
-      | isValidDiscount discount itemLookup     = addDiscounts nextList itemLookup remaining
-      | otherwise                               = addDiscounts discountList itemLookup remaining
+    addDiscounts discountList _ []              = return discountList
+    addDiscounts discountList itemLookup (discount: remaining) = do
+      valid <- isValidDiscount discount itemLookup
+      case valid of
+        True -> addDiscounts nextList itemLookup remaining
+        False -> addDiscounts discountList itemLookup remaining
       where nextList                              = DiscountList { discounts = discount: discounts discountList }
 
-  loadDiscount :: Handle -> (String -> [Item]) -> IO DiscountList -> IO DiscountList
+  loadDiscount :: Handle -> (String -> IO [Item]) -> IO DiscountList -> IO DiscountList
   loadDiscount handle itemLookup discountList = do
     eof <- hIsEOF handle
     updated <- case eof of
@@ -44,7 +48,7 @@ module DiscountList ( DiscountList, createDiscountList, getDiscount, addDiscount
         updated <- case (decode $ fromString line) :: Maybe Discount of
           Just discount -> do
             dl <- discountList
-            loadDiscount handle itemLookup $ pure $ addDiscount dl itemLookup discount
+            loadDiscount handle itemLookup $ addDiscount dl itemLookup discount
           Nothing -> do
             hClose handle
             discountList
@@ -54,7 +58,7 @@ module DiscountList ( DiscountList, createDiscountList, getDiscount, addDiscount
         discountList
     return updated
 
-  loadDiscounts :: (String -> [Item]) -> String -> IO DiscountList -> IO DiscountList
+  loadDiscounts :: (String -> IO [Item]) -> String -> IO DiscountList -> IO DiscountList
   loadDiscounts itemLookup fileName discountList = do
     handle <- openFile fileName ReadMode
     loadDiscount handle itemLookup discountList

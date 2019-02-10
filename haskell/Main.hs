@@ -4,7 +4,7 @@ module Main where
   import Discount
   import Item
   import Transaction
-  import ItemList
+  import ItemListClient
   import DiscountList
 
   add :: DiscountList -> ItemList -> TransactionType -> [Item] -> IO Double
@@ -22,7 +22,9 @@ module Main where
     waitForScan discountList itemList transaction nextCode
 
   scan :: DiscountList -> ItemList -> TransactionType -> String -> IO Double
-  scan discountList itemList transaction code         = add discountList itemList transaction (getItem itemList code)
+  scan discountList itemList transaction code         = do
+    item <- getItem itemList code
+    add discountList itemList transaction item
 
   waitForScan :: DiscountList -> ItemList -> TransactionType -> String -> IO Double
   waitForScan discountList itemList transaction code  = case code of
@@ -31,17 +33,13 @@ module Main where
 
   console :: DiscountList -> ItemList -> IO ()
   console discountList itemList
-    | invalidDiscount   = print "Invalid Discount"
-    | invalidItem       = print "Invalid Item"
     | otherwise         = do
       total               <- prompt discountList itemList transaction
       putStr "Total: " *> print total
-    where invalidDiscount = any (==False) $ flip isValidDiscount (getItem itemList) <$> (transactionDiscounts transaction)
-          invalidItem     = any (==False) $ isValidItem <$> transactionItems transaction
-          transaction     = createTransaction $ fromGregorian 2019 4 30
+    where transaction     = createTransaction $ fromGregorian 2019 4 30
 
   main :: IO ()
   main = do
-    itemList            <- loadItems "./Items.json" $ pure createItemList
+    let itemList        = createItemList
     discountList        <- loadDiscounts (getItem itemList) "./Discounts.json" $ pure createDiscountList
     console discountList itemList

@@ -4,6 +4,7 @@
 
 module ItemAPI where
 
+  import Control.Monad.Trans
   import Network.HTTP.Types.Status
   import Network.Wai.Middleware.Cors
   import Web.Scotty
@@ -17,8 +18,9 @@ module ItemAPI where
     scotty 8082 $ do
       middleware simpleCors
       get "/item/:code" $ do
-        code <- param "code"
-        let items = getItem itemList code
-        case items of
+        requestedCode <- param "code"
+        foundItems <- liftIO $ getItem itemList requestedCode
+        case foundItems of
           []      -> status status404 *> text "Not Found"
           [item]  -> json item
+          list    -> status status500 *> text "Non-unique Code"
