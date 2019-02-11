@@ -4,6 +4,7 @@
 
 module DiscountAPI where
 
+  import Control.Monad.Trans
   import Network.HTTP.Types.Status
   import Network.Wai.Middleware.Cors
   import Web.Scotty
@@ -20,7 +21,7 @@ module DiscountAPI where
       middleware simpleCors
       get "/discount/:code" $ do
         code <- param "code"
-        let discounts = getDiscount discountList code
+        discounts <- liftIO $ getDiscount discountList code
         case discounts of
           []          -> status status404 *> text "Not Found"
           [discount]  -> json discount

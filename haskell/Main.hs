@@ -5,14 +5,14 @@ module Main where
   import Item
   import Transaction
   import ItemListClient
-  import DiscountList
+  import DiscountListClient
 
   add :: DiscountList -> ItemList -> TransactionType -> [Item] -> IO Double
   add discountList itemList transaction []            = do
     putStrLn "Item not found!"
     prompt discountList itemList transaction
   add discountList itemList transaction [item]        = do
-    let nextTransaction = scanItem transaction (getDiscount discountList) item
+    nextTransaction <- scanItem transaction (getDiscount discountList) item
     putStrLn $ show $ transactionTotal nextTransaction
     prompt discountList itemList nextTransaction
 
@@ -41,5 +41,5 @@ module Main where
   main :: IO ()
   main = do
     let itemList        = createItemList
-    discountList        <- loadDiscounts (getItem itemList) "./Discounts.json" $ pure createDiscountList
+    let discountList    = createDiscountList
     console discountList itemList

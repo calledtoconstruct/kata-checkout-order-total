@@ -1,5 +1,6 @@
 module Transaction ( TransactionType (transactionDiscounts, transactionItems), createTransaction, transactionTotal, scanItem ) where
 
+  import Control.Monad.Trans
   import Data.Time
   import Discount
   import Item
@@ -24,7 +25,7 @@ module Transaction ( TransactionType (transactionDiscounts, transactionItems), c
     discountTotal         :: transaction -> Double
     nonDiscountTotal      :: transaction -> Double
     transactionTotal      :: transaction -> Double
-    scanItem              :: transaction -> (String -> [Discount]) -> Item -> TransactionType
+    scanItem              :: transaction -> (String -> IO [Discount]) -> Item -> IO TransactionType
 
   sameCode :: Item -> Discount -> Bool
   sameCode item discount = discountCode discount == itemCode item
@@ -39,16 +40,20 @@ module Transaction ( TransactionType (transactionDiscounts, transactionItems), c
     transactionTotal transaction              = (fromIntegral $ floor $ 100 * total) / 100
       where total                               = discountTotal transaction + nonDiscountTotal transaction
       
-    scanItem transaction discountLookup item  = nextTransaction
-      where nextTransaction                     = StandardTransaction {
-              transactionDiscounts                = discounts,
-              transactionItems                    = item: transactionItems transaction,
-              transactionDate                     = transactionDate transaction
-            }
-            found                               = discountLookup $ itemCode item
-            discounts
-              | length matching == 1              = existing
-              | length found == 1                 = (head found): existing
-              | otherwise                         = existing
-            existing                            = transactionDiscounts transaction
+    scanItem transaction discountLookup item  = do
+      discounts <- case length matching of
+        1 -> return existing
+        otherwise -> do
+          found <- discountLookup $ itemCode item
+          case length found of
+            1 -> do
+              let single = head found
+              return $ single: existing
+            otherwise -> return existing
+      return $ StandardTransaction {
+        transactionDiscounts                = discounts,
+        transactionItems                    = item: transactionItems transaction,
+        transactionDate                     = transactionDate transaction
+      }
+      where existing                            = transactionDiscounts transaction
             matching                            = filter (sameCode item) existing

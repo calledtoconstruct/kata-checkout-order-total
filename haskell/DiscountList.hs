@@ -11,7 +11,7 @@ module DiscountList ( DiscountList, createDiscountList, getDiscount, addDiscount
   }
 
   class DiscountListClass discountList where
-    getDiscount       :: discountList -> String -> [Discount]
+    getDiscount       :: discountList -> String -> IO [Discount]
     addDiscount       :: discountList -> (String -> IO [Item]) -> Discount -> IO DiscountList
     addDiscounts      :: discountList -> (String -> IO [Item]) -> [Discount] -> IO DiscountList
 
@@ -23,7 +23,7 @@ module DiscountList ( DiscountList, createDiscountList, getDiscount, addDiscount
 
   instance DiscountListClass DiscountList where
 
-    getDiscount discountList code               = filter (sameCode code) (discounts discountList)
+    getDiscount discountList code               = return $ filter (sameCode code) (discounts discountList)
 
     addDiscount discountList itemLookup discount = do
       valid <- isValidDiscount discount itemLookup
