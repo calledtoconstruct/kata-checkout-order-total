@@ -35,19 +35,19 @@ module ItemList ( ItemList, createItemList, getItem, addItems, loadItems ) where
       where nextList            = ItemList { items = item: items itemList }
 
   loadItem :: Handle -> IO ItemList -> IO ItemList
-  loadItem handle itemList = do
+  loadItem handle itemList    = do
     eof <- hIsEOF handle
     updated <- case eof of
-      False -> do
+      False                     -> do
         line <- hGetLine handle
         updated <- case (decode $ fromString line) :: Maybe Item of
-          Just item -> do
+          Just item               -> do
             loadItem handle $ pure . flip addItem item =<< itemList
-          Nothing -> do
+          Nothing                 -> do
             hClose handle
             itemList
         return updated
-      True -> do
+      True                      -> do
         hClose handle
         itemList
     return updated

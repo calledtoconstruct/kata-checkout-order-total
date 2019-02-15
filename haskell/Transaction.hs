@@ -34,7 +34,7 @@ module Transaction ( TransactionType (transactionDiscounts, transactionItems), c
 
     discountTotal transaction                 = sum $ getTotal (transactionDate transaction) (transactionItems transaction) <$> (transactionDiscounts transaction)
 
-    nonDiscountTotal transaction              = sum $ itemPrice <$> full_price_items
+    nonDiscountTotal transaction              = sum $ itemTotal <$> full_price_items
       where full_price_items                    = filter (isItemCoveredByDiscount $ transactionDiscounts transaction) $ transactionItems transaction
 
     transactionTotal transaction              = (fromIntegral $ floor $ 100 * total) / 100

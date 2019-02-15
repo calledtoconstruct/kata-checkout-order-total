@@ -1,5 +1,6 @@
 module Main where
 
+  import Control.Monad.Trans
   import Data.Time
   import Discount
   import Item
@@ -7,19 +8,31 @@ module Main where
   import ItemListClient
   import DiscountListClient
 
-  add :: DiscountList -> ItemList -> TransactionType -> [Item] -> IO Double
-  add discountList itemList transaction []            = do
-    putStrLn "Item not found!"
-    prompt discountList itemList transaction
-  add discountList itemList transaction [item]        = do
+  addItem :: DiscountList -> ItemList -> TransactionType -> Item -> IO Double
+  addItem discountList itemList transaction item      = do
     nextTransaction <- scanItem transaction (getDiscount discountList) item
     putStrLn $ show $ transactionTotal nextTransaction
     prompt discountList itemList nextTransaction
 
-  prompt :: DiscountList -> ItemList -> TransactionType -> IO Double
-  prompt discountList itemList transaction            = do
-    nextCode <- putStr "Enter a product code: " *> getLine
-    waitForScan discountList itemList transaction nextCode
+  add :: DiscountList -> ItemList -> TransactionType -> [Item] -> IO Double
+  add discountList itemList transaction []            = do
+    putStrLn "Item not found!"
+    prompt discountList itemList transaction
+  add discountList itemList transaction [item]        = case item of
+    ByWeightItem{}      -> case (itemWeight item) of
+      Nothing             -> do
+        weightString <- putStr "Enter weight: " *> getLine
+        let weight        = read weightString :: Double
+        let weightedItem  = ByWeightItem {
+          itemCode          = itemCode item,
+          itemDescription   = itemDescription item,
+          itemPrice         = itemPrice item,
+          itemType          = "by weight",
+          itemWeight        = Just weight
+        }
+        addItem discountList itemList transaction weightedItem
+      Just weight         -> addItem discountList itemList transaction item
+    ByQuantityItem{}    -> addItem discountList itemList transaction item
 
   scan :: DiscountList -> ItemList -> TransactionType -> String -> IO Double
   scan discountList itemList transaction code         = do
@@ -31,15 +44,19 @@ module Main where
     "done"              -> return $ transactionTotal transaction
     otherwise           -> scan discountList itemList transaction code
 
+  prompt :: DiscountList -> ItemList -> TransactionType -> IO Double
+  prompt discountList itemList transaction            = do
+    nextCode <- putStr "Enter a product code: " *> getLine
+    waitForScan discountList itemList transaction nextCode
+
   console :: DiscountList -> ItemList -> IO ()
-  console discountList itemList
-    | otherwise         = do
-      total               <- prompt discountList itemList transaction
+  console discountList itemList                       = do
+      total <- prompt discountList itemList transaction
       putStr "Total: " *> print total
-    where transaction     = createTransaction $ fromGregorian 2019 4 30
+    where transaction   = createTransaction $ fromGregorian 2019 4 30
 
   main :: IO ()
-  main = do
+  main                                                = do
     let itemList        = createItemList
     let discountList    = createDiscountList
     console discountList itemList
