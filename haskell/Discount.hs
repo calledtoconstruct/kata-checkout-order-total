@@ -4,10 +4,10 @@
 
 module Discount ( Discount (..), getTotal, isApplicable, isValidDiscount ) where
 
-  import Data.Aeson (FromJSON, ToJSON, withObject, parseJSON, (.:))
+  import Data.Aeson (FromJSON, ToJSON)
   import GHC.Generics
-
   import Data.Time
+  import Data.Sort
   import Item
 
   class DiscountClass discount where
@@ -57,6 +57,13 @@ module Discount ( Discount (..), getTotal, isApplicable, isValidDiscount ) where
     discountSale :: Int,
     discountPrice :: Double,
     discountLimit :: Int
+  } | UpSalePercentDiscountByWeight {
+    discountCode :: String,
+    discountStartDate :: Day,
+    discountEndDate :: Day,
+    discountBulk :: Int,
+    discountSale :: Int,
+    discountPercent :: Double
   } deriving (Generic, Show)
 
   calculateStandard :: Discount -> [Item] -> Double
@@ -123,6 +130,14 @@ module Discount ( Discount (..), getTotal, isApplicable, isValidDiscount ) where
           bundles             = fromIntegral $ div under bundle_quantity
           item_quantity       = getCountOfMatchingItems discount list
 
+  calculateUpSalePercentDiscountByWeight :: Discount -> [Item] -> Double
+  calculateUpSalePercentDiscountByWeight discount []          = 0
+  calculateUpSalePercentDiscountByWeight discount list        = sum costs
+    where pattern_start       = replicate (discountBulk discount) 1
+          pattern_end         = replicate (discountSale discount) (discountPercent discount) 
+          totals              = reverse . sort $ itemTotal <$> list
+          costs               = map (uncurry (*)) $ zip totals $ cycle $ pattern_start ++ pattern_end
+
   instance DiscountClass Discount where
     getTotal _ [] _                             = 0
     getTotal currentDate list@(item: items) discount
@@ -133,6 +148,7 @@ module Discount ( Discount (..), getTotal, isApplicable, isValidDiscount ) where
         LimitedUpSalePercentDiscount{}            -> calculateLimitedUpSalePercent discount list
         UpSaleFlatPriceDiscount{}                 -> calculateUpSaleFlatPrice discount list
         LimitedUpSaleFlatPriceDiscount{}          -> calculateLimitedUpSaleFlatPrice discount list
+        UpSalePercentDiscountByWeight{}           -> calculateUpSalePercentDiscountByWeight discount list
       | sameCode                                = (itemPrice item) + getTotal currentDate items discount
       | otherwise                               = getTotal currentDate items discount
       where sameCode                              = itemCode item == discountCode discount
@@ -141,14 +157,19 @@ module Discount ( Discount (..), getTotal, isApplicable, isValidDiscount ) where
     isApplicable discount item                  = itemCode item == discountCode discount
     getCountOfMatchingItems discount list       = length $ filter (isApplicable discount) list
     isValidDiscount discount itemLookup         = do
-      hasItem <- referencesItem discount itemLookup
+      items <- itemLookup $ discountCode discount
+      let hasItem = 1 == length items
+      let item = head items
+      let hasByQuantityItem = isByQuantityItem item
+      let hasByWeightItem = isByWeightItem item
       return $ case discount of
-        StandardDiscount{}                          -> hasCode && hasItem && hasStartDate && hasEndDate && hasPrice
-        BulkFlatPriceDiscount{}                     -> hasCode && hasItem && hasStartDate && hasEndDate && hasBulk && hasPrice
-        UpSalePercentDiscount{}                     -> hasCode && hasItem && hasStartDate && hasEndDate && hasBulk && hasSale && hasPercent
-        LimitedUpSalePercentDiscount{}              -> hasCode && hasItem && hasStartDate && hasEndDate && hasBulk && hasSale && hasPercent && hasLimit
-        UpSaleFlatPriceDiscount{}                   -> hasCode && hasItem && hasStartDate && hasEndDate && hasBulk && hasSale && hasPrice
-        LimitedUpSaleFlatPriceDiscount{}            -> hasCode && hasItem && hasStartDate && hasEndDate && hasBulk && hasSale && hasPrice && hasLimit
+        StandardDiscount{}                          -> hasCode && hasItem && hasByQuantityItem && hasStartDate && hasEndDate && hasPrice
+        BulkFlatPriceDiscount{}                     -> hasCode && hasItem && hasByQuantityItem && hasStartDate && hasEndDate && hasBulk && hasPrice
+        UpSalePercentDiscount{}                     -> hasCode && hasItem && hasByQuantityItem && hasStartDate && hasEndDate && hasBulk && hasSale && hasPercent
+        LimitedUpSalePercentDiscount{}              -> hasCode && hasItem && hasByQuantityItem && hasStartDate && hasEndDate && hasBulk && hasSale && hasPercent && hasLimit
+        UpSaleFlatPriceDiscount{}                   -> hasCode && hasItem && hasByQuantityItem && hasStartDate && hasEndDate && hasBulk && hasSale && hasPrice
+        LimitedUpSaleFlatPriceDiscount{}            -> hasCode && hasItem && hasByQuantityItem && hasStartDate && hasEndDate && hasBulk && hasSale && hasPrice && hasLimit
+        UpSalePercentDiscountByWeight{}             -> hasCode && hasItem && hasByWeightItem && hasStartDate && hasEndDate && hasBulk && hasSale && hasPercent
       where hasCode                               = not $ null $ discountCode discount
             hasStartDate                          = True
             hasEndDate                            = True
@@ -157,10 +178,6 @@ module Discount ( Discount (..), getTotal, isApplicable, isValidDiscount ) where
             hasSale                               = (discountSale discount) > 0
             hasPercent                            = (discountPercent discount) > 0.0 && (discountPercent discount) <= 1.0
             hasLimit                              = (discountLimit discount) > 0
-
-  referencesItem discount itemLookup          = do
-    items <- itemLookup $ discountCode discount
-    return $ (==) 1 $ length items
 
   instance ToJSON Discount where
 
