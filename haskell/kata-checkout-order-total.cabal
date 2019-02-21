@@ -22,6 +22,9 @@ executable kata-checkout-order-total
   -- other-extensions:
   build-depends:        base >=4.9 && <4.10,
                         time,
-                        aeson >=1.2
+                        aeson >=1.2,
+                        http-client,
+                        sort,
+                        mtl
   -- hs-source-dirs:
   default-language:     Haskell2010
