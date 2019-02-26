@@ -1,7 +1,6 @@
 import { ItemList, ItemType, Item, Priced } from './item';
 import { DateRange } from './date';
 import { Currency } from './currency';
-import { Typed, TypeFactory } from './typed';
 
 export interface DiscountList {
     add(discount: Discount): Promise<void>;
@@ -18,6 +17,7 @@ export class DiscountItem {
 }
 
 export interface Discount {
+    readonly tag: string;
     readonly discountStartDate: Date;
     readonly discountEndDate: Date;
     readonly discountCode: string;
@@ -56,6 +56,8 @@ const validateItemDateRange: (discount: Discount) => void = (discount: Discount)
 
 export class StandardDiscount implements Discount {
     private static typeName: string = "StandardDiscount";
+
+    public readonly tag: string = StandardDiscount.typeName;
 
     constructor(
         public readonly discountStartDate: Date,
@@ -109,6 +111,8 @@ const sumItems: (items: Array<DiscountItem>) => ItemSummary = (items: Array<Disc
 
 export class BulkFlatPriceDiscount implements Discount {
     private static typeName: string = "BulkFlatPriceDiscount";
+
+    public readonly tag: string = BulkFlatPriceDiscount.typeName;
 
     constructor(
         public readonly discountStartDate: Date,
@@ -195,13 +199,17 @@ const validateWholeNumberSaleQuantity: (upSale: UpSale) => void = (upSale: UpSal
 
 abstract class UpSaleDiscount implements Discount, UpSale {
 
+    public readonly tag: string;
+
     constructor(
         public readonly discountStartDate: Date,
         public readonly discountEndDate: Date,
         public readonly discountCode: string,
         public readonly discountBulk: number,
-        public readonly discountSale: number
-    ) { }
+        public readonly discountSale: number,
+    ) {
+        this.tag = this.getTypeName();
+    }
 
     public abstract getTypeName(): string;
 
@@ -474,54 +482,91 @@ export class DiscountListImplementation implements DiscountList {
 
 }
 
-export class DiscountTypeFactory implements TypeFactory<Discount> {
-    private readonly discounts: any = {
-        StandardDiscount: (from: Discount): Discount => {
-            const source: StandardDiscount = <StandardDiscount>from;
-            return new StandardDiscount(source.discountStartDate, source.discountEndDate, source.discountCode, source.discountPrice);
-        },
-        BulkFlatPriceDiscount: (from: Discount): Discount => {
-            const source: BulkFlatPriceDiscount = <BulkFlatPriceDiscount>from;
-            return new BulkFlatPriceDiscount(source.discountStartDate, source.discountEndDate, source.discountCode, source.discountBulk, source.discountPrice);
-        },
-        UpSalePercentDiscount: (from: Discount): Discount => {
-            const source: UpSalePercentDiscount = <UpSalePercentDiscount>from;
-            return new UpSalePercentDiscount(source.discountStartDate, source.discountEndDate, source.discountCode, source.discountBulk, source.discountSale, source.discountPercent);
-        },
-        LimitedUpSalePercentDiscount: (from: Discount): Discount => {
-            const source: LimitedUpSalePercentDiscount = <LimitedUpSalePercentDiscount>from;
-            return new LimitedUpSalePercentDiscount(source.discountStartDate, source.discountEndDate, source.discountCode, source.discountBulk, source.discountSale, source.discountPercent, source.discountLimit);
-        },
-        UpSaleFlatPriceDiscount: (from: Discount): Discount => {
-            const source: UpSaleFlatPriceDiscount = <UpSaleFlatPriceDiscount>from;
-            return new UpSaleFlatPriceDiscount(source.discountStartDate, source.discountEndDate, source.discountCode, source.discountBulk, source.discountSale, source.discountPrice);
-        },
-        LimitedUpSaleFlatPriceDiscount: (from: Discount): Discount => {
-            const source: LimitedUpSaleFlatPriceDiscount = <LimitedUpSaleFlatPriceDiscount>from;
-            return new LimitedUpSaleFlatPriceDiscount(source.discountStartDate, source.discountEndDate, source.discountCode, source.discountBulk, source.discountSale, source.discountPrice, source.discountLimit);
-        },
-        UpSalePercentDiscountByWeight: (from: Discount): Discount => {
-            const source: UpSalePercentDiscountByWeight = <UpSalePercentDiscountByWeight>from;
-            return new UpSalePercentDiscountByWeight(source.discountStartDate, source.discountEndDate, source.discountCode, source.discountBulk, source.discountSale, source.discountPercent);
+export class DiscountTypeFactory {
+
+    private static readonly map = new Array<[string, (tagged: Discount) => Discount]>(
+        ['StandardDiscount', (tagged: Discount): Discount => {
+            let standardDiscount: StandardDiscount = <StandardDiscount>tagged;
+            return new StandardDiscount(
+                standardDiscount.discountStartDate,
+                standardDiscount.discountEndDate,
+                standardDiscount.discountCode,
+                standardDiscount.discountPrice
+            );
+        }], ['BulkFlatPriceDiscount', (tagged: Discount): Discount => {
+            let bulkFlatPriceDiscount: BulkFlatPriceDiscount = <BulkFlatPriceDiscount>tagged;
+            return new BulkFlatPriceDiscount(
+                bulkFlatPriceDiscount.discountStartDate,
+                bulkFlatPriceDiscount.discountEndDate,
+                bulkFlatPriceDiscount.discountCode,
+                bulkFlatPriceDiscount.discountBulk,
+                bulkFlatPriceDiscount.discountPrice
+            );
+        }], ['UpSaleFlatPriceDiscount', (tagged: Discount): Discount => {
+            let upSaleFlatPriceDiscount: UpSaleFlatPriceDiscount = <UpSaleFlatPriceDiscount>tagged;
+            return new UpSaleFlatPriceDiscount(
+                upSaleFlatPriceDiscount.discountStartDate,
+                upSaleFlatPriceDiscount.discountEndDate,
+                upSaleFlatPriceDiscount.discountCode,
+                upSaleFlatPriceDiscount.discountBulk,
+                upSaleFlatPriceDiscount.discountSale,
+                upSaleFlatPriceDiscount.discountPrice
+            );
+        }], ['UpSalePercentDiscount', (tagged: Discount): Discount => {
+            let upSalePercentDiscount: UpSalePercentDiscount = <UpSalePercentDiscount>tagged;
+            return new UpSalePercentDiscount(
+                upSalePercentDiscount.discountStartDate,
+                upSalePercentDiscount.discountEndDate,
+                upSalePercentDiscount.discountCode,
+                upSalePercentDiscount.discountBulk,
+                upSalePercentDiscount.discountSale,
+                upSalePercentDiscount.discountPercent
+            );
+        }], ['UpSalePercentDiscountByWeight', (tagged: Discount): Discount => {
+            let upSalePercentDiscountByWeight: UpSalePercentDiscountByWeight = <UpSalePercentDiscountByWeight>tagged;
+            return new UpSalePercentDiscountByWeight(
+                upSalePercentDiscountByWeight.discountStartDate,
+                upSalePercentDiscountByWeight.discountEndDate,
+                upSalePercentDiscountByWeight.discountCode,
+                upSalePercentDiscountByWeight.discountBulk,
+                upSalePercentDiscountByWeight.discountSale,
+                upSalePercentDiscountByWeight.discountPercent
+            );
+        }], ['LimitedUpSalePercentDiscount', (tagged: Discount): Discount => {
+            let limitedUpSalePercentDiscount: LimitedUpSalePercentDiscount = <LimitedUpSalePercentDiscount>tagged;
+            return new LimitedUpSalePercentDiscount(
+                limitedUpSalePercentDiscount.discountStartDate,
+                limitedUpSalePercentDiscount.discountEndDate,
+                limitedUpSalePercentDiscount.discountCode,
+                limitedUpSalePercentDiscount.discountBulk,
+                limitedUpSalePercentDiscount.discountSale,
+                limitedUpSalePercentDiscount.discountPercent,
+                limitedUpSalePercentDiscount.discountLimit
+            );
+        }], ['LimitedUpSaleFlatPriceDiscount', (tagged: Discount): Discount => {
+            let limitedUpSaleFlatPriceDiscount: LimitedUpSaleFlatPriceDiscount = <LimitedUpSaleFlatPriceDiscount>tagged;
+            return new LimitedUpSaleFlatPriceDiscount(
+                limitedUpSaleFlatPriceDiscount.discountStartDate,
+                limitedUpSaleFlatPriceDiscount.discountEndDate,
+                limitedUpSaleFlatPriceDiscount.discountCode,
+                limitedUpSaleFlatPriceDiscount.discountBulk,
+                limitedUpSaleFlatPriceDiscount.discountSale,
+                limitedUpSaleFlatPriceDiscount.discountPrice,
+                limitedUpSaleFlatPriceDiscount.discountLimit
+            );
+        }]
+    );
+
+    public get(tagged: Discount): Discount {
+        let output: Discount | null = null;
+        DiscountTypeFactory.map.forEach(element => {
+            if (element[0] === tagged.tag) {
+                output = element[1](tagged);
+            }
+        });
+        if (output == null) {
+            throw Error('Failed while attempting to deserialize a Discount object.');
         }
-    };
-
-    public type(instance: Discount): Typed<Discount> {
-        const name: string = instance.getTypeName();
-        this.get(name);
-        return new Typed<Discount>(name, instance);
-    }
-
-    public make(from: Typed<Discount>): Discount {
-        const factory: (from: Discount) => Discount = this.get(from.type);
-        return factory(from.thing);
-    }
-
-    private get(name: string): (from: Discount) => Discount {
-        const factory: (from: Discount) => Discount = this.discounts[name];
-        if (factory === undefined) {
-            throw new Error(`Type ${name} is not buildable.`);
-        }
-        return factory;
+        return output;
     }
 }

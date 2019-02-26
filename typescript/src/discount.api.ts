@@ -2,10 +2,9 @@
 import * as express from 'express';
 import * as cors from 'cors';
 import * as env from './env';
-import { DiscountListImplementation, DiscountList, Discount, StandardDiscount, UpSalePercentDiscountByWeight, DiscountTypeFactory } from './discount';
+import { DiscountListImplementation, DiscountList, Discount, StandardDiscount, UpSalePercentDiscountByWeight } from './discount';
 import { ItemList } from './item';
 import { ItemListClient } from './item.list.client';
-import { TypeFactory, Typed } from './typed';
 
 const application = express();
 const port: number = env.DISCOUNT_API_PORT;
@@ -14,7 +13,6 @@ application.use(cors());
 
 const itemList: ItemList = new ItemListClient();
 const discountList: DiscountList = new DiscountListImplementation(itemList);
-const typeFactory: TypeFactory<Discount> = new DiscountTypeFactory();
 
 const startDate: Date = new Date(new Date().valueOf() - 10);
 const endDate: Date = new Date(new Date().valueOf() + 10);
@@ -44,8 +42,7 @@ application.get('/discount/:date/:code', async (request: express.Request, respon
     try {
         const discount: Discount | undefined = await discountList.get(date, code);
         if (discount !== undefined) {
-            const typed: Typed<Discount> = typeFactory.type(discount);
-            response.jsonp(typed);
+            response.jsonp(discount);
         } else {
             response.sendStatus(404);
         }

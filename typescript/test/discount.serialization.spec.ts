@@ -1,8 +1,17 @@
 import { TestScenario, Parameterized } from "./parameterized";
-import { Discount, StandardDiscount, DiscountTypeFactory, BulkFlatPriceDiscount, UpSalePercentDiscount, LimitedUpSalePercentDiscount, UpSaleFlatPriceDiscount, LimitedUpSaleFlatPriceDiscount, UpSalePercentDiscountByWeight } from "../src/discount";
-import { Typed, TypeFactory } from "../src/typed";
+import {
+    Discount,
+    StandardDiscount,
+    BulkFlatPriceDiscount,
+    UpSalePercentDiscount,
+    LimitedUpSalePercentDiscount,
+    UpSaleFlatPriceDiscount,
+    LimitedUpSaleFlatPriceDiscount,
+    UpSalePercentDiscountByWeight,
+    DiscountTypeFactory
+} from "../src/discount";
 
-export class TestDiscountTypeFactory {
+export class TestDiscountSerialization {
 
     public static scenarios(): void {
 
@@ -18,13 +27,12 @@ export class TestDiscountTypeFactory {
 
         describe('Given the discount type factory', () => {
 
-            const discountTypeFactory: TypeFactory<Discount> = new DiscountTypeFactory();
+            const typeFactory = new DiscountTypeFactory();
 
             serializationScenarios.forEach().describe('when serializing', (scenario: TestScenario<DiscountSerializationScenario>) => {
 
                 const description: string = scenario.description;
-                const typed: Typed<Discount> = discountTypeFactory.type(scenario.target.instance);
-                const output: string = JSON.stringify(typed);
+                const output: string = JSON.stringify(scenario.target.instance);
 
                 describe(description, () => {
 
@@ -39,8 +47,8 @@ export class TestDiscountTypeFactory {
             serializationScenarios.forEach().describe('when deserializing', (scenario: TestScenario<DiscountSerializationScenario>) => {
 
                 const description: string = scenario.description;
-                const typed: Typed<Discount> = JSON.parse(scenario.target.text);
-                const output: Discount = discountTypeFactory.make(typed);
+                const tagged: Discount = <Discount>JSON.parse(scenario.target.text);
+                const output: Discount = typeFactory.get(tagged);
 
                 describe(description, () => {
 
@@ -81,7 +89,7 @@ const limit: number = 3;
 class StandardDiscountSerializationScenario extends DiscountSerializationScenario {
     constructor() {
         const discount: StandardDiscount = new StandardDiscount(startDate, endDate, code, price);
-        const text: string = '{"type":"StandardDiscount","thing":{"discountStartDate":"2019-02-01T05:00:00.000Z","discountEndDate":"2019-03-01T05:00:00.000Z","discountCode":"cat food","discountPrice":1}}';
+        const text: string = '{"discountStartDate":"2019-02-01T05:00:00.000Z","discountEndDate":"2019-03-01T05:00:00.000Z","discountCode":"cat food","discountPrice":1,"tag":"StandardDiscount"}';
         super(discount, text);
     }
 }
@@ -89,7 +97,7 @@ class StandardDiscountSerializationScenario extends DiscountSerializationScenari
 class BulkFlatPriceDiscountSerializationScenario extends DiscountSerializationScenario {
     constructor() {
         const discount: BulkFlatPriceDiscount = new BulkFlatPriceDiscount(startDate, endDate, code, quantity, price);
-        const text: string = '{"type":"BulkFlatPriceDiscount","thing":{"discountStartDate":"2019-02-01T05:00:00.000Z","discountEndDate":"2019-03-01T05:00:00.000Z","discountCode":"cat food","discountBulk":3,"discountPrice":1}}';
+        const text: string = '{"discountStartDate":"2019-02-01T05:00:00.000Z","discountEndDate":"2019-03-01T05:00:00.000Z","discountCode":"cat food","discountBulk":3,"discountPrice":1,"tag":"BulkFlatPriceDiscount"}';
         super(discount, text);
     }
 }
@@ -97,7 +105,7 @@ class BulkFlatPriceDiscountSerializationScenario extends DiscountSerializationSc
 class UpSalePercentDiscountSerializationScenario extends DiscountSerializationScenario {
     constructor() {
         const discount: UpSalePercentDiscount = new UpSalePercentDiscount(startDate, endDate, code, bulk, sale, percent);
-        const text: string = '{"type":"UpSalePercentDiscount","thing":{"discountStartDate":"2019-02-01T05:00:00.000Z","discountEndDate":"2019-03-01T05:00:00.000Z","discountCode":"cat food","discountBulk":2,"discountSale":1,"discountPercent":0.25}}';
+        const text: string = '{"discountStartDate":"2019-02-01T05:00:00.000Z","discountEndDate":"2019-03-01T05:00:00.000Z","discountCode":"cat food","discountBulk":2,"discountSale":1,"tag":"UpSalePercentDiscount","discountPercent":0.25}';
         super(discount, text);
     }
 }
@@ -105,7 +113,7 @@ class UpSalePercentDiscountSerializationScenario extends DiscountSerializationSc
 class LimitedUpSalePercentDiscountSerializationScenario extends DiscountSerializationScenario {
     constructor() {
         const discount: LimitedUpSalePercentDiscount = new LimitedUpSalePercentDiscount(startDate, endDate, code, bulk, sale, percent, limit);
-        const text: string = '{"type":"LimitedUpSalePercentDiscount","thing":{"discountStartDate":"2019-02-01T05:00:00.000Z","discountEndDate":"2019-03-01T05:00:00.000Z","discountCode":"cat food","discountBulk":2,"discountSale":1,"discountPercent":0.25,"discountLimit":3}}';
+        const text: string = '{"discountStartDate":"2019-02-01T05:00:00.000Z","discountEndDate":"2019-03-01T05:00:00.000Z","discountCode":"cat food","discountBulk":2,"discountSale":1,"tag":"LimitedUpSalePercentDiscount","discountPercent":0.25,"discountLimit":3}';
         super(discount, text);
     }
 }
@@ -113,7 +121,7 @@ class LimitedUpSalePercentDiscountSerializationScenario extends DiscountSerializ
 class UpSaleFlatPriceDiscountSerializationScenario extends DiscountSerializationScenario {
     constructor() {
         const discount: UpSaleFlatPriceDiscount = new UpSaleFlatPriceDiscount(startDate, endDate, code, bulk, sale, price);
-        const text: string = '{"type":"UpSaleFlatPriceDiscount","thing":{"discountStartDate":"2019-02-01T05:00:00.000Z","discountEndDate":"2019-03-01T05:00:00.000Z","discountCode":"cat food","discountBulk":2,"discountSale":1,"discountPrice":1}}';
+        const text: string = '{"discountStartDate":"2019-02-01T05:00:00.000Z","discountEndDate":"2019-03-01T05:00:00.000Z","discountCode":"cat food","discountBulk":2,"discountSale":1,"tag":"UpSaleFlatPriceDiscount","discountPrice":1}';
         super(discount, text);
     }
 }
@@ -121,7 +129,7 @@ class UpSaleFlatPriceDiscountSerializationScenario extends DiscountSerialization
 class LimitedUpSaleFlatPriceDiscountSerializationScenario extends DiscountSerializationScenario {
     constructor() {
         const discount: LimitedUpSaleFlatPriceDiscount = new LimitedUpSaleFlatPriceDiscount(startDate, endDate, code, bulk, sale, price, limit);
-        const text: string = '{"type":"LimitedUpSaleFlatPriceDiscount","thing":{"discountStartDate":"2019-02-01T05:00:00.000Z","discountEndDate":"2019-03-01T05:00:00.000Z","discountCode":"cat food","discountBulk":2,"discountSale":1,"discountPrice":1,"discountLimit":3}}';
+        const text: string = '{"discountStartDate":"2019-02-01T05:00:00.000Z","discountEndDate":"2019-03-01T05:00:00.000Z","discountCode":"cat food","discountBulk":2,"discountSale":1,"tag":"LimitedUpSaleFlatPriceDiscount","discountPrice":1,"discountLimit":3}';
         super(discount, text);
     }
 }
@@ -129,7 +137,7 @@ class LimitedUpSaleFlatPriceDiscountSerializationScenario extends DiscountSerial
 class UpSalePercentDiscountByWeightSerializationScenario extends DiscountSerializationScenario {
     constructor() {
         const discount: UpSalePercentDiscountByWeight = new UpSalePercentDiscountByWeight(startDate, endDate, code, bulk, sale, price);
-        const text: string = '{"type":"UpSalePercentDiscountByWeight","thing":{"discountStartDate":"2019-02-01T05:00:00.000Z","discountEndDate":"2019-03-01T05:00:00.000Z","discountCode":"cat food","discountBulk":2,"discountSale":1,"discountPercent":1}}';
+        const text: string = '{"discountStartDate":"2019-02-01T05:00:00.000Z","discountEndDate":"2019-03-01T05:00:00.000Z","discountCode":"cat food","discountBulk":2,"discountSale":1,"tag":"UpSalePercentDiscountByWeight","discountPercent":1}';
         super(discount, text);
     }
 }
