@@ -1,0 +1,9 @@
+[
+    {"tag":"StandardDiscount","discountPrice":3,"discountEndDate":"2019-12-31","discountStartDate":"2019-01-01","discountCode":"dog food"},
+    {"tag":"BulkFlatPriceDiscount","discountBulk":3,"discountPrice":1,"discountEndDate":"2019-12-31","discountStartDate":"2019-01-01","discountCode":"crisps"},
+    {"tag":"UpSalePercentDiscount","discountBulk":2,"discountPercent":0.5,"discountEndDate":"2019-12-31","discountSale":1,"discountStartDate":"2019-01-01","discountCode":"cat food"},
+    {"tag":"LimitedUpSalePercentDiscount","discountBulk":2,"discountLimit":6,"discountPercent":1,"discountEndDate":"2019-12-31","discountSale":1,"discountStartDate":"2019-01-01","discountCode":"turkey"},
+    {"tag":"UpSaleFlatPriceDiscount","discountBulk":2,"discountPrice":1,"discountEndDate":"2019-12-31","discountSale":1,"discountStartDate":"2019-01-01","discountCode":"swiss cheese"},
+    {"tag":"LimitedUpSaleFlatPriceDiscount","discountBulk":2,"discountPrice":1.5,"discountLimit":6,"discountEndDate":"2019-12-31","discountSale":1,"discountStartDate":"2019-01-01","discountCode":"bologna"},
+    {"tag":"UpSalePercentDiscountByWeight","discountBulk":2,"discountPercent":0.5,"discountEndDate":"2019-12-31","discountSale":1,"discountStartDate":"2019-01-01","discountCode":"ground beef"}
+]
