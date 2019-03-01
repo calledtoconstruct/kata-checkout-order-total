@@ -25,6 +25,9 @@ executable kata-checkout-order-total
                         aeson >=1.2,
                         http-client,
                         sort,
-                        mtl
+                        mtl,
+                        utf8-string,
+                        wai-cors,
+                        scotty
   -- hs-source-dirs:
   default-language:     Haskell2010
