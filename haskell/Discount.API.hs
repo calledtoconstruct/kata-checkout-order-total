@@ -10,12 +10,12 @@ module DiscountAPI where
   import Web.Scotty
   import Discount
   import DiscountList
-  import ItemList
+  import ItemListClient
 
   main :: IO ()
   main = do
     putStrLn "Starting Server..."
-    itemList <- loadItems "./Items.json" $ pure createItemList
+    let itemList = createItemList
     discountList <- loadDiscounts (getItem itemList) "./Discounts.json" $ pure createDiscountList
     scotty 8081 $ do
       middleware simpleCors
