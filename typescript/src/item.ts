@@ -18,12 +18,18 @@ export interface Priced {
 }
 
 export class StandardItem implements Item, Priced {
+
+    public readonly tag: string;
+
     constructor(
         public readonly itemCode: string,
         public readonly itemDescription: string,
         public readonly itemType: ItemType,
         public readonly itemPrice: number
     ) {
+        this.tag = this.itemType === 'by quantity'
+            ? 'ByQuantityItem'
+            : 'ByWeightItem'
     }
 
     public validate(): void {
