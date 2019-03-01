@@ -49,14 +49,15 @@ module Main where
     nextCode <- putStr "Enter a product code: " *> getLine
     waitForScan discountList itemList transaction nextCode
 
-  console :: DiscountList -> ItemList -> IO ()
-  console discountList itemList                       = do
+  console :: DiscountList -> ItemList -> Day -> IO ()
+  console discountList itemList date                  = do
       total <- prompt discountList itemList transaction
       putStr "Total: " *> print total
-    where transaction   = createTransaction $ fromGregorian 2019 4 30
+    where transaction   = createTransaction date
 
   main :: IO ()
   main                                                = do
+    zonedTime           <- getZonedTime
     let itemList        = createItemList
     let discountList    = createDiscountList
-    console discountList itemList
+    console discountList itemList $ localDay $ zonedTimeToLocalTime zonedTime

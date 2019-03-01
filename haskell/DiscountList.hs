@@ -2,6 +2,7 @@ module DiscountList ( DiscountList, createDiscountList, getDiscount, addDiscount
 
   import Data.ByteString.Lazy.UTF8  (fromString)
   import Data.Aeson                 (decode)
+  import Data.Time
   import System.IO
   import Discount
   import Item
@@ -11,19 +12,22 @@ module DiscountList ( DiscountList, createDiscountList, getDiscount, addDiscount
   }
 
   class DiscountListClass discountList where
-    getDiscount       :: discountList -> String -> IO [Discount]
+    getDiscount       :: discountList -> String -> Day -> IO [Discount]
     addDiscount       :: discountList -> (String -> IO [Item]) -> Discount -> IO DiscountList
     addDiscounts      :: discountList -> (String -> IO [Item]) -> [Discount] -> IO DiscountList
 
   createDiscountList :: DiscountList
   createDiscountList                              = DiscountList { discounts = [] }
 
+  sameDate :: Day -> Discount -> Bool
+  sameDate date discount                          = date >= (discountStartDate discount) && date <= (discountEndDate discount)
+
   sameCode :: String -> Discount -> Bool
   sameCode code discount                          = code == discountCode discount
 
   instance DiscountListClass DiscountList where
 
-    getDiscount discountList code                 = return $ filter (sameCode code) (discounts discountList)
+    getDiscount discountList code date            = return $ filter (sameDate date) $ filter (sameCode code) (discounts discountList)
 
     addDiscount discountList itemLookup discount  = do
       valid                     <- isValidDiscount discount itemLookup

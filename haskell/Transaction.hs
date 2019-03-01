@@ -25,7 +25,7 @@ module Transaction ( TransactionType (transactionDiscounts, transactionItems), c
     discountTotal         :: transaction -> Double
     nonDiscountTotal      :: transaction -> Double
     transactionTotal      :: transaction -> Double
-    scanItem              :: transaction -> (String -> IO [Discount]) -> Item -> IO TransactionType
+    scanItem              :: transaction -> (String -> Day -> IO [Discount]) -> Item -> IO TransactionType
 
   sameCode :: Item -> Discount -> Bool
   sameCode item discount = discountCode discount == itemCode item
@@ -44,7 +44,7 @@ module Transaction ( TransactionType (transactionDiscounts, transactionItems), c
       discounts <- case length matching of
         1 -> return existing
         otherwise -> do
-          found <- discountLookup $ itemCode item
+          found <- discountLookup (itemCode item) (transactionDate transaction)
           case length found of
             1 -> do
               let single = head found
