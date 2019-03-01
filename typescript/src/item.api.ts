@@ -4,6 +4,7 @@ import * as cors from 'cors';
 import * as env from './env';
 import { ItemListImplementation, ItemList, Item, StandardItem, Priced } from './item';
 import { asyncForEach } from './async.for.each';
+import { readFile } from 'jsonfile';
 
 const application = express();
 const port: number = env.ITEM_API_PORT;
@@ -12,21 +13,25 @@ application.use(cors());
 
 const itemList: ItemList = new ItemListImplementation();
 
-const items: Array<Item> = [
-    new StandardItem('dog food', 'A 32oz package of premium dog food.', 'by quantity', 5.00),
-    new StandardItem('cat food', 'A 12oz can of premium cat food.', 'by quantity', 1.25),
-    new StandardItem('ground beef', 'Ground Chuck', 'by weight', 2.00)
-];
-
-const addItemPromise: Promise<void> = asyncForEach(items, async (item: Item): Promise<void> => {
-    try {
-        await itemList.add(item);
-    } catch (error) {
-        if (error instanceof Error) {
-            console.log(error.message);
-        }
-    }
-});
+const addItemPromise: Promise<void> = readFile('./items.json')
+    .then((items: Array<Item>): Promise<void> => {
+        return asyncForEach(items, async (item: Item): Promise<void> => {
+            try {
+                var castedItem = <StandardItem>item;
+                var standardItem = new StandardItem(
+                    castedItem.itemCode,
+                    castedItem.itemDescription,
+                    castedItem.itemType,
+                    castedItem.itemPrice
+                );
+                await itemList.add(standardItem);
+            } catch (error) {
+                if (error instanceof Error) {
+                    console.log(error.message);
+                }
+            }
+        });
+    });
 
 application.get('/', async (_: express.Request, response: express.Response): Promise<void> => {
     response.sendStatus(200);
