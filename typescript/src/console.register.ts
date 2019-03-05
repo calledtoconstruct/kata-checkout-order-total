@@ -4,7 +4,7 @@ import { DiscountList } from "./discount";
 import { ItemListClient } from "./item.list.client";
 import { DiscountListClient } from "./discount.list.client";
 
-const readline = require('readline');
+import readline = require('readline');
 
 class Application {
 
@@ -65,7 +65,7 @@ class Application {
         if (item !== undefined) {
           if (item.itemType === 'by weight') {
             console.log('Weigh the item: ');
-            this.input.question('>', async (weight: number) => await this.processWeight(item)(weight));
+            this.input.question('>', async (weight: string) => await this.processWeight(item)(parseFloat(weight)));
           } else {
             await this.addByQuantityItem(item);
             await this.next();
