@@ -23,11 +23,7 @@ module Main where
       Nothing             -> do
         weightString <- putStr "Enter weight: " *> getLine
         let weight        = read weightString :: Double
-        let weightedItem  = ByWeightItem {
-          itemCode          = itemCode item,
-          itemDescription   = itemDescription item,
-          itemPrice         = itemPrice item,
-          itemType          = "by weight",
+        let weightedItem  = item {
           itemWeight        = Just weight
         }
         addItem discountList itemList transaction weightedItem

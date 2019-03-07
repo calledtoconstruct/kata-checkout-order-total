@@ -50,10 +50,9 @@ module Transaction ( TransactionType (transactionDiscounts, transactionItems), c
               let single = head found
               return $ single: existing
             otherwise -> return existing
-      return $ StandardTransaction {
+      return $ transaction {
         transactionDiscounts                = discounts,
-        transactionItems                    = item: transactionItems transaction,
-        transactionDate                     = transactionDate transaction
+        transactionItems                    = item: transactionItems transaction
       }
       where existing                            = transactionDiscounts transaction
             matching                            = filter (sameCode item) existing

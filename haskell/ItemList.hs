@@ -25,14 +25,14 @@ module ItemList ( ItemList, createItemList, getItem, addItems, loadItems ) where
     getItem itemList code     = return $ filter (sameCode code) $ items itemList
 
     addItem itemList item
-      | isValidItem item      = ItemList { items = item: items itemList }
+      | isValidItem item      = itemList { items = item: items itemList }
       | otherwise             = itemList
 
     addItems itemList []      = itemList
     addItems itemList (item: remaining)
       | isValidItem item        = addItems nextList remaining
       | otherwise               = addItems itemList remaining
-      where nextList            = ItemList { items = item: items itemList }
+      where nextList            = itemList { items = item: items itemList }
 
   loadItem :: Handle -> IO ItemList -> IO ItemList
   loadItem handle itemList    = do

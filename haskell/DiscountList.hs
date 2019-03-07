@@ -32,16 +32,16 @@ module DiscountList ( DiscountList, createDiscountList, getDiscount, addDiscount
     addDiscount discountList itemLookup discount  = do
       valid                     <- isValidDiscount discount itemLookup
       return $ case valid of
-        True                      -> DiscountList { discounts = discount: discounts discountList }
+        True                      -> discountList { discounts = discount: discounts discountList }
         False                     -> discountList
 
-    addDiscounts discountList _ []                                = return discountList
+    addDiscounts discountList _ []                = return discountList
     addDiscounts discountList itemLookup (discount: remaining) = do
       valid                     <- isValidDiscount discount itemLookup
       case valid of
         True                      -> addDiscounts nextList itemLookup remaining
         False                     -> addDiscounts discountList itemLookup remaining
-      where nextList      = DiscountList { discounts = discount: discounts discountList }
+      where nextList      = discountList { discounts = discount: discounts discountList }
 
   loadDiscount :: Handle -> (String -> IO [Item]) -> IO DiscountList -> IO DiscountList
   loadDiscount handle itemLookup discountList     = do
