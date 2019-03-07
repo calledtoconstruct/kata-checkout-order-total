@@ -7,7 +7,8 @@ export class ItemListClient implements ItemList {
 
     async get(code: string): Promise<Item & Priced | undefined> {
         try {
-            return await sendRequest(`http://${env.BASE_URL}:${env.ITEM_API_PORT}/item/${code}`);
+            const result = await sendRequest(`http://${env.BASE_URL}:${env.ITEM_API_PORT}/item/${code}`);
+            return <Item & Priced>result;
         } catch (error) {
             if (error === 404) {
                 return undefined;
