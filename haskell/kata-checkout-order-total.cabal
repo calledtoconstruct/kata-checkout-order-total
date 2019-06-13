@@ -20,7 +20,7 @@ executable kata-checkout-order-total
   main-is:             Main.hs
   -- other-modules:
   -- other-extensions:
-  build-depends:        base >=4.9 && <4.10,
+  build-depends:        base >=4.9 && <4.12,
                         time,
                         aeson >=1.2,
                         http-client,
@@ -31,3 +31,32 @@ executable kata-checkout-order-total
                         scotty
   -- hs-source-dirs:
   default-language:     Haskell2010
+
+executable discount-api
+  main-is:             DiscountAPI.hs
+  build-depends:        base >=4.9 && <4.12,
+                        time,
+                        aeson >=1.2,
+                        http-client,
+                        http-types,
+                        sort,
+                        mtl,
+                        utf8-string,
+                        wai-cors,
+                        scotty
+  default-language:     Haskell2010
+
+executable item-api
+  main-is:             ItemAPI.hs
+  build-depends:        base >=4.9 && <4.12,
+                        time,
+                        aeson >=1.2,
+                        http-client,
+                        http-types,
+                        sort,
+                        mtl,
+                        utf8-string,
+                        wai-cors,
+                        scotty
+  default-language:     Haskell2010
+
