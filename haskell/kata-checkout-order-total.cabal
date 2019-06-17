@@ -20,7 +20,7 @@ executable kata-checkout-order-total
   main-is:             Main.hs
   -- other-modules:
   -- other-extensions:
-  build-depends:        base >=4.9 && <4.12,
+  build-depends:        base >=4.9 && <4.13,
                         time,
                         aeson >=1.2,
                         http-client,
@@ -34,7 +34,7 @@ executable kata-checkout-order-total
 
 executable discount-api
   main-is:             DiscountAPI.hs
-  build-depends:        base >=4.9 && <4.12,
+  build-depends:        base >=4.9 && <4.13,
                         time,
                         aeson >=1.2,
                         http-client,
@@ -48,7 +48,7 @@ executable discount-api
 
 executable item-api
   main-is:             ItemAPI.hs
-  build-depends:        base >=4.9 && <4.12,
+  build-depends:        base >=4.9 && <4.13,
                         time,
                         aeson >=1.2,
                         http-client,

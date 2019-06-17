@@ -1,12 +1,13 @@
 FROM haskell
 
-RUN apt -y install zlib1g zlib1g-dev
+#RUN apt -y install zlib1g zlib1g-dev
 
 WORKDIR /opt/server
 
+RUN cabal update
+
 COPY ./kata-checkout-order-total.cabal /opt/server/kata-checkout-order-total.cabal
 
-RUN cabal update
 RUN cabal install --only-dependencies
 
 COPY . /opt/server
