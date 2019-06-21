@@ -16,5 +16,5 @@ RUN ghc Item.API.hs -main-is ItemAPI -o Item.API
 
 EXPOSE 8082
 
-CMD ["Item.API"]
+CMD ["/opt/server/Item.API"]
 
