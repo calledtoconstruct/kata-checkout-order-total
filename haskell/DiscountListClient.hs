@@ -26,7 +26,7 @@ module DiscountListClient ( DiscountList, createDiscountList, getDiscount ) wher
       let seconds                         = formatTime defaultTimeLocale "%s" utcTime
       let milliseconds                    = show $ (*) 1000 $ read seconds
       manager                             <- newManager defaultManagerSettings
-      initialRequest                      <- parseRequest $ "http://localhost:8081/discount/" ++ milliseconds ++ "/" ++ code
+      initialRequest                      <- parseRequest $ "http://discount-api:8081/discount/" ++ milliseconds ++ "/" ++ code
       let request                         = initialRequest { method = "GET" }
       response                            <- httpLbs request manager
       let discount                        = decode $ responseBody response :: Maybe Discount
