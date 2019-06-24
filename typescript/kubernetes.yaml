@@ -1,0 +1,107 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: item-api
+  labels:
+    app: item-api
+spec:
+  type: LoadBalancer
+  ports:
+  - protocol: TCP
+    port: 8082
+    targetPort: 8082
+  selector:
+    app: item-api
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: discount-api
+  labels:
+    app: discount-api
+spec:
+  type: LoadBalancer
+  ports:
+  - protocol: TCP
+    port: 8081
+    targetPort: 8081
+  selector:
+    app: discount-api
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: item-api
+  labels:
+    app: item-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: item-api
+  template:
+    metadata:
+      labels:
+        app: item-api
+    spec:
+      containers:
+      - name: item-api
+        image: item-api:v1.0.0
+        ports:
+        - containerPort: 8082
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: discount-api
+  labels:
+    app: discount-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: discount-api
+  template:
+    metadata:
+      labels:
+        app: discount-api
+    spec:
+      containers:
+      - name: discount-api
+        image: discount-api:v1.0.0
+        ports:
+        - containerPort: 8081
+---
+apiVersion: linkerd.io/v1alpha1
+kind: ServiceProfile
+metadata:
+  name: item-api
+spec:
+  routes:
+  - name: '/item/{id}'
+    condition:
+      pathRegex: '/item/(.*)'
+      method: GET
+    responseClasses:
+    - condition:
+        status:
+          min: 500
+          max: 599
+      isFailure: true
+---
+apiVersion: linkerd.io/v1alpha1
+kind: ServiceProfile
+metadata:
+  name: discount-api
+spec:
+  routes:
+  - name: '/discount/{time}/{id}'
+    condition:
+      pathRegex: '/discount/\d+/(.*)'
+      method: GET
+    responseClasses:
+    - condition:
+        status:
+          min: 500
+          max: 599
+      isFailure: true
