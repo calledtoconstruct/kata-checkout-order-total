@@ -28,6 +28,21 @@ spec:
   selector:
     app: discount-api
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: application
+  labels:
+    app: application
+spec:
+  type: LoadBalancer
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
+  selector:
+    app: application
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -71,6 +86,28 @@ spec:
         image: discount-api:v1.0.0
         ports:
         - containerPort: 8081
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: application
+  labels:
+    app: application
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: application
+  template:
+    metadata:
+      labels:
+        app: application
+    spec:
+      containers:
+      - name: application
+        image: application:v1.0.0
+        ports:
+        - containerPort: 8080
 ---
 apiVersion: linkerd.io/v1alpha1
 kind: ServiceProfile

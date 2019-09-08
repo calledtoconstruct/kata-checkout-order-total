@@ -8,9 +8,5 @@ RUN npm audit fix
 COPY . .
 
 FROM kcot-base
-EXPOSE 8082
-CMD [ "npm", "run", "host-item-api" ]
-
-FROM kcot-base
 EXPOSE 8081
 CMD [ "npm", "run", "host-discount-api" ]
