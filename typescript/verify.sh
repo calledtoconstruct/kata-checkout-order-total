@@ -1,0 +1,1 @@
+firefox $(sudo minikube service application --url)/verify
