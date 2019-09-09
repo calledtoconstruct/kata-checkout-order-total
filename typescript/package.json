@@ -8,9 +8,12 @@
   },
   "scripts": {
     "console": "tsc --project tsconfig.console.json && node console/console.register.js",
-    "host-application": "tsc --project tsconfig.application.json && webpack --config webpack.config.js && node application/application.api.js",
-    "host-discount-api": "tsc --project tsconfig.discount.api.json && node discount/discount.api.js",
-    "host-item-api": "tsc --project tsconfig.item.api.json && node item/item.api.js",
+    "build-application": "tsc --project tsconfig.application.json && webpack --config webpack.config.js",
+    "build-discount-api": "tsc --project tsconfig.discount.api.json",
+    "build-item-api": "tsc --project tsconfig.item.api.json",
+    "run-application": "node application/application.api.js",
+    "run-discount-api": "node discount/discount.api.js",
+    "run-item-api": "node item/item.api.js",
     "test": "tsc --project tsconfig.test.json && jasmine test/transpiled/test/test.spec.js"
   },
   "repository": {

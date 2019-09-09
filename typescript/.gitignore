@@ -4,3 +4,4 @@ discount
 item
 node_modules
 test/transpiled
+typescript/Dockerfile

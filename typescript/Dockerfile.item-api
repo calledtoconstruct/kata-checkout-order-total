@@ -1,0 +1,14 @@
+
+RUN npm run build-item-api
+
+RUN npm un terser tslint typescript webpack webpack-cli
+RUN npm un karma jasmine @types/jasmine
+RUN npm cache clean --force
+RUN rm -rf ./src
+RUN rm -rf ./test
+RUN rm tsconfig*
+RUN rm tslint*
+
+FROM kcot-base
+EXPOSE 8082
+CMD [ "npm", "run", "run-item-api" ]
