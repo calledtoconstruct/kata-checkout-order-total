@@ -46,11 +46,10 @@ spec:
     spec:
       containers:
       - name: item-api
-        image: us.gcr.io/enlightenment-today/item-api:v1.0.0
+        image: image-prefix/item-api:v1.0.0
         ports:
         - containerPort: 8082
       nodeSelector:
-        cloud.google.com/gke-nodepool: application
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -70,11 +69,10 @@ spec:
     spec:
       containers:
       - name: discount-api
-        image: us.gcr.io/enlightenment-today/discount-api:v1.0.0
+        image: image-prefix/discount-api:v1.0.0
         ports:
         - containerPort: 8081
       nodeSelector:
-        cloud.google.com/gke-nodepool: application
 ---
 apiVersion: linkerd.io/v1alpha1
 kind: ServiceProfile

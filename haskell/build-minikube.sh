@@ -5,3 +5,6 @@ $dockdo rmi item-api:v1.0.0
 $dockdo rmi discount-api:v1.0.0
 $dockdo build --tag item-api:v1.0.0 --target item-api .
 $dockdo build --tag discount-api:v1.0.0 --target discount-api .
+cat kubernetes.yaml | sed 's/image-prefix\///g' | sudo linkerd inject - | sudo minikube kubectl apply -- -f -
+
+#cat kubernetes.yaml | sed 's/image-prefix\///g' | sudo linkerd inject - | sudo minikube kubectl apply -- -f -

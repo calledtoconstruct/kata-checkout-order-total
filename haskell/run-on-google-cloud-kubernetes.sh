@@ -7,7 +7,7 @@ docker build --tag us.gcr.io/enlightenment-today/item-api:v1.0.0 --target item-a
 docker push us.gcr.io/enlightenment-today/item-api:v1.0.0
 docker build --tag us.gcr.io/enlightenment-today/discount-api:v1.0.0 --target discount-api .
 docker push us.gcr.io/enlightenment-today/discount-api:v1.0.0
-cat kubernetes.yaml | linkerd inject - | kubectl apply -f -
+cat kubernetes.yaml | sed 's/image-prefix\//us.gcr.io\/enlightenment-today\//g' | sed 's/\([[:space:]]*\)nodeSelector:/\1nodeSelector:\n\1  cloud.google.com\/gke-nodepool: application/g' | linkerd inject - | kubectl apply -f -
 
 #cat kubernetes.yaml | linkerd inject - | kubectl delete -f -
 #linkerd install --ignore-cluster | kubectl delete -f -
