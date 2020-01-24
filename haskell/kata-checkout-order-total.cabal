@@ -60,3 +60,8 @@ executable item-api
                         scotty
   default-language:     Haskell2010
 
+executable all
+  main-is:             Main.hs
+  hs-source-dirs:      .
+  default-language:     Haskell2010
+
