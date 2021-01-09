@@ -213,7 +213,7 @@ abstract class UpSaleDiscount implements Discount, UpSale {
 
     public abstract getTypeName(): string;
 
-    public abstract async validate(itemList: ItemList): Promise<void>;
+    public abstract validate(itemList: ItemList): Promise<void>;
 
     protected async validateItemType(itemList: ItemList, type: ItemType): Promise<void> {
         validateItemCode(this);

@@ -1,5 +1,5 @@
 
-import * as uuid from 'uuid';
+import { v4 as uuid } from 'uuid';
 import { Item, Priced, ItemList } from './item';
 import { DiscountList, Discount, DiscountItem } from './discount';
 import { asyncForEach } from './async.for.each';
