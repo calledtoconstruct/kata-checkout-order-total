@@ -2,14 +2,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveGeneric #-}
 
-module ItemAPI where
+module Main where
 
-  import Control.Monad.Trans
-  import Network.HTTP.Types.Status
-  import Network.Wai.Middleware.Cors
-  import Web.Scotty
-  import Item
-  import ItemList
+  import Control.Monad.Trans ( MonadIO(liftIO) )
+  import Network.HTTP.Types.Status ( status500, status404 )
+  import Network.Wai.Middleware.Cors ( simpleCors )
+  import Web.Scotty ( get, json, middleware, param, scotty, status, text )
+  import ItemList ( getItem, createItemList, loadItems )
 
   main :: IO ()
   main = do

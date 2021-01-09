@@ -1,9 +1,8 @@
 module Transaction ( TransactionType (transactionDiscounts, transactionItems), createTransaction, transactionTotal, scanItem ) where
 
-  import Control.Monad.Trans
-  import Data.Time
-  import Discount
-  import Item
+  import Data.Time ( Day )
+  import Discount ( Discount(discountCode), isApplicable, getTotal )
+  import Item ( Item(itemCode), itemTotal )
 
   data TransactionType = StandardTransaction {
     transactionDiscounts  :: [Discount],
@@ -37,19 +36,19 @@ module Transaction ( TransactionType (transactionDiscounts, transactionItems), c
     nonDiscountTotal transaction              = sum $ itemTotal <$> full_price_items
       where full_price_items                    = filter (isItemCoveredByDiscount $ transactionDiscounts transaction) $ transactionItems transaction
 
-    transactionTotal transaction              = (fromIntegral $ floor $ 100 * total) / 100
+    transactionTotal transaction              = fromIntegral (floor $ 100 * total) / 100
       where total                               = discountTotal transaction + nonDiscountTotal transaction
-      
+
     scanItem transaction discountLookup item  = do
       discounts <- case length matching of
         1 -> return existing
-        otherwise -> do
+        _ -> do
           found <- discountLookup (itemCode item) (transactionDate transaction)
           case length found of
             1 -> do
               let single = head found
               return $ single: existing
-            otherwise -> return existing
+            _ -> return existing
       return $ transaction {
         transactionDiscounts                = discounts,
         transactionItems                    = item: transactionItems transaction

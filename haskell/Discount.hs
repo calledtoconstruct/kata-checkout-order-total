@@ -5,9 +5,9 @@
 module Discount ( Discount (..), getTotal, isApplicable, isValidDiscount ) where
 
   import Data.Aeson (FromJSON, ToJSON)
-  import GHC.Generics
-  import Data.Time
-  import Data.Sort
+  import GHC.Generics ( Generic )
+  import Data.Time ( Day )
+  import Data.Sort ( sort )
   import Item
 
   class DiscountClass discount where

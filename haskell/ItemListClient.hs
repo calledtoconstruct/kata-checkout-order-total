@@ -5,7 +5,7 @@ module ItemListClient ( ItemList, createItemList, getItem ) where
 
   import Data.Aeson               (decode)
   import Network.HTTP.Client      (newManager, defaultManagerSettings, parseRequest, httpLbs, method, responseBody)
-  import Item
+  import Item ( Item )
 
   data ItemList                   = ItemList
 
@@ -24,4 +24,4 @@ module ItemListClient ( ItemList, createItemList, getItem ) where
       let item                      = decode $ responseBody response :: Maybe Item
       case item of
         Just item                     -> return [item]
-        otherwise                     -> return []
+        _                             -> return []

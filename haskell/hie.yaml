@@ -1,0 +1,8 @@
+cradle:
+  cabal:
+    - path: "./"
+      component: "exe:item-api"
+    - path: "./"
+      component: "exe:discount-api"
+    - path: "./"
+      component: "exe:kata-checkout-order-total"

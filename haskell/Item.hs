@@ -28,10 +28,10 @@ module Item ( Item (..), isByQuantityItem, isByWeightItem, isValidItem, itemTota
 
   instance ItemClass Item where
     itemTotal item          = case item of
-      ByQuantityItem{}        -> itemPrice item 
+      ByQuantityItem{}        -> itemPrice item
       ByWeightItem{}          -> case itemWeight item of
         Nothing                 -> 0
-        Just weight             -> (itemPrice item) * weight
+        Just weight             -> itemPrice item * weight
     isByQuantityItem item   = case item of
       ByQuantityItem{}        -> True
       ByWeightItem{}          -> False
@@ -41,7 +41,7 @@ module Item ( Item (..), isByQuantityItem, isByWeightItem, isValidItem, itemTota
     isValidItem item        = hasCode && hasDescription && hasPrice
       where hasCode           = not $ null $ itemCode item
             hasDescription    = not $ null $ itemDescription item
-            hasPrice          = (itemPrice item) > 0.0
+            hasPrice          = itemPrice item > 0.0
 
   instance ToJSON Item where
 
