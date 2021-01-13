@@ -16,7 +16,7 @@ build-type:          Simple
 extra-source-files:  ChangeLog.md
 cabal-version:       >=1.10
 
-executable kata-checkout-order-total
+executable console-app
   main-is:             Main.hs
   other-modules:        Discount,
                         DiscountListClient,
@@ -37,7 +37,7 @@ executable kata-checkout-order-total
                         ./
   default-language:     Haskell2010
 
-executable discount-api
+executable discount-api-app
   main-is:             Main.hs
   other-modules:        Discount,
                         DiscountList,
@@ -57,7 +57,7 @@ executable discount-api
                         ./
   default-language:     Haskell2010
 
-executable item-api
+executable item-api-app
   main-is:             Main.hs
   other-modules:        Item,
                         ItemList
