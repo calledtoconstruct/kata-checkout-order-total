@@ -1,5 +1,7 @@
-sudo docker stop item-api
-sudo docker rm item-api
-sudo docker stop discount-api
-sudo docker rm discount-api
+#!/bin/bash
+docker stop item-api
+docker rm item-api
+docker stop discount-api
+docker rm discount-api
+docker network rm services
 

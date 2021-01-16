@@ -11,10 +11,10 @@ else
   linkerd install | sed 's/\([[:space:]]*\)nodeSelector:/\1nodeSelector:\n\1  cloud.google.com\/gke-nodepool: default-pool/g' | kubectl apply -f -
   linkerd check
   echo "Deploying application components"
-  sudo docker build --tag us.gcr.io/$(gcloud config get-value core/project)/item-api:v1.0.0 --target item-api .
-  sudo docker push us.gcr.io/$(gcloud config get-value core/project)/item-api:v1.0.0
-  sudo docker build --tag us.gcr.io/$(gcloud config get-value core/project)/discount-api:v1.0.0 --target discount-api .
-  sudo docker push us.gcr.io/$(gcloud config get-value core/project)/discount-api:v1.0.0
+  docker build --tag us.gcr.io/$(gcloud config get-value core/project)/item-api:v1.0.0 --target item-api .
+  docker push us.gcr.io/$(gcloud config get-value core/project)/item-api:v1.0.0
+  docker build --tag us.gcr.io/$(gcloud config get-value core/project)/discount-api:v1.0.0 --target discount-api .
+  docker push us.gcr.io/$(gcloud config get-value core/project)/discount-api:v1.0.0
   cat kubernetes.yaml | sed 's/image-prefix\//us.gcr.io\/$(gcloud config get-value core\/project)\//g' | sed 's/\([[:space:]]*\)nodeSelector:/\1nodeSelector:\n\1  cloud.google.com\/gke-nodepool: application/g' | linkerd inject - | kubectl apply -f -
   echo "Deployment complete"
 fi
