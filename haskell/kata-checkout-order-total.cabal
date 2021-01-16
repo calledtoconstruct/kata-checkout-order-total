@@ -36,6 +36,8 @@ executable console-app
   hs-source-dirs:       ./console/
                         ./
   default-language:     Haskell2010
+  ghc-options:          -O2
+                        -Wall
 
 executable discount-api-app
   main-is:             Main.hs
@@ -56,6 +58,8 @@ executable discount-api-app
   hs-source-dirs:       ./discount-api/
                         ./
   default-language:     Haskell2010
+  ghc-options:          -O2
+                        -Wall
 
 executable item-api-app
   main-is:             Main.hs
@@ -74,29 +78,5 @@ executable item-api-app
   hs-source-dirs:       ./item-api
                         ./
   default-language:     Haskell2010
-
--- executable all
---   main-is:             Main.hs
---   other-modules:        ItemAPI,
---                         DiscountAPI,
---                         Discount,
---                         DiscountList,
---                         DiscountListClient,
---                         Item,
---                         ItemList,
---                         ItemListClient,
---                         Transaction
---   build-depends:        base,
---                         time,
---                         mtl,
---                         aeson,
---                         sort,
---                         http-client,
---                         http-types,
---                         utf8-string,
---                         wai-cors,
---                         scotty
---   hs-source-dirs:       ./
---                         ./src
---   default-language:     Haskell2010
-
+  ghc-options:          -O2
+                        -Wall
