@@ -3,10 +3,21 @@
 # --------------------------------------
 # export MINIKUBE_HOME=/media/joseph/data/minikube
 
+# Configure Docker to run off external drive
+# Create /etc/docker/daemon.json with:
+# {
+#   "data-root": "/media/username/data/docker",
+#   "storage-driver": "overlay2"
+# }
+# Copy the docker folder to the external drive:
+# sudo cp /var/lib/docker /media/username/data/docker --recursive
+# Also, execute the following:
+# sudo mount -n -o remount,suid /media/username/data/
+
 # --------------
 # Start minikube
 # --------------
-# minikube start --driver=docker
+# minikube start --driver=docker --disk-size=20GB
 # eval $(minikube -p minikube docker-env)
 
 # --------------------------
