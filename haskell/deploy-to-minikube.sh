@@ -32,9 +32,8 @@
 # Start apis and console application
 # ----------------------------------
 cat kubernetes.yaml | sed 's/image-prefix\///g' | linkerd inject - | kubectl apply -f -
-kubectl port-forward service/item-api 8082 &
-kubectl port-forward service/discount-api 8081 &
-cabal run console-app
+sudo minikube tunnel &
+cabal run console -- --item-api $(minikube service --url item-api) --discount-api $(minikube service --url discount-api)
 
 # minikube status
 # linkerd check

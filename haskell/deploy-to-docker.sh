@@ -7,4 +7,4 @@ docker network ls | grep -q . && docker network rm services
 docker network create services
 docker run --detach --network services --name item-api --publish 8082:8082 item-api:v1.0.0
 docker run --detach --network services --name discount-api --publish 8081:8081 discount-api:v1.0.0
-cabal run console-app
+cabal run console

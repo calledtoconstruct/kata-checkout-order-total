@@ -1,6 +1,5 @@
 
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 module Main where
 
@@ -13,7 +12,7 @@ module Main where
   main :: IO ()
   main = do
     putStrLn "Starting Server..."
-    itemList <- loadItems "./Items.json" $ pure createItemList
+    itemList <- loadItems "./Items.json" $ pure $ createItemList ""
     scotty 8082 $ do
       middleware simpleCors
       get "/item/:code" $ do
@@ -22,4 +21,4 @@ module Main where
         case foundItems of
           []      -> status status404 *> text "Not Found"
           [item]  -> json item
-          list    -> status status500 *> text "Non-unique Code"
+          _       -> status status500 *> text "Non-unique Code"

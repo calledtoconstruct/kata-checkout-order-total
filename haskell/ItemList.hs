@@ -3,7 +3,7 @@ module ItemList (ItemList, createItemList, getItem, addItems, loadItems) where
 import Data.Aeson (decode)
 import Data.ByteString.Lazy.UTF8 (fromString)
 import Item ( Item(itemCode), isValidItem )
-import System.IO
+import System.IO ( Handle, IOMode(ReadMode), hClose, hIsEOF, hGetLine, openFile )
 
 newtype ItemList = ItemList { items :: [Item] }
 
@@ -12,8 +12,8 @@ class ItemListClass itemList where
   addItem :: itemList -> Item -> itemList
   addItems :: itemList -> [Item] -> itemList
 
-createItemList :: ItemList
-createItemList = ItemList {items = []}
+createItemList :: String -> ItemList
+createItemList _ = ItemList { items = [] }
 
 sameCode :: String -> Item -> Bool
 sameCode code item = code == itemCode item

@@ -5,7 +5,7 @@
 module Item ( Item (..), isByQuantityItem, isByWeightItem, isValidItem, itemTotal ) where
 
   import Data.Aeson   (FromJSON, ToJSON)
-  import GHC.Generics
+  import GHC.Generics ( Generic )
 
   class ItemClass item where
     isByQuantityItem  :: item -> Bool

@@ -3,9 +3,9 @@ module DiscountList (DiscountList, createDiscountList, getDiscount, addDiscounts
 import Data.Aeson (decode)
 import Data.ByteString.Lazy.UTF8 (fromString)
 import Data.Time ( Day )
-import Discount
+import Discount ( Discount(discountStartDate, discountEndDate, discountCode), isValidDiscount )
 import Item ( Item )
-import System.IO
+import System.IO ( Handle, hClose, hIsEOF, openFile, hGetLine, IOMode(ReadMode) )
 
 newtype DiscountList = DiscountList { discounts :: [Discount] }
 
@@ -14,11 +14,11 @@ class DiscountListClass discountList where
   addDiscount :: discountList -> (String -> IO [Item]) -> Discount -> IO DiscountList
   addDiscounts :: discountList -> (String -> IO [Item]) -> [Discount] -> IO DiscountList
 
-createDiscountList :: DiscountList
-createDiscountList = DiscountList {discounts = []}
+createDiscountList :: String -> DiscountList
+createDiscountList _ = DiscountList {discounts = []}
 
 sameDate :: Day -> Discount -> Bool
-sameDate date discount = date >= discountStartDate discount && date <= (discountEndDate discount)
+sameDate date discount = date >= discountStartDate discount && date <= discountEndDate discount
 
 sameCode :: String -> Discount -> Bool
 sameCode code discount = code == discountCode discount

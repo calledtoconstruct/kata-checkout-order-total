@@ -7,21 +7,21 @@ module ItemListClient ( ItemList, createItemList, getItem ) where
   import Network.HTTP.Client      (newManager, defaultManagerSettings, parseRequest, httpLbs, method, responseBody)
   import Item ( Item )
 
-  data ItemList                   = ItemList
+  data ItemList = ItemList { baseUrl :: String }
 
   class ItemListClass itemList where
     getItem :: itemList -> String -> IO [Item]
 
-  createItemList :: ItemList
-  createItemList                  = ItemList
+  createItemList :: String -> ItemList
+  createItemList baseURL = ItemList { baseUrl = baseURL }
 
   instance ItemListClass ItemList where
-    getItem itemList code         = do
+    getItem itemList code = do
       manager                       <- newManager defaultManagerSettings
-      initialRequest                <- parseRequest $ "http://item-api:8082/item/" ++ code
+      initialRequest                <- parseRequest $ baseUrl itemList ++ "/item/" ++ code
       let request                   = initialRequest { method = "GET" }
       response                      <- httpLbs request manager
       let item                      = decode $ responseBody response :: Maybe Item
       case item of
-        Just item                     -> return [item]
+        Just foundItem                -> return [foundItem]
         _                             -> return []

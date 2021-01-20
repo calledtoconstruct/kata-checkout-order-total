@@ -16,7 +16,7 @@ build-type:          Simple
 extra-source-files:  ChangeLog.md
 cabal-version:       >=1.10
 
-executable console-app
+executable console
   main-is:             Main.hs
   other-modules:        Discount,
                         DiscountListClient,
@@ -32,14 +32,15 @@ executable console-app
                         mtl,
                         utf8-string,
                         wai-cors,
-                        scotty
+                        scotty,
+                        optparse-applicative
   hs-source-dirs:       ./console/
                         ./
   default-language:     Haskell2010
   ghc-options:          -O2
                         -Wall
 
-executable discount-api-app
+executable discount-api
   main-is:             Main.hs
   other-modules:        Discount,
                         DiscountList,
@@ -61,7 +62,7 @@ executable discount-api-app
   ghc-options:          -O2
                         -Wall
 
-executable item-api-app
+executable item-api
   main-is:             Main.hs
   other-modules:        Item,
                         ItemList

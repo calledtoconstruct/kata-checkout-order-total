@@ -2,14 +2,14 @@ apiVersion: v1
 kind: Service
 metadata:
   name: item-api
+  namespace: default
   labels:
     app: item-api
 spec:
   type: LoadBalancer
   ports:
-  - protocol: TCP
+  - name: service
     port: 8082
-    targetPort: 8082
   selector:
     app: item-api
 ---
@@ -17,14 +17,14 @@ apiVersion: v1
 kind: Service
 metadata:
   name: discount-api
+  namespace: default
   labels:
     app: discount-api
 spec:
   type: LoadBalancer
   ports:
-  - protocol: TCP
+  - name: service
     port: 8081
-    targetPort: 8081
   selector:
     app: discount-api
 ---
@@ -32,10 +32,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: item-api
+  namespace: default
   labels:
     app: item-api
 spec:
-  replicas: 2
+  replicas: 4
   selector:
     matchLabels:
       app: item-api
@@ -48,17 +49,19 @@ spec:
       - name: item-api
         image: image-prefix/item-api:v1.0.0
         ports:
-        - containerPort: 8082
+        - name: service
+          containerPort: 8082
       nodeSelector:
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: discount-api
+  namespace: default
   labels:
     app: discount-api
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: discount-api
@@ -71,19 +74,22 @@ spec:
       - name: discount-api
         image: image-prefix/discount-api:v1.0.0
         ports:
-        - containerPort: 8081
+        - name: service
+          containerPort: 8081
       nodeSelector:
 ---
-apiVersion: linkerd.io/v1alpha1
+apiVersion: linkerd.io/v1alpha2
 kind: ServiceProfile
 metadata:
   name: item-api
+  namespace: default
 spec:
   routes:
-  - name: '/item/{id}'
+  - name: 'GET /item/{id}'
     condition:
-      pathRegex: '/item/(.*)'
-      method: GET
+      all:
+      - method: GET
+      - pathRegex: /item/(.*)
     responseClasses:
     - condition:
         status:
@@ -91,16 +97,18 @@ spec:
           max: 599
       isFailure: true
 ---
-apiVersion: linkerd.io/v1alpha1
+apiVersion: linkerd.io/v1alpha2
 kind: ServiceProfile
 metadata:
   name: discount-api
+  namespace: default
 spec:
   routes:
-  - name: '/discount/{time}/{id}'
+  - name: 'GET /discount/{time}/{id}'
     condition:
-      pathRegex: '/discount/\d+/(.*)'
-      method: GET
+      all:
+      - method: GET
+      - pathRegex: /discount/\d+/(.*)
     responseClasses:
     - condition:
         status:
