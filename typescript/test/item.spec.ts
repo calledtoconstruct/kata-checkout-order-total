@@ -23,11 +23,11 @@ export class TestItemList {
                 );
 
                 describe('When adding the item', () => {
-        
+
                     beforeEach(async (): Promise<void> => {
                         await itemList.add(item);
                     });
-        
+
                     it('Should exist in the list', async (): Promise<void> => {
                         const result = await itemList.includes(item);
                         expect(result).toBe(true);
@@ -43,17 +43,17 @@ export class TestItemList {
                         'by quantity',
                         5.0
                     );
-        
+
                     beforeEach(async (): Promise<void> => {
                         await itemList.add(item);
                         await itemList.add(otherItem);
                     });
-        
+
                     it('the first item should not exist in the list', async (): Promise<void> => {
                         const result = await itemList.includes(item);
                         expect(result).toBe(false);
                     });
-        
+
                     it('the other item should exist in the list', async (): Promise<void> => {
                         const result = await itemList.includes(otherItem);
                         expect(result).toBe(true);
@@ -74,7 +74,7 @@ export class TestItemList {
                 const scenarioDescription: string = invalidItemScenario.description;
                 const invalidItem: Item = invalidItemScenario.target;
                 let error: Error | null = null;
-        
+
                 beforeEach(async (): Promise<void> => {
                     try {
                         await itemList.add(invalidItem);
@@ -82,14 +82,14 @@ export class TestItemList {
                     } catch (caught) {
                         error = (caught instanceof Error)
                             ? caught
-                            : new Error("Unexpected exception");
+                            : new Error('Unexpected exception');
                     }
                 });
 
                 it('Should reject the item because it is missing ' + scenarioDescription, () => {
-                    expect(error).not.toBeNull()
+                    expect(error).not.toBeNull();
                 });
-        
+
                 it('Should not be added to the list because it is missing ' + scenarioDescription, async (): Promise<void> => {
                     const result = await itemList.includes(invalidItem);
                     expect(result).toBe(false);

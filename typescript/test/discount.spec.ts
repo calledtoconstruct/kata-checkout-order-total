@@ -38,10 +38,10 @@ class FakeByWeightItem implements Item {
 class FakeItemList implements ItemList {
     private readonly items: any = {};
     public async add(_: Item): Promise<void> {
-        throw new Error("Method not implemented.");
+        throw new Error('Method not implemented.');
     }
     public async includes(_: Item): Promise<boolean> {
-        throw new Error("Method not implemented.");
+        throw new Error('Method not implemented.');
     }
     public async get(code: string): Promise<Item & Priced> {
         if (this.items[code] === undefined) {
@@ -136,7 +136,7 @@ export class TestDiscountList {
                     } catch (exception) {
                         error = (exception instanceof Error)
                             ? exception
-                            : new Error("Unexpected exception");
+                            : new Error('Unexpected exception');
                     }
                 });
 
@@ -216,7 +216,7 @@ export class TestDiscountList {
                             } catch (exception) {
                                 error = (exception instanceof Error)
                                     ? exception
-                                    : new Error("Unexpected exception");
+                                    : new Error('Unexpected exception');
                             }
                         });
 
@@ -282,7 +282,7 @@ export class TestDiscountList {
                         } catch (exception) {
                             error = (exception instanceof Error)
                                 ? exception
-                                : new Error("Unexpected exception");
+                                : new Error('Unexpected exception');
                         }
                     });
 
@@ -335,7 +335,7 @@ export class TestDiscount {
                         } catch (exception) {
                             error = (exception instanceof Error)
                                 ? exception
-                                : new Error("Unexpected exception");
+                                : new Error('Unexpected exception');
                         }
                     });
 
@@ -380,7 +380,7 @@ export class TestDiscount {
                         } catch (exception) {
                             error = (exception instanceof Error)
                                 ? exception
-                                : new Error("Unexpected exception");
+                                : new Error('Unexpected exception');
                         }
                     });
 
@@ -425,7 +425,7 @@ export class TestDiscount {
                         } catch (exception) {
                             error = (exception instanceof Error)
                                 ? exception
-                                : new Error("Unexpected exception");
+                                : new Error('Unexpected exception');
                         }
                     });
 
@@ -470,7 +470,7 @@ export class TestDiscount {
                         } catch (exception) {
                             error = (exception instanceof Error)
                                 ? exception
-                                : new Error("Unexpected exception");
+                                : new Error('Unexpected exception');
                         }
                     });
 
@@ -515,7 +515,7 @@ export class TestDiscount {
                         } catch (exception) {
                             error = (exception instanceof Error)
                                 ? exception
-                                : new Error("Unexpected exception");
+                                : new Error('Unexpected exception');
                         }
                     });
 

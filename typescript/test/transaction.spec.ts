@@ -14,7 +14,7 @@ export class TestTransaction {
             describe('When starting a new transaction', () => {
 
                 let first: string;
-                let second: string
+                let second: string;
 
                 beforeEach(() => {
                     const itemList: ItemList = new ItemListImplementation();
@@ -59,7 +59,7 @@ export class TestTransaction {
 
             describe('When removing an item', () => {
 
-                const code: string = 'some by quantity item';
+                const code = 'some by quantity item';
                 let error: Error | null = null;
 
                 beforeEach(async (): Promise<void> => {
@@ -68,7 +68,7 @@ export class TestTransaction {
                     } catch (exception) {
                         error = (exception instanceof Error)
                             ? exception
-                            : new Error("Unexpected exception");
+                            : new Error('Unexpected exception');
                     }
                 });
 
@@ -83,8 +83,8 @@ export class TestTransaction {
         describe('Given a transaction and a by quantity item', () => {
 
             let transaction: Transaction;
-            const code: string = 'by quantity item';
-            const price: number = 3.00;
+            const code = 'by quantity item';
+            const price = 3.00;
             const item: Item = new StandardItem(
                 code,
                 'some random by quantity item.',
@@ -170,9 +170,9 @@ export class TestTransaction {
                         } catch (exception) {
                             error = (exception instanceof Error)
                                 ? exception
-                                : new Error("Unexpected exception");
+                                : new Error('Unexpected exception');
                         }
-                    })
+                    });
 
                     it('Then an error should be raised.', () => {
                         expect(error).not.toBeNull();
@@ -226,8 +226,8 @@ export class TestTransaction {
         describe('Given a transaction and one or more by weight items', () => {
 
             let transaction: Transaction;
-            const code: string = 'by weight item';
-            const price: number = 1.25
+            const code = 'by weight item';
+            const price = 1.25;
             const item: Item = new StandardItem(
                 code,
                 'some random by weight item.',
@@ -254,19 +254,19 @@ export class TestTransaction {
                         } catch (exception) {
                             error = (exception instanceof Error)
                                 ? exception
-                                : new Error("Unexpected exception");
+                                : new Error('Unexpected exception');
                         }
                     });
 
                     it('Should raise an error.', () => {
                         expect(error).not.toBeNull();
-                    })
+                    });
 
                 });
 
                 describe('and providing a weight', () => {
 
-                    const weight: number = 2.5;
+                    const weight = 2.5;
                     let before: number;
                     let after: number;
                     let itemTotal: number;
@@ -298,7 +298,7 @@ export class TestTransaction {
 
                     describe('for multiple packages', () => {
 
-                        const otherItemWeight: number = 3.0;
+                        const otherItemWeight = 3.0;
 
                         beforeEach(async (): Promise<void> => {
                             before = transaction.quantity(code);
@@ -340,13 +340,13 @@ export class TestTransaction {
                         } catch (exception) {
                             error = (exception instanceof Error)
                                 ? exception
-                                : new Error("Unexpected exception");
+                                : new Error('Unexpected exception');
                         }
                     });
 
                     it('Should raise an error.', () => {
                         expect(error).not.toBeNull();
-                    })
+                    });
 
                 });
 
@@ -358,7 +358,7 @@ export class TestTransaction {
 
                     describe('for a single package', () => {
 
-                        const weight: number = 2.5;
+                        const weight = 2.5;
 
                         beforeEach(async (): Promise<void> => {
                             itemTotal = await transaction.scan(code, weight);
@@ -380,8 +380,8 @@ export class TestTransaction {
 
                     describe('for multiple packages', () => {
 
-                        const firstWeight: number = 1;
-                        const secondWeight: number = 2;
+                        const firstWeight = 1;
+                        const secondWeight = 2;
 
                         beforeEach(async (): Promise<void> => {
                             await transaction.scan(code, firstWeight);

@@ -1,9 +1,9 @@
 
-import { Transaction } from "../src/transaction";
-import { Priced, Item, StandardItem, ItemList, ItemListImplementation } from "../src/item";
-import { UpSalePercentDiscountByWeight, Discount, DiscountListImplementation, DiscountList } from "../src/discount";
-import { Currency } from "../src/currency";
-import { Parameterized, TestScenario } from "./parameterized";
+import { Transaction } from '../src/transaction';
+import { Priced, Item, StandardItem, ItemList, ItemListImplementation } from '../src/item';
+import { UpSalePercentDiscountByWeight, Discount, DiscountListImplementation, DiscountList } from '../src/discount';
+import { Currency } from '../src/currency';
+import { Parameterized, TestScenario } from './parameterized';
 
 export class TestUpSalePercentDiscountByWeight {
 
@@ -15,8 +15,8 @@ export class TestUpSalePercentDiscountByWeight {
 
             describe('And a by quantity item', () => {
 
-                const code: string = 'some by quantity item';
-                const price: number = 2.97;
+                const code = 'some by quantity item';
+                const price = 2.97;
                 const item: Item & Priced = new StandardItem(
                     code,
                     'random description',
@@ -27,9 +27,9 @@ export class TestUpSalePercentDiscountByWeight {
                 describe('And a discount rule for the same item', () => {
 
                     const today: number = new Date().valueOf();
-                    const bulk: number = 2;
-                    const sale: number = 1;
-                    const discountPercent: number = 0.50;
+                    const bulk = 2;
+                    const sale = 1;
+                    const discountPercent = 0.50;
 
                     const discount: Discount = new UpSalePercentDiscountByWeight(
                         new Date(today - 10),
@@ -52,8 +52,8 @@ export class TestUpSalePercentDiscountByWeight {
 
                         describe('And too few quantity', () => {
 
-                            const firstWeight: number = 2.5;
-                            const secondWeight: number = 3.25;
+                            const firstWeight = 2.5;
+                            const secondWeight = 3.25;
 
                             let itemTotal: number;
                             let quantity: number;
@@ -73,9 +73,9 @@ export class TestUpSalePercentDiscountByWeight {
 
                         describe('And the right quantity', () => {
 
-                            const firstWeight: number = 2.5;
-                            const secondWeight: number = 3.25;
-                            const thirdWeight: number = 4.00;
+                            const firstWeight = 2.5;
+                            const secondWeight = 3.25;
+                            const thirdWeight = 4.00;
 
                             let itemTotal: number;
                             let quantity: number;
@@ -98,14 +98,14 @@ export class TestUpSalePercentDiscountByWeight {
 
                         describe('And more than enough items', () => {
 
-                            const firstWeight: number = 2.5;
-                            const secondWeight: number = 3.25;
-                            const thirdWeight: number = 4.00;
-                            const fourthWeight: number = 1.5;
-                            const fifthWeight: number = 5.25;
-                            const sixthWeight: number = 4.00;
-                            const seventhWeight: number = 1.0;
-                            const eighthWeight: number = 3.25;
+                            const firstWeight = 2.5;
+                            const secondWeight = 3.25;
+                            const thirdWeight = 4.00;
+                            const fourthWeight = 1.5;
+                            const fifthWeight = 5.25;
+                            const sixthWeight = 4.00;
+                            const seventhWeight = 1.0;
+                            const eighthWeight = 3.25;
 
                             let itemTotal: number;
                             let quantity: number;
@@ -153,10 +153,10 @@ export class TestUpSalePercentDiscountByWeight {
 
                 describe(description, () => {
 
-                    const code: string = 'some by weight item';
+                    const code = 'some by weight item';
                     const today: number = new Date().valueOf();
-                    const bulk: number = 2;
-                    const sale: number = 1;
+                    const bulk = 2;
+                    const sale = 1;
 
                     const discount: Discount = new UpSalePercentDiscountByWeight(
                         new Date(today - 10),
@@ -169,7 +169,7 @@ export class TestUpSalePercentDiscountByWeight {
 
                     describe('When validating', () => {
 
-                        const price: number = 2.97;
+                        const price = 2.97;
                         const item: Item & Priced = new StandardItem(
                             code,
                             'random description',
@@ -183,11 +183,11 @@ export class TestUpSalePercentDiscountByWeight {
                             const itemList: ItemList = new ItemListImplementation();
                             await itemList.add(item);
                             try {
-                                await discount.validate(itemList)
+                                await discount.validate(itemList);
                             } catch (exception) {
                                 error = (exception instanceof Error)
                                     ? exception
-                                    : new Error("Unexpected exception");
+                                    : new Error('Unexpected exception');
                             }
                         });
 

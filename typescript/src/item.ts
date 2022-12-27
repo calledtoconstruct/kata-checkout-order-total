@@ -29,7 +29,7 @@ export class StandardItem implements Item, Priced {
     ) {
         this.tag = this.itemType === 'by quantity'
             ? 'ByQuantityItem'
-            : 'ByWeightItem'
+            : 'ByWeightItem';
     }
 
     public validate(): void {

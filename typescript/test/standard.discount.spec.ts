@@ -1,7 +1,7 @@
 
-import { Transaction } from "../src/transaction";
-import { StandardItem, Item, Priced, ItemList, ItemListImplementation } from "../src/item";
-import { StandardDiscount, Discount, DiscountList, DiscountListImplementation } from "../src/discount";
+import { Transaction } from '../src/transaction';
+import { StandardItem, Item, Priced, ItemList, ItemListImplementation } from '../src/item';
+import { StandardDiscount, Discount, DiscountList, DiscountListImplementation } from '../src/discount';
 
 export class TestStandardDiscount {
 
@@ -13,15 +13,15 @@ export class TestStandardDiscount {
 
             describe('and a by quantity item', () => {
 
-                const code: string = 'some by quantity item';
-                const price: number = 2.97;
+                const code = 'some by quantity item';
+                const price = 2.97;
                 const item: Item & Priced = new StandardItem(
                     code,
                     'random description',
                     'by quantity',
                     price
                 );
-                const discountPrice: number = 1.50;
+                const discountPrice = 1.50;
                 const today: number = new Date().valueOf();
 
                 describe('and a standard discount for the same item', () => {

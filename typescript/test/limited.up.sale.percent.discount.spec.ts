@@ -1,9 +1,9 @@
 
-import { Transaction } from "../src/transaction";
-import { Priced, Item, StandardItem, ItemList, ItemListImplementation } from "../src/item";
-import { Discount, LimitedUpSalePercentDiscount, DiscountListImplementation, DiscountList } from "../src/discount";
-import { Currency } from "../src/currency";
-import { TestScenario, Parameterized } from "./parameterized";
+import { Transaction } from '../src/transaction';
+import { Priced, Item, StandardItem, ItemList, ItemListImplementation } from '../src/item';
+import { Discount, LimitedUpSalePercentDiscount, DiscountListImplementation, DiscountList } from '../src/discount';
+import { Currency } from '../src/currency';
+import { TestScenario, Parameterized } from './parameterized';
 
 export class TestLimitedUpSalePercentDiscount {
 
@@ -15,8 +15,8 @@ export class TestLimitedUpSalePercentDiscount {
 
             describe('And a by quantity item', () => {
 
-                const code: string = 'some by quantity item';
-                const price: number = 2.97;
+                const code = 'some by quantity item';
+                const price = 2.97;
                 const item: Item & Priced = new StandardItem(
                     code,
                     'random description',
@@ -27,10 +27,10 @@ export class TestLimitedUpSalePercentDiscount {
                 describe('And a discount rule for the same item', () => {
 
                     const today: number = new Date().valueOf();
-                    const bulk: number = 2;
-                    const sale: number = 1;
-                    const discountPercent: number = 0.20;
-                    const limit: number = 6;
+                    const bulk = 2;
+                    const sale = 1;
+                    const discountPercent = 0.20;
+                    const limit = 6;
 
                     const discount: Discount = new LimitedUpSalePercentDiscount(
                         new Date(today - 10),
@@ -137,11 +137,11 @@ export class TestLimitedUpSalePercentDiscount {
 
                 describe(description, () => {
 
-                    const code: string = 'some by quantity item';
+                    const code = 'some by quantity item';
                     const today: number = new Date().valueOf();
-                    const bulk: number = 2;
-                    const sale: number = 1;
-                    const limit: number = 6;
+                    const bulk = 2;
+                    const sale = 1;
+                    const limit = 6;
 
                     const discount: Discount = new LimitedUpSalePercentDiscount(
                         new Date(today - 10),
@@ -155,7 +155,7 @@ export class TestLimitedUpSalePercentDiscount {
 
                     describe('When validating', () => {
 
-                        const price: number = 2.97;
+                        const price = 2.97;
                         const item: Item & Priced = new StandardItem(
                             code,
                             'random description',
@@ -164,16 +164,16 @@ export class TestLimitedUpSalePercentDiscount {
                         );
 
                         let error: Error | null = null;
-    
+
                         beforeEach(async (): Promise<void> => {
                             const itemList: ItemList = new ItemListImplementation();
                             await itemList.add(item);
                             try {
-                                await discount.validate(itemList)
+                                await discount.validate(itemList);
                             } catch (exception) {
                                 error = (exception instanceof Error)
                                     ? exception
-                                    : new Error("Unexpected exception");
+                                    : new Error('Unexpected exception');
                             }
                         });
 

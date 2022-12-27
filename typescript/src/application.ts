@@ -1,9 +1,9 @@
 
-import { ItemList } from "./item";
-import { DiscountList } from "./discount";
-import { Transaction } from "./transaction";
-import { ItemListClient } from "./item.list.client";
-import { DiscountListClient } from "./discount.list.client";
+import { ItemList } from './item';
+import { DiscountList } from './discount';
+import { Transaction } from './transaction';
+import { ItemListClient } from './item.list.client';
+import { DiscountListClient } from './discount.list.client';
 
 const itemList: ItemList = new ItemListClient();
 const discountList: DiscountList = new DiscountListClient();

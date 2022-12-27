@@ -11,7 +11,7 @@ class TransactionItem {
         private readonly itemWeight?: number
     ) { }
 
-    private howMany: number = 1;
+    private howMany = 1;
 
     public code(): string {
         return this.item.itemCode;
@@ -55,6 +55,14 @@ export class Transaction {
 
     private readonly item: Array<TransactionItem> = new Array<TransactionItem>();
 
+    private static validateType(scanned: Item, weight?: number): void {
+        if (scanned.itemType === 'by weight' && weight === undefined) {
+            throw new Error('Weight is required for this type of item.');
+        } else if (scanned.itemType === 'by quantity' && weight !== undefined) {
+            throw new Error('Weight is not required for this type of item.');
+        }
+    }
+
     public start(): string {
         this.date = new Date();
 
@@ -62,14 +70,6 @@ export class Transaction {
         this.transaction = 'transaction ' + uniqueId;
 
         return this.transaction;
-    }
-
-    private static validateType(scanned: Item, weight?: number): void {
-        if (scanned.itemType === 'by weight' && weight === undefined) {
-            throw new Error('Weight is required for this type of item.');
-        } else if (scanned.itemType === 'by quantity' && weight !== undefined) {
-            throw new Error('Weight is not required for this type of item.');
-        }
     }
 
     public async scan(code: string, weight?: number): Promise<number> {
@@ -82,7 +82,7 @@ export class Transaction {
         Transaction.validateType(scanned, weight);
 
         const transactionItem: TransactionItem = new TransactionItem(scanned, weight);
-        
+
         this.item.push(transactionItem);
 
         return await this.itemTotal(code);
@@ -93,7 +93,7 @@ export class Transaction {
         const related: Array<TransactionItem> = this.items(code);
 
         if (discount === undefined) {
-            let total: number = 0;
+            let total = 0;
 
             related.forEach((transactionItem: TransactionItem): void => {
                 total += transactionItem.total();
@@ -144,7 +144,7 @@ export class Transaction {
     }
 
     public async total(): Promise<number> {
-        let code: Array<string> = new Array<string>();
+        const code: Array<string> = new Array<string>();
 
         this.item.forEach((item: TransactionItem): void => {
             const itemCode: string = item.code();
@@ -155,7 +155,7 @@ export class Transaction {
             }
         });
 
-        let total: number = 0;
+        let total = 0;
 
         await asyncForEach(code, async (itemCode: string): Promise<void> => {
             const itemTotal = await this.itemTotal(itemCode);
@@ -168,10 +168,10 @@ export class Transaction {
     public quantity(code: string): number {
         const matching: Array<TransactionItem> = this.item.filter((value: TransactionItem): boolean => value.code() === code);
 
-        let count: number = 0;
+        let count = 0;
 
         matching.forEach((value: TransactionItem): void => {
-            count += value.quantity()
+            count += value.quantity();
         });
 
         return count;

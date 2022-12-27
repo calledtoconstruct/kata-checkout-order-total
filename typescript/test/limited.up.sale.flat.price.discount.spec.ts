@@ -1,9 +1,9 @@
 
-import { Transaction } from "../src/transaction";
-import { LimitedUpSaleFlatPriceDiscount, Discount, DiscountListImplementation, DiscountList } from "../src/discount";
-import { Priced, Item, StandardItem, ItemList, ItemListImplementation } from "../src/item";
-import { Currency } from "../src/currency";
-import { Parameterized, TestScenario } from "./parameterized";
+import { Transaction } from '../src/transaction';
+import { LimitedUpSaleFlatPriceDiscount, Discount, DiscountListImplementation, DiscountList } from '../src/discount';
+import { Priced, Item, StandardItem, ItemList, ItemListImplementation } from '../src/item';
+import { Currency } from '../src/currency';
+import { Parameterized, TestScenario } from './parameterized';
 
 export class TestLimitedUpSaleFlatPriceDiscount {
 
@@ -15,8 +15,8 @@ export class TestLimitedUpSaleFlatPriceDiscount {
 
             describe('And a by quantity item', () => {
 
-                const code: string = 'some by quantity item';
-                const price: number = 2.97;
+                const code = 'some by quantity item';
+                const price = 2.97;
                 const item: Item & Priced = new StandardItem(
                     code,
                     'random description',
@@ -27,10 +27,10 @@ export class TestLimitedUpSaleFlatPriceDiscount {
                 describe('And a discount rule for the same item', () => {
 
                     const today: number = new Date().valueOf();
-                    const bulk: number = 3;
-                    const sale: number = 1;
-                    const discountPrice: number = 1.00;
-                    const limit: number = 8;
+                    const bulk = 3;
+                    const sale = 1;
+                    const discountPrice = 1.00;
+                    const limit = 8;
 
                     const discount: Discount = new LimitedUpSaleFlatPriceDiscount(
                         new Date(today - 10),
@@ -125,8 +125,8 @@ export class TestLimitedUpSaleFlatPriceDiscount {
 
         describe('Given a limited discount', () => {
 
-            const bulk: number = 2;
-            const sale: number = 1;
+            const bulk = 2;
+            const sale = 1;
 
             const scenarios = new Parameterized<number, TestScenario<number>>([
                 { description: 'of zero', target: 0 },
@@ -142,9 +142,9 @@ export class TestLimitedUpSaleFlatPriceDiscount {
 
                 describe(description, () => {
 
-                    const code: string = 'some by quantity item';
+                    const code = 'some by quantity item';
                     const today: number = new Date().valueOf();
-                    const price: number = 1.00;
+                    const price = 1.00;
 
                     const discount: Discount = new LimitedUpSaleFlatPriceDiscount(
                         new Date(today - 10),
@@ -158,25 +158,25 @@ export class TestLimitedUpSaleFlatPriceDiscount {
 
                     describe('When validating', () => {
 
-                        const price: number = 2.97;
+                        const itemPrice = 2.97;
                         const item: Item & Priced = new StandardItem(
                             code,
                             'random description',
                             'by quantity',
-                            price
+                            itemPrice
                         );
 
                         let error: Error | null = null;
-    
+
                         beforeEach(async (): Promise<void> => {
                             const itemList: ItemList = new ItemListImplementation();
                             await itemList.add(item);
                             try {
-                                await discount.validate(itemList)
+                                await discount.validate(itemList);
                             } catch (exception) {
                                 error = (exception instanceof Error)
                                     ? exception
-                                    : new Error("Unexpected exception");
+                                    : new Error('Unexpected exception');
                             }
                         });
 

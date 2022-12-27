@@ -17,8 +17,8 @@ const addItemPromise: Promise<void> = readFile('./items.json')
     .then((items: Array<Item>): Promise<void> => {
         return asyncForEach(items, async (item: Item): Promise<void> => {
             try {
-                var castedItem = <StandardItem>item;
-                var standardItem = new StandardItem(
+                const castedItem = <StandardItem>item;
+                const standardItem = new StandardItem(
                     castedItem.itemCode,
                     castedItem.itemDescription,
                     castedItem.itemType,

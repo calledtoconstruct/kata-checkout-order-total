@@ -1,8 +1,8 @@
-import { Transaction } from "./transaction";
-import { ItemList, Item, Priced } from "./item";
-import { DiscountList } from "./discount";
-import { ItemListClient } from "./item.list.client";
-import { DiscountListClient } from "./discount.list.client";
+import { Transaction } from './transaction';
+import { ItemList, Item, Priced } from './item';
+import { DiscountList } from './discount';
+import { ItemListClient } from './item.list.client';
+import { DiscountListClient } from './discount.list.client';
 
 import readline = require('readline');
 
@@ -14,7 +14,8 @@ class Application {
   });
 
   constructor(
-    private readonly transaction: Transaction
+    private readonly transaction: Transaction,
+    private readonly itemList: ItemList
   ) {
     this.input.on('close', () => {
       process.exit();
@@ -51,7 +52,7 @@ class Application {
     return async (weight: number): Promise<void> => {
       await this.addByWeightItem(item, weight);
       await this.next();
-    }
+    };
   }
 
   private async processCode(code: string): Promise<void> {
@@ -61,7 +62,7 @@ class Application {
       this.input.close();
     } else {
       try {
-        const item: (Item & Priced) | undefined = await itemList.get(code);
+        const item: (Item & Priced) | undefined = await this.itemList.get(code);
         if (item !== undefined) {
           if (item.itemType === 'by weight') {
             console.log('Weigh the item: ');
@@ -89,14 +90,18 @@ class Application {
   }
 }
 
-const itemList: ItemList = new ItemListClient();
+const startConsole = () => {
+  const itemList: ItemList = new ItemListClient();
 
-const discountList: DiscountList = new DiscountListClient();
+  const discountList: DiscountList = new DiscountListClient();
 
-const transaction: Transaction = new Transaction(itemList, discountList);
+  const transaction: Transaction = new Transaction(itemList, discountList);
 
-transaction.start();
+  transaction.start();
 
-const application: Application = new Application(transaction);
+  const application: Application = new Application(transaction, itemList);
 
-application.next();
+  application.next();
+};
+
+startConsole();
