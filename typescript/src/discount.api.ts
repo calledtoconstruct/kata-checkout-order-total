@@ -17,8 +17,10 @@ const itemList: ItemList = new ItemListClient();
 const discountList: DiscountList = new DiscountListImplementation(itemList);
 const discountTypeFactory: DiscountTypeFactory = new DiscountTypeFactory();
 
+console.log('Loading discounts...');
 const discountsLoaded: Promise<void> = readFile('discounts.json')
     .then((discounts: Array<Discount>): Promise<void> => {
+        console.log(`Processing ${discounts.length} discounts...`)
         return asyncForEach(discounts, async (discount: Discount): Promise<void> => {
             const mappedDiscount: Discount = discountTypeFactory.get(discount);
             return await discountList.add(mappedDiscount);
@@ -45,6 +47,7 @@ application.get('/discount/:date/:code', async (request: express.Request, respon
 });
 
 discountsLoaded.then(() => {
+    console.log('Starting API...');
     application.listen(port, (): void => {
         console.log('Discount API Listening.');
     });
