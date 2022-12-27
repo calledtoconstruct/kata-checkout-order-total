@@ -80,7 +80,9 @@ export class TestItemList {
                         await itemList.add(invalidItem);
                         fail();
                     } catch (caught) {
-                        error = caught;
+                        error = (caught instanceof Error)
+                            ? caught
+                            : new Error("Unexpected exception");
                     }
                 });
 

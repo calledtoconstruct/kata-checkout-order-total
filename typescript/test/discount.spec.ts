@@ -134,7 +134,9 @@ export class TestDiscountList {
                     try {
                         await discountList.add(discount);
                     } catch (exception) {
-                        error = exception;
+                        error = (exception instanceof Error)
+                            ? exception
+                            : new Error("Unexpected exception");
                     }
                 });
 
@@ -212,7 +214,9 @@ export class TestDiscountList {
                             try {
                                 await discountList.add(overlappingDiscount);
                             } catch (exception) {
-                                error = exception;
+                                error = (exception instanceof Error)
+                                    ? exception
+                                    : new Error("Unexpected exception");
                             }
                         });
 
@@ -276,7 +280,9 @@ export class TestDiscountList {
                         try {
                             await discount.validate(itemList);
                         } catch (exception) {
-                            error = exception;
+                            error = (exception instanceof Error)
+                                ? exception
+                                : new Error("Unexpected exception");
                         }
                     });
 
@@ -327,7 +333,9 @@ export class TestDiscount {
                         try {
                             await invalidDiscount.validate(itemList);
                         } catch (exception) {
-                            error = exception;
+                            error = (exception instanceof Error)
+                                ? exception
+                                : new Error("Unexpected exception");
                         }
                     });
 
@@ -370,7 +378,9 @@ export class TestDiscount {
                         try {
                             await invalidDiscount.validate(itemList);
                         } catch (exception) {
-                            error = exception;
+                            error = (exception instanceof Error)
+                                ? exception
+                                : new Error("Unexpected exception");
                         }
                     });
 
@@ -413,7 +423,9 @@ export class TestDiscount {
                         try {
                             await invalidDiscount.validate(itemList);
                         } catch (exception) {
-                            error = exception;
+                            error = (exception instanceof Error)
+                                ? exception
+                                : new Error("Unexpected exception");
                         }
                     });
 
@@ -456,7 +468,9 @@ export class TestDiscount {
                         try {
                             await invalidDiscount.validate(itemList);
                         } catch (exception) {
-                            error = exception;
+                            error = (exception instanceof Error)
+                                ? exception
+                                : new Error("Unexpected exception");
                         }
                     });
 
@@ -499,7 +513,9 @@ export class TestDiscount {
                         try {
                             await invalidDiscount.validate(itemList);
                         } catch (exception) {
-                            error = exception;
+                            error = (exception instanceof Error)
+                                ? exception
+                                : new Error("Unexpected exception");
                         }
                     });
 

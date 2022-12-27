@@ -66,7 +66,9 @@ export class TestTransaction {
                     try {
                         await transaction.void(code);
                     } catch (exception) {
-                        error = exception;
+                        error = (exception instanceof Error)
+                            ? exception
+                            : new Error("Unexpected exception");
                     }
                 });
 
@@ -166,7 +168,9 @@ export class TestTransaction {
                         try {
                             await transaction.scan(code, 4.25);
                         } catch (exception) {
-                            error = exception;
+                            error = (exception instanceof Error)
+                                ? exception
+                                : new Error("Unexpected exception");
                         }
                     })
 
@@ -248,7 +252,9 @@ export class TestTransaction {
                         try {
                             await transaction.scan(code);
                         } catch (exception) {
-                            error = exception;
+                            error = (exception instanceof Error)
+                                ? exception
+                                : new Error("Unexpected exception");
                         }
                     });
 
@@ -332,7 +338,9 @@ export class TestTransaction {
                         try {
                             await transaction.void(code);
                         } catch (exception) {
-                            error = exception;
+                            error = (exception instanceof Error)
+                                ? exception
+                                : new Error("Unexpected exception");
                         }
                     });
 

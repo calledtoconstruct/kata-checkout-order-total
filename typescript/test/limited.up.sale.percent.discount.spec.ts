@@ -171,7 +171,9 @@ export class TestLimitedUpSalePercentDiscount {
                             try {
                                 await discount.validate(itemList)
                             } catch (exception) {
-                                error = exception;
+                                error = (exception instanceof Error)
+                                    ? exception
+                                    : new Error("Unexpected exception");
                             }
                         });
 
