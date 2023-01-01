@@ -1,0 +1,33 @@
+cabal-version:       3.6
+name:                console
+version:             0.1.0.0
+-- synopsis:
+-- description:
+homepage:            https://github.com/calledtoconstruct/kata-checkout-order-total
+license:             BSD-3-Clause
+license-file:        ../LICENSE
+author:              Joseph Woolley
+maintainer:          joe@calledtoconstruct.net
+-- copyright:
+-- category:
+build-type:          Simple
+extra-source-files:  ChangeLog.md
+
+executable console
+  main-is:              Main.hs
+  build-depends:        Cabal,
+                        base,
+                        time,
+                        aeson,
+                        http-client,
+                        sort,
+                        mtl,
+                        utf8-string,
+                        wai-cors,
+                        scotty,
+                        optparse-applicative,
+                        kcot-shared
+  hs-source-dirs:       ./
+  default-language:     Haskell2010
+  ghc-options:          -O2
+                        -Wall

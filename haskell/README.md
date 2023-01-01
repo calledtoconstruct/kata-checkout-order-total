@@ -1,9 +1,31 @@
 # kata-checkout-order-total :: Haskell #
 ##### The checkout order total solution written in Haskell #####
 
-### Interoperability ##
+### Interoperability ###
 
 This version is designed to seamlessly interoperate with the Typescript version.
+
+### Building ###
+
+To build all packages of the solution, execute the following:
+
+```bash
+$ cabal build all
+```
+
+To run the unit test suite, execute the following:
+
+```bash
+$ cabal test all
+```
+
+When using the vscode devcontainer, for the haskell language server plugin to work correctly, you mean need to first execute:
+
+```bash
+$ cabal update && cabal build all
+```
+
+(prior to opening a .hs file in the editor)
 
 ### Notes on using Docker ###
 

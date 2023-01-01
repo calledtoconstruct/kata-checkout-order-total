@@ -1,15 +1,14 @@
-
 {-# LANGUAGE BangPatterns #-}
 
 module Main where
-
   import Data.Time
-  import Item ( Item(ByQuantityItem, ByWeightItem, itemWeight) )
-  import Transaction ( createTransaction, transactionTotal, scanItem, TransactionType )
-  import ItemListClient ( createItemList, ItemList, getItem )
-  import DiscountListClient ( createDiscountList, DiscountList, getDiscount )
   import Options.Applicative
   import System.IO ( hFlush, stdout )
+
+  import DiscountListClient ( createDiscountList, DiscountList, getDiscount )
+  import Item ( Item(ByQuantityItem, ByWeightItem, itemWeight) )
+  import ItemListClient ( createItemList, ItemList, getItem )
+  import Transaction ( createTransaction, transactionTotal, scanItem, TransactionType )
   
   addItem :: DiscountList -> ItemList -> TransactionType -> Item -> IO Double
   addItem discountList itemList transaction item      = do

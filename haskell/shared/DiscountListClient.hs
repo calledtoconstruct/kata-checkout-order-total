@@ -1,24 +1,27 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE InstanceSigs #-}
 
-module DiscountListClient (DiscountList, createDiscountList, getDiscount) where
+module DiscountListClient ( DiscountList, createDiscountList, getDiscount ) where
 
-import Data.Aeson (decode)
+import Data.Aeson ( decode )
 import Data.Time
-import Discount (Discount)
-import Network.HTTP.Client (defaultManagerSettings, httpLbs, method, newManager, parseRequest, responseBody)
+import Network.HTTP.Client ( defaultManagerSettings, httpLbs, method, newManager, parseRequest, responseBody )
 
-data DiscountList = DiscountList {
+import Discount ( Discount )
+
+newtype DiscountList = DiscountList {
   baseUrl :: String
 }
 
 class DiscountListClass discountList where
-  getDiscount :: discountList -> String -> Day -> IO [Discount]
+  getDiscount :: discountList -> Day -> String -> IO [Discount]
 
 createDiscountList :: String -> DiscountList
 createDiscountList baseURL = DiscountList { baseUrl = baseURL }
 
 instance DiscountListClass DiscountList where
-  getDiscount discountList code date = do
+  getDiscount :: DiscountList -> Day -> String -> IO [Discount]
+  getDiscount discountList date code = do
     zonedTime <- getZonedTime
     let currentLocalTime = zonedTimeToLocalTime zonedTime
     let localTime = LocalTime date $ localTimeOfDay currentLocalTime

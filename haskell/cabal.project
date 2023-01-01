@@ -1,0 +1,7 @@
+packages:
+    console/
+    discount-api/
+    item-api/
+    test/
+    shared/
+write-ghc-environment-files: always

@@ -1,13 +1,14 @@
-
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE InstanceSigs #-}
 
 module ItemListClient ( ItemList, createItemList, getItem ) where
 
   import Data.Aeson               (decode)
   import Network.HTTP.Client      (newManager, defaultManagerSettings, parseRequest, httpLbs, method, responseBody)
+
   import Item ( Item )
 
-  data ItemList = ItemList { baseUrl :: String }
+  newtype ItemList = ItemList { baseUrl :: String }
 
   class ItemListClass itemList where
     getItem :: itemList -> String -> IO [Item]
@@ -16,6 +17,7 @@ module ItemListClient ( ItemList, createItemList, getItem ) where
   createItemList baseURL = ItemList { baseUrl = baseURL }
 
   instance ItemListClass ItemList where
+    getItem :: ItemList -> String -> IO [Item]
     getItem itemList code = do
       manager                       <- newManager defaultManagerSettings
       initialRequest                <- parseRequest $ baseUrl itemList ++ "/item/" ++ code

@@ -1,4 +1,3 @@
-
 {-# LANGUAGE OverloadedStrings #-}
 
 module Main where
@@ -7,6 +6,7 @@ module Main where
   import Network.HTTP.Types.Status ( status500, status404 )
   import Network.Wai.Middleware.Cors ( simpleCors )
   import Web.Scotty ( get, json, middleware, param, scotty, status, text )
+
   import ItemList ( getItem, createItemList, loadItems )
 
   main :: IO ()

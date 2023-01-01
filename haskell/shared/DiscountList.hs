@@ -1,16 +1,21 @@
-module DiscountList (DiscountList, createDiscountList, getDiscount, addDiscounts, loadDiscounts) where
+{-# LANGUAGE InstanceSigs #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use if" #-}
+  
+module DiscountList ( DiscountList, createDiscountList, getDiscount, addDiscounts, loadDiscounts ) where
 
-import Data.Aeson (decode)
-import Data.ByteString.Lazy.UTF8 (fromString)
+import Data.Aeson ( decode )
+import Data.ByteString.Lazy.UTF8 ( fromString )
 import Data.Time ( Day )
+import System.IO ( Handle, hClose, hIsEOF, openFile, hGetLine, IOMode(ReadMode) )
+
 import Discount ( Discount(discountStartDate, discountEndDate, discountCode), isValidDiscount )
 import Item ( Item )
-import System.IO ( Handle, hClose, hIsEOF, openFile, hGetLine, IOMode(ReadMode) )
 
 newtype DiscountList = DiscountList { discounts :: [Discount] }
 
 class DiscountListClass discountList where
-  getDiscount :: discountList -> String -> Day -> IO [Discount]
+  getDiscount :: discountList -> Day -> String -> IO [Discount]
   addDiscount :: discountList -> (String -> IO [Item]) -> Discount -> IO DiscountList
   addDiscounts :: discountList -> (String -> IO [Item]) -> [Discount] -> IO DiscountList
 
@@ -24,14 +29,17 @@ sameCode :: String -> Discount -> Bool
 sameCode code discount = code == discountCode discount
 
 instance DiscountListClass DiscountList where
-  getDiscount discountList code date = return $ filter (sameDate date) $ filter (sameCode code) (discounts discountList)
+  getDiscount :: DiscountList -> Day -> String -> IO [Discount]
+  getDiscount discountList date code = return $ filter (sameDate date) $ filter (sameCode code) (discounts discountList)
 
+  addDiscount :: DiscountList -> (String -> IO [Item]) -> Discount -> IO DiscountList
   addDiscount discountList itemLookup discount = do
     valid <- isValidDiscount discount itemLookup
     return $ case valid of
       True -> discountList {discounts = discount : discounts discountList}
       False -> discountList
 
+  addDiscounts :: DiscountList -> (String -> IO [Item]) -> [Discount] -> IO DiscountList
   addDiscounts discountList _ [] = return discountList
   addDiscounts discountList itemLookup (discount : remaining) = do
     valid <- isValidDiscount discount itemLookup

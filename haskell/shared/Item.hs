@@ -1,6 +1,6 @@
-
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE InstanceSigs #-}
 
 module Item ( Item (..), isByQuantityItem, isByWeightItem, isValidItem, itemTotal ) where
 
@@ -27,17 +27,24 @@ module Item ( Item (..), isByQuantityItem, isByWeightItem, isValidItem, itemTota
   } deriving (Generic, Show)
 
   instance ItemClass Item where
+    itemTotal :: Item -> Double
     itemTotal item          = case item of
       ByQuantityItem{}        -> itemPrice item
       ByWeightItem{}          -> case itemWeight item of
         Nothing                 -> 0
         Just weight             -> itemPrice item * weight
+
+    isByQuantityItem :: Item -> Bool
     isByQuantityItem item   = case item of
       ByQuantityItem{}        -> True
       ByWeightItem{}          -> False
+
+    isByWeightItem :: Item -> Bool
     isByWeightItem item     = case item of
       ByQuantityItem{}        -> False
       ByWeightItem{}          -> True
+
+    isValidItem :: Item -> Bool
     isValidItem item        = hasCode && hasDescription && hasPrice
       where hasCode           = not $ null $ itemCode item
             hasDescription    = not $ null $ itemDescription item

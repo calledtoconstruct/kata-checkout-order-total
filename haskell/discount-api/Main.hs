@@ -1,16 +1,16 @@
-
 {-# LANGUAGE OverloadedStrings #-}
 
 module Main where
 
-  import Data.Time
   import Control.Monad.Trans ( MonadIO(liftIO) )
+  import Data.Maybe ( fromMaybe )
+  import Data.Time
   import Network.HTTP.Types.Status (status500,  status404 )
   import Network.Wai.Middleware.Cors ( simpleCors )
   import Web.Scotty ( get, json, middleware, param, scotty, status, text )
+
   import DiscountList ( getDiscount, createDiscountList, loadDiscounts )
   import ItemListClient ( createItemList, getItem )
-  import Data.Maybe ( fromMaybe )
 
   parseDate :: String -> TimeZone -> ZonedTime -> Day
   parseDate dateString timeZone defaultTime = localDay localTime
@@ -31,7 +31,7 @@ module Main where
       get "/discount/:date/:code" $ do
         code <- param "code"
         dateString <- param "date"
-        discounts <- liftIO $ getDiscount discountList code $ parseDate dateString timeZone defaultTime
+        discounts <- liftIO $ getDiscount discountList (parseDate dateString timeZone defaultTime)  code
         case discounts of
           (_:_:_)     -> status status500 *> text "Internal Server Error"
           []          -> status status404 *> text "Not Found"

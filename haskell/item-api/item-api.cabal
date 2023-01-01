@@ -1,0 +1,33 @@
+cabal-version:       3.6
+name:                item-api
+version:             0.1.0.0
+-- synopsis:
+-- description:
+homepage:            https://github.com/calledtoconstruct/kata-checkout-order-total
+license:             BSD-3-Clause
+license-file:        ../LICENSE
+author:              Joseph Woolley
+maintainer:          joe@calledtoconstruct.net
+-- copyright:
+-- category:
+build-type:          Simple
+extra-source-files:  ChangeLog.md
+
+executable item-api
+  main-is:              Main.hs
+  build-depends:        aeson,
+                        base,
+                        Cabal,
+                        http-types,
+                        http-client,
+                        kcot-shared,
+                        mtl,
+                        scotty,
+                        sort,
+                        time,
+                        utf8-string,
+                        wai-cors
+  hs-source-dirs:       ./
+  default-language:     Haskell2010
+  ghc-options:          -O2
+                        -Wall

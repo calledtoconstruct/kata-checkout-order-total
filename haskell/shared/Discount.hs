@@ -1,13 +1,12 @@
-
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE InstanceSigs #-}
 
 module Discount ( Discount (..), getTotal, isApplicable, isValidDiscount ) where
 
   import Data.Aeson (FromJSON, ToJSON)
-  import GHC.Generics ( Generic )
-  import Data.Time ( Day )
   import Data.Sort ( sort )
+  import Data.Time ( Day )
+  import GHC.Generics ( Generic )
   import Item ( Item(itemCode, itemPrice), itemTotal, isByQuantityItem, isByWeightItem )
 
   class DiscountClass discount where
@@ -139,6 +138,7 @@ module Discount ( Discount (..), getTotal, isApplicable, isValidDiscount ) where
           costs               = zipWith (*) totals $ cycle $ pattern_start ++ pattern_end
 
   instance DiscountClass Discount where
+    getTotal :: Day -> [Item] -> Discount -> Double
     getTotal _ [] _                             = 0
     getTotal currentDate list@(item: items) discount
       | sameCode && saleBegan && saleNotEnded   = case discount of
@@ -154,8 +154,14 @@ module Discount ( Discount (..), getTotal, isApplicable, isValidDiscount ) where
       where sameCode                              = itemCode item == discountCode discount
             saleBegan                             = discountStartDate discount <= currentDate
             saleNotEnded                          = discountEndDate discount >= currentDate
+
+    isApplicable :: Discount -> Item -> Bool
     isApplicable discount item                  = itemCode item == discountCode discount
+
+    getCountOfMatchingItems :: Discount -> [Item] -> Int
     getCountOfMatchingItems discount list       = length $ filter (isApplicable discount) list
+
+    isValidDiscount :: Discount -> (String -> IO [Item]) -> IO Bool
     isValidDiscount discount itemLookup         = do
       items <- itemLookup $ discountCode discount
       let hasItem = 1 == length items
