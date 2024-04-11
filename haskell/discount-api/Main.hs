@@ -7,13 +7,13 @@ module Main where
   import Data.Time
   import Network.HTTP.Types.Status (status500,  status404 )
   import Network.Wai.Middleware.Cors ( simpleCors )
-  import Web.Scotty ( get, json, middleware, param, scotty, status, text )
+  import Web.Scotty ( get, json, middleware, scotty, status, text, pathParam )
 
   import DiscountList ( getDiscount, createDiscountList, loadDiscounts )
   import ItemListClient ( createItemList, getItem )
 
-  parseDate :: String -> TimeZone -> ZonedTime -> Day
-  parseDate dateString timeZone defaultTime = localDay localTime
+  parseDate :: String -> ZonedTime -> Day
+  parseDate dateString defaultTime = localDay localTime
     where localTime = zonedTimeToLocalTime zonedTime
           zonedTime = fromMaybe defaultTime maybeDate
           maybeDate = parseTimeM True defaultTimeLocale "%s" seconds
@@ -24,14 +24,13 @@ module Main where
     putStrLn "Starting Server..."
     let itemList = createItemList "http://item-api:8082"
     discountList <- loadDiscounts (getItem itemList) "./Discounts.json" $ pure $ createDiscountList ""
-    timeZone <- getCurrentTimeZone
     defaultTime <- getZonedTime
     scotty 8081 $ do
       middleware simpleCors
       get "/discount/:date/:code" $ do
-        code <- param "code"
-        dateString <- param "date"
-        discounts <- liftIO $ getDiscount discountList (parseDate dateString timeZone defaultTime)  code
+        code <- pathParam "code"
+        dateString <- pathParam "date"
+        discounts <- liftIO $ getDiscount discountList (parseDate dateString defaultTime)  code
         case discounts of
           (_:_:_)     -> status status500 *> text "Internal Server Error"
           []          -> status status404 *> text "Not Found"

@@ -1,15 +1,25 @@
 {
-    "name": "GHC 9.4 with Haskell Language Server",
+    "name": "GHC 9.8.2 with Haskell Language Server",
     "dockerFile": "Dockerfile",
     "runArgs": [],
 
     // Use 'settings' to set *default* container specific settings.json values on container create. 
     // You can edit these settings after create using File > Preferences > Settings > Remote.
-    "settings": {
-        "terminal.integrated.profiles.linux": {
-            "bash": {
-                "path": "/bin/bash"
-            }
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "terminal.integrated.profiles.linux": {
+                    "bash": {
+                        "path": "/bin/bash"
+                    }
+                },
+                "haskell.plugin.semanticTokens.globalOn": true
+            },
+            // Add the IDs of extensions you want installed when the container is created in the array below.
+            "extensions": [
+                "haskell.haskell",
+                "ms-azuretools.vscode-docker"
+            ]
         }
     },
     "remoteEnv": {
@@ -24,11 +34,5 @@
     // "postCreateCommand": "gcc -v",
     
     // Comment out the next line if you want to run as root instead
-    "remoteUser": "vscode",
-    
-    // Add the IDs of extensions you want installed when the container is created in the array below.
-    "extensions": [
-        "haskell.haskell",
-        "ms-azuretools.vscode-docker"
-    ]
+    "remoteUser": "vscode"
 }

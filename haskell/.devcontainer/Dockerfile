@@ -1,4 +1,4 @@
-FROM haskell:9.4.2
+FROM haskell:9.8.2
 # FROM debian:bookworm
 
 # This Dockerfile adds a non-root user with sudo access. Use the "remoteUser"
@@ -39,11 +39,11 @@ RUN mkdir $HOME/.ghcup \
     && ghcup upgrade \
     && ghcup upgrade \
     && ghcup upgrade \
-    && ghcup install cabal 3.8.1.0 \
-    && ghcup install hls 1.8.0.0 \
-    && ghcup install ghc 9.4.2 \
-    && ghcup install stack 2.9.1 \
-    && ghcup set ghc 9.4.2 
+    && ghcup install cabal 3.10.3.0 \
+    && ghcup install hls 2.7.0.0 \
+    && ghcup install ghc 9.8.2 \
+    && ghcup install stack 2.15.5 \
+    && ghcup set ghc 9.8.2 
 
 # RUN cabal update \
 #     && cabal build --dependencies-only
